@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Effects</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            background-attachment: fixed !important;
+            min-height: 100vh !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            font-family: Arial, sans-serif !important;
+        }
+        
+        .test-card {
+            background: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(15px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 15px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+            transition: all 0.3s ease !important;
+            padding: 20px !important;
+            margin: 20px !important;
+            max-width: 300px !important;
+        }
+        
+        .test-card:hover {
+            transform: translateY(-10px) scale(1.02) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%) !important;
+            border: none !important;
+            border-radius: 10px !important;
+            color: white !important;
+            padding: 10px 20px !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px) scale(1.05) !important;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4) !important;
+        }
+        
+        .holographic {
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000) !important;
+            background-size: 400% !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            animation: holographic 2s linear infinite !important;
+            font-size: 2rem !important;
+            font-weight: bold !important;
+        }
+        
+        @keyframes holographic {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .bounce {
+            animation: bounce 2s infinite !important;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 60%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            80% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <h1 class="holographic bounce">🎨 Test Effects Page</h1>
+            
+            <div class="test-card">
+                <h3>Hover me!</h3>
+                <p>This card should have hover effects</p>
+                <button class="test-button">Click me!</button>
+            </div>
+            
+            <div class="test-card">
+                <h3>Another card</h3>
+                <p>Background should be gradient</p>
+                <button class="test-button">Test button</button>
+            </div>
+            
+            <div class="test-card">
+                <h3>Effects Test</h3>
+                <p>✨ Gradient background</p>
+                <p>🎭 Holographic text</p>
+                <p>🎪 Bounce animation</p>
+                <p>🔮 Glass morphism</p>
+                <button class="test-button">Amazing!</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

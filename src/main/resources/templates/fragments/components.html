@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Components</title>
+</head>
+<body>
+
+<!-- Product Card Fragment -->
+<article th:fragment="product-card(product)" class="card h-100 position-relative" role="article" 
+         th:aria-labelledby="'product-title-' + ${product.id}">
+    <!-- Sale badge -->
+    <span th:if="${product.salePrice != null and product.salePrice < product.price}" 
+          class="badge badge-sale rounded-pill" aria-label="Sản phẩm đang giảm giá">
+        SALE
+    </span>
+    
+    <!-- New badge -->
+    <span th:if="${product.isNew}" class="badge badge-new rounded-pill" aria-label="Sản phẩm mới">
+        MỚI
+    </span>
+    
+    <!-- Product image -->
+    <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/placeholder-product.jpg'}" 
+         class="card-img-top" th:alt="'Hình ảnh sản phẩm ' + ${product.name}"
+         loading="lazy" decoding="async">
+    
+    <div class="card-body d-flex flex-column">
+        <!-- Product name -->
+        <h5 class="card-title" th:text="${product.name}" th:id="'product-title-' + ${product.id}">Product Name</h5>
+        
+        <!-- Product description -->
+        <p class="card-text text-muted small flex-grow-1" 
+           th:text="${#strings.abbreviate(product.description, 80)}">Product description...</p>
+        
+        <!-- Price -->
+        <div class="mb-3" role="group" aria-label="Thông tin giá sản phẩm">
+            <span class="price" th:text="${#numbers.formatCurrency(product.salePrice != null ? product.salePrice : product.price)}"
+                  th:aria-label="'Giá hiện tại: ' + ${#numbers.formatCurrency(product.salePrice != null ? product.salePrice : product.price)}">
+                $0.00
+            </span>
+            <span th:if="${product.salePrice != null and product.salePrice < product.price}" 
+                  class="price-old ms-2" th:text="${#numbers.formatCurrency(product.price)}"
+                  th:aria-label="'Giá gốc: ' + ${#numbers.formatCurrency(product.price)}">
+                $0.00
+            </span>
+        </div>
+        
+        <!-- Stock status -->
+        <div class="mb-3" role="status" aria-label="Trạng thái tồn kho">
+            <span th:if="${product.stockQuantity > 0}" class="badge bg-success" aria-label="Sản phẩm còn hàng">
+                <i class="bi bi-check-circle me-1" aria-hidden="true"></i>Còn hàng
+            </span>
+            <span th:if="${product.stockQuantity == 0}" class="badge bg-danger" aria-label="Sản phẩm hết hàng">
+                <i class="bi bi-x-circle me-1" aria-hidden="true"></i>Hết hàng
+            </span>
+            <span th:if="${product.stockQuantity > 0 and product.stockQuantity <= 5}" class="badge bg-warning text-dark ms-1" 
+                  aria-label="Sản phẩm sắp hết hàng">
+                <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>Sắp hết
+            </span>
+        </div>
+        
+        <!-- Action buttons -->
+        <div class="mt-auto">
+            <div class="d-grid gap-2" role="group" aria-label="Hành động sản phẩm">
+                <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-outline-primary btn-sm"
+                   th:aria-label="'Xem chi tiết sản phẩm ' + ${product.name}">
+                    <i class="bi bi-eye me-1" aria-hidden="true"></i>Xem Chi Tiết
+                </a>
+                <button th:if="${product.stockQuantity > 0}" 
+                        class="btn btn-primary btn-sm add-to-cart-btn" 
+                        th:data-product-id="${product.id}"
+                        th:aria-label="'Thêm ' + ${product.name} + ' vào giỏ hàng'">
+                    <i class="bi bi-cart-plus me-1" aria-hidden="true"></i>Thêm Vào Giỏ
+                </button>
+                <button th:if="${product.stockQuantity == 0}" 
+                        class="btn btn-secondary btn-sm" disabled
+                        th:aria-label="'Sản phẩm ' + ${product.name} + ' đã hết hàng'">
+                    <i class="bi bi-cart-x me-1" aria-hidden="true"></i>Hết Hàng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination Fragment -->
+<nav th:fragment="pagination(page)" th:if="${page.totalPages > 1}" aria-label="Điều hướng trang" role="navigation">
+    <ul class="pagination justify-content-center">
+        <!-- Previous page -->
+        <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+            <a class="page-link" th:href="${page.first} ? '#' : @{''(page=${page.number - 1}, size=${page.size})}"
+               th:tabindex="${page.first} ? '-1' : '0'" th:attr="aria-disabled=${page.first}"
+               aria-label="Trang trước">
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                <span class="visually-hidden">Trang trước</span>
+            </a>
+        </li>
+        
+        <!-- Page numbers -->
+        <li th:each="pageNum : ${#numbers.sequence(0, page.totalPages - 1)}" 
+            class="page-item" th:classappend="${pageNum == page.number} ? 'active'">
+            <a class="page-link" th:href="@{''(page=${pageNum}, size=${page.size})}" 
+               th:text="${pageNum + 1}" th:aria-label="'Trang ' + ${pageNum + 1}"
+               th:aria-current="${pageNum == page.number} ? 'page' : null">1</a>
+        </li>
+        
+        <!-- Next page -->
+        <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+            <a class="page-link" th:href="${page.last} ? '#' : @{''(page=${page.number + 1}, size=${page.size})}"
+               th:tabindex="${page.last} ? '-1' : '0'" th:attr="aria-disabled=${page.last}"
+               aria-label="Trang sau">
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                <span class="visually-hidden">Trang sau</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<!-- Loading Spinner Fragment -->
+<div th:fragment="loading-spinner" class="spinner-overlay d-none" id="loadingSpinner" role="status" aria-live="polite">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Đang tải nội dung, vui lòng chờ...</span>
+    </div>
+</div>
+
+<!-- Alert Message Fragment -->
+<div th:fragment="alert(type, message)" th:if="${message}" 
+     class="alert alert-dismissible fade show" th:classappend="'alert-' + ${type}" role="alert"
+     th:attr="aria-live=${type == 'danger' ? 'assertive' : 'polite'}">
+    <i th:class="${type == 'success' ? 'bi bi-check-circle' : 
+                  type == 'danger' ? 'bi bi-exclamation-triangle' : 
+                  type == 'warning' ? 'bi bi-exclamation-triangle' : 
+                  'bi bi-info-circle'} + ' me-2'" aria-hidden="true"></i>
+    <span th:text="${message}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" 
+            th:aria-label="'Đóng thông báo ' + ${type == 'success' ? 'thành công' : 
+                                                type == 'danger' ? 'lỗi' : 
+                                                type == 'warning' ? 'cảnh báo' : 'thông tin'}"></button>
+</div>
+
+<!-- Breadcrumb Fragment -->
+<nav th:fragment="breadcrumb(items)" aria-label="breadcrumb" th:if="${items != null and !items.isEmpty()}">
+    <ol class="breadcrumb">
+        <li th:each="item, iterStat : ${items}" 
+            class="breadcrumb-item" 
+            th:classappend="${iterStat.last} ? 'active'" 
+            th:attr="aria-current=${iterStat.last} ? 'page'">
+            <a th:if="${!iterStat.last}" th:href="${item.url}" th:text="${item.name}">Item</a>
+            <span th:if="${iterStat.last}" th:text="${item.name}">Current Item</span>
+        </li>
+    </ol>
+</nav>
+
+<!-- Empty State Fragment -->
+<div th:fragment="empty-state(title, message, actionText, actionUrl)" class="text-center py-5" role="status">
+    <div class="mb-4" aria-hidden="true">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+    </div>
+    <h3 class="text-muted" th:text="${title}">Không có dữ liệu</h3>
+    <p class="text-muted mb-4" th:text="${message}">Hiện tại chưa có dữ liệu để hiển thị.</p>
+    <a th:if="${actionText != null and actionUrl != null}" 
+       th:href="${actionUrl}" 
+       class="btn btn-primary" 
+       th:text="${actionText}">Thực hiện hành động</a>
+</div>
+
+<!-- Rating Stars Fragment -->
+<div th:fragment="rating-stars(rating)" class="rating-stars" role="img" 
+     th:aria-label="'Đánh giá ' + ${rating} + ' trên 5 sao'">
+    <span th:each="star : ${#numbers.sequence(1, 5)}" 
+          th:class="${star <= rating} ? 'text-warning' : 'text-muted'"
+          th:aria-label="${star <= rating} ? 'Sao đầy' : 'Sao trống'}">
+        <i class="bi bi-star-fill" aria-hidden="true"></i>
+    </span>
+    <span class="ms-2 text-muted" th:text="'(' + ${rating} + '/5)'" aria-hidden="true"></span>
+</div>
+
+</body>
+</html>

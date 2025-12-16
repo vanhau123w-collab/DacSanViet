@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- Footer -->
+    <footer class="bg-dark text-light mt-5" role="contentinfo" th:fragment="footer">
+        <div class="container py-4">
+            <div class="row">
+                <!-- Company info -->
+                <div class="col-md-4 mb-3">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-shop me-2" aria-hidden="true"></i>Đặc Sản Quê Hương
+                    </h5>
+                    <p class="text-muted">
+                        Chuyên cung cấp các sản phẩm đặc sản chất lượng cao từ khắp các vùng miền Việt Nam.
+                        Mang hương vị quê hương đến mọi gia đình.
+                    </p>
+                    <div class="d-flex gap-3" role="list" aria-label="Liên kết mạng xã hội">
+                        <a href="#" class="text-light" aria-label="Facebook"><i class="bi bi-facebook fs-5" aria-hidden="true"></i></a>
+                        <a href="#" class="text-light" aria-label="Instagram"><i class="bi bi-instagram fs-5" aria-hidden="true"></i></a>
+                        <a href="#" class="text-light" aria-label="YouTube"><i class="bi bi-youtube fs-5" aria-hidden="true"></i></a>
+                        <a href="#" class="text-light" aria-label="Email"><i class="bi bi-envelope fs-5" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Quick links -->
+                <div class="col-md-2 mb-3">
+                    <h6 class="fw-bold mb-3">Liên Kết</h6>
+                    <nav aria-label="Liên kết nhanh">
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-muted text-decoration-none">Về Chúng Tôi</a></li>
+                            <li><a href="#" class="text-muted text-decoration-none">Liên Hệ</a></li>
+                            <li><a href="#" class="text-muted text-decoration-none">Chính Sách</a></li>
+                            <li><a href="#" class="text-muted text-decoration-none">Điều Khoản</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                
+                <!-- Categories -->
+                <div class="col-md-3 mb-3">
+                    <h6 class="fw-bold mb-3">Danh Mục</h6>
+                    <nav aria-label="Danh mục sản phẩm">
+                        <ul class="list-unstyled">
+                            <li><a th:href="@{/products?category=1}" class="text-muted text-decoration-none">Đặc Sản Miền Bắc</a></li>
+                            <li><a th:href="@{/products?category=2}" class="text-muted text-decoration-none">Đặc Sản Miền Trung</a></li>
+                            <li><a th:href="@{/products?category=3}" class="text-muted text-decoration-none">Đặc Sản Miền Nam</a></li>
+                            <li><a th:href="@{/categories}" class="text-muted text-decoration-none">Tất Cả Danh Mục</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                
+                <!-- Contact info -->
+                <div class="col-md-3 mb-3">
+                    <h6 class="fw-bold mb-3">Liên Hệ</h6>
+                    <address class="text-muted">
+                        <div><i class="bi bi-geo-alt me-2" aria-hidden="true"></i>123 Đường ABC, Quận XYZ, TP.HCM</div>
+                        <div><i class="bi bi-telephone me-2" aria-hidden="true"></i><a href="tel:0123456789" class="text-muted text-decoration-none">0123 456 789</a></div>
+                        <div><i class="bi bi-envelope me-2" aria-hidden="true"></i><a href="mailto:info@dacsanquenhuong.vn" class="text-muted text-decoration-none">info@dacsanquenhuong.vn</a></div>
+                        <div><i class="bi bi-clock me-2" aria-hidden="true"></i>8:00 - 22:00 (Thứ 2 - CN)</div>
+                    </address>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <!-- Copyright -->
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-muted mb-0">
+                        &copy; 2024 Đặc Sản Quê Hương. Tất cả quyền được bảo lưu.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div role="img" aria-label="Phương thức thanh toán được chấp nhận">
+                        <img src="https://via.placeholder.com/40x25/007bff/ffffff?text=VISA" alt="Thẻ Visa" class="me-2">
+                        <img src="https://via.placeholder.com/40x25/ff5722/ffffff?text=MC" alt="Thẻ Mastercard" class="me-2">
+                        <img src="https://via.placeholder.com/40x25/4caf50/ffffff?text=ATM" alt="Thẻ ATM nội địa" class="me-2">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

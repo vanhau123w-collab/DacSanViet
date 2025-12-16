@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top" role="navigation" aria-label="Điều hướng chính" th:fragment="navbar">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand fw-bold" th:href="@{/}" aria-label="Trang chủ Đặc Sản Quê Hương">
+                <i class="bi bi-shop me-2" aria-hidden="true"></i>Đặc Sản Quê Hương
+            </a>
+            
+            <!-- Mobile toggle button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Mở/đóng menu điều hướng">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Navigation items -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Left navigation -->
+                <ul class="navbar-nav me-auto" role="menubar">
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" th:href="@{/}" th:classappend="${#request.requestURI == '/' ? 'active' : ''}" 
+                           role="menuitem" th:aria-current="${#request.requestURI == '/' ? 'page' : null}">
+                            <i class="bi bi-house me-1" aria-hidden="true"></i>Trang Chủ
+                        </a>
+                    </li>
+                    <li class="nav-item" role="none">
+                        <a class="nav-link" th:href="@{/products}" th:classappend="${#strings.startsWith(#request.requestURI, '/products') ? 'active' : ''}" 
+                           role="menuitem" th:aria-current="${#strings.startsWith(#request.requestURI, '/products') ? 'page' : null}">
+                            <i class="bi bi-grid me-1" aria-hidden="true"></i>Sản Phẩm
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown" role="none">
+                        <a class="nav-link dropdown-toggle" href="#" role="menuitem" data-bs-toggle="dropdown" 
+                           aria-expanded="false" aria-haspopup="true" id="categoriesDropdown">
+                            <i class="bi bi-tags me-1" aria-hidden="true"></i>Danh Mục
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="categoriesDropdown">
+                            <li role="none"><a class="dropdown-item" th:href="@{/products?category=1}" role="menuitem">Đặc Sản Miền Bắc</a></li>
+                            <li role="none"><a class="dropdown-item" th:href="@{/products?category=2}" role="menuitem">Đặc Sản Miền Trung</a></li>
+                            <li role="none"><a class="dropdown-item" th:href="@{/products?category=3}" role="menuitem">Đặc Sản Miền Nam</a></li>
+                            <li role="separator"><hr class="dropdown-divider"></li>
+                            <li role="none"><a class="dropdown-item" th:href="@{/categories}" role="menuitem">Tất Cả Danh Mục</a></li>
+                        </ul>
+                    </li>
+                    <!-- Additional navigation for authenticated users -->
+                    <li class="nav-item" sec:authorize="isAuthenticated()" role="none">
+                        <a class="nav-link" th:href="@{/orders}" th:classappend="${#strings.startsWith(#request.requestURI, '/orders') ? 'active' : ''}" 
+                           role="menuitem" th:aria-current="${#strings.startsWith(#request.requestURI, '/orders') ? 'page' : null}">
+                            <i class="bi bi-bag me-1" aria-hidden="true"></i>Đơn Hàng
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Search form -->
+                <form class="d-flex me-3" th:action="@{/products/search}" method="get" role="search" aria-label="Tìm kiếm sản phẩm">
+                    <div class="input-group">
+                        <label for="search-input" class="visually-hidden">Tìm kiếm sản phẩm</label>
+                        <input class="form-control" type="search" name="keyword" id="search-input" 
+                               placeholder="Tìm kiếm sản phẩm..." th:value="${param.keyword}"
+                               aria-label="Nhập từ khóa tìm kiếm sản phẩm">
+                        <button class="btn btn-outline-light" type="submit" aria-label="Thực hiện tìm kiếm">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Right navigation -->
+                <ul class="navbar-nav" role="menubar">
+                    <!-- Shopping cart -->
+                    <li class="nav-item" role="none">
+                        <a class="nav-link position-relative" th:href="@{/cart}" role="menuitem" 
+                           th:aria-label="${cartItemCount != null and cartItemCount > 0 ? 'Giỏ hàng có ' + cartItemCount + ' sản phẩm' : 'Giỏ hàng trống'}">
+                            <i class="bi bi-cart3 fs-5" aria-hidden="true"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                                  th:if="${cartItemCount != null and cartItemCount > 0}" th:text="${cartItemCount}"
+                                  aria-label="Số lượng sản phẩm trong giỏ hàng">0</span>
+                        </a>
+                    </li>
+                    
+                    <!-- User menu -->
+                    <li class="nav-item dropdown" sec:authorize="isAuthenticated()" role="none">
+                        <a class="nav-link dropdown-toggle" href="#" role="menuitem" data-bs-toggle="dropdown" 
+                           aria-expanded="false" aria-haspopup="true" id="userDropdown" 
+                           th:aria-label="'Menu người dùng cho ' + ${#authentication.name}">
+                            <i class="bi bi-person-circle me-1" aria-hidden="true"></i>
+                            <span sec:authentication="name">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" role="menu" aria-labelledby="userDropdown">
+                            <li role="none"><a class="dropdown-item" th:href="@{/profile}" role="menuitem">
+                                <i class="bi bi-person me-2" aria-hidden="true"></i>Thông Tin Cá Nhân
+                            </a></li>
+                            <li role="none"><a class="dropdown-item" th:href="@{/orders}" role="menuitem">
+                                <i class="bi bi-bag me-2" aria-hidden="true"></i>Đơn Hàng Của Tôi
+                            </a></li>
+                            <li role="none"><a class="dropdown-item" th:href="@{/cart}" role="menuitem">
+                                <i class="bi bi-cart me-2" aria-hidden="true"></i>Giỏ Hàng
+                            </a></li>
+                            <li role="separator"><hr class="dropdown-divider"></li>
+                            <li sec:authorize="hasRole('ADMIN')" role="none">
+                                <a class="dropdown-item" th:href="@{/admin/dashboard}" role="menuitem">
+                                    <i class="bi bi-speedometer2 me-2" aria-hidden="true"></i>Bảng Điều Khiển
+                                </a>
+                            </li>
+                            <li sec:authorize="hasRole('ADMIN')" role="none">
+                                <a class="dropdown-item" th:href="@{/admin/orders}" role="menuitem">
+                                    <i class="bi bi-clipboard-check me-2" aria-hidden="true"></i>Quản Lý Đơn Hàng
+                                </a>
+                            </li>
+                            <li sec:authorize="hasRole('ADMIN')" role="none">
+                                <a class="dropdown-item" th:href="@{/admin/customers}" role="menuitem">
+                                    <i class="bi bi-people me-2" aria-hidden="true"></i>Quản Lý Khách Hàng
+                                </a>
+                            </li>
+                            <li sec:authorize="hasRole('ADMIN')" role="none">
+                                <a class="dropdown-item" th:href="@{/admin/products}" role="menuitem">
+                                    <i class="bi bi-box-seam me-2" aria-hidden="true"></i>Quản Lý Sản Phẩm
+                                </a>
+                            </li>
+                            <li sec:authorize="hasRole('ADMIN')" role="none">
+                                <a class="dropdown-item" th:href="@{/admin/reports}" role="menuitem">
+                                    <i class="bi bi-graph-up me-2" aria-hidden="true"></i>Báo Cáo Bán Hàng
+                                </a>
+                            </li>
+                            <li sec:authorize="hasRole('ADMIN')" role="none">
+                                <a class="dropdown-item" th:href="@{/database}" role="menuitem">
+                                    <i class="bi bi-database me-2" aria-hidden="true"></i>Xem Database
+                                </a>
+                            </li>
+                            <li sec:authorize="hasRole('ADMIN')" role="separator"><hr class="dropdown-divider"></li>
+                            <li role="none">
+                                <form th:action="@{/logout}" method="post" class="d-inline">
+                                    <button type="submit" class="dropdown-item" role="menuitem">
+                                        <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Đăng Xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Login/Register for anonymous users -->
+                    <li class="nav-item" sec:authorize="!isAuthenticated()" role="none">
+                        <a class="nav-link" th:href="@{/login}" role="menuitem">
+                            <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>Đăng Nhập
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()" role="none">
+                        <a class="nav-link" th:href="@{/register}" role="menuitem">
+                            <i class="bi bi-person-plus me-1" aria-hidden="true"></i>Đăng Ký
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>

@@ -1,0 +1,131 @@
+### Test Order Processing System APIs
+
+### 1. Register a new user
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "password123",
+  "fullName": "Test User"
+}
+
+### 2. Login to get JWT token
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123"
+}
+
+### 3. Create a category (Admin required)
+POST http://localhost:8080/api/categories
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "name": "Đặc sản miền Bắc",
+  "description": "Các sản phẩm đặc sản từ miền Bắc Việt Nam"
+}
+
+### 4. Create a product (Admin required)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "name": "Bánh chưng Hà Nội",
+  "description": "Bánh chưng truyền thống Hà Nội, làm từ gạo nếp, đậu xanh và thịt heo",
+  "price": 150000,
+  "stockQuantity": 50,
+  "categoryId": 1,
+  "isActive": true,
+  "isFeatured": true,
+  "weightGrams": 500,
+  "origin": "Hà Nội"
+}
+
+### 5. Add product to cart
+POST http://localhost:8080/api/cart/add
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "productId": 1,
+  "quantity": 2
+}
+
+### 6. View cart
+GET http://localhost:8080/api/cart
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 7. Create shipping address
+POST http://localhost:8080/api/users/addresses
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "fullName": "Test User",
+  "phoneNumber": "0123456789",
+  "addressLine1": "123 Đường ABC",
+  "city": "Hà Nội",
+  "province": "Hà Nội",
+  "postalCode": "100000",
+  "country": "Vietnam",
+  "isDefault": true
+}
+
+### 8. Create order from cart
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "shippingAddressId": 1,
+  "paymentMethod": "Credit Card",
+  "notes": "Giao hàng vào buổi sáng"
+}
+
+### 9. Get user's orders
+GET http://localhost:8080/api/orders/my-orders
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 10. Get order by ID
+GET http://localhost:8080/api/orders/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 11. Update order status (Admin only)
+PUT http://localhost:8080/api/orders/admin/1/status
+Content-Type: application/json
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+{
+  "status": "CONFIRMED",
+  "notes": "Đơn hàng đã được xác nhận"
+}
+
+### 12. Get inventory statistics (Admin only)
+GET http://localhost:8080/api/inventory/statistics
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### 13. Get low stock products (Admin only)
+GET http://localhost:8080/api/inventory/low-stock
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### 14. Update product stock (Admin only)
+PUT http://localhost:8080/api/inventory/products/1/stock?quantity=100
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### 15. Cancel order
+PUT http://localhost:8080/api/orders/1/cancel
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 16. Search orders (Admin only)
+GET http://localhost:8080/api/orders/admin/search?searchTerm=test
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+
+### 17. Get order statistics (Admin only)
+GET http://localhost:8080/api/orders/admin/statistics
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE

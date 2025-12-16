@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Database Viewer - Đặc Sản Quê Hương</title>
+    <style>
+        .db-section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .db-title {
+            color: #e74c3c;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 0.5rem;
+        }
+        
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .db-table th,
+        .db-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .db-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .db-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success { background-color: #28a745; color: white; }
+        .badge-danger { background-color: #dc3545; color: white; }
+        .badge-primary { background-color: #007bff; color: white; }
+        .badge-warning { background-color: #ffc107; color: black; }
+        
+        .refresh-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .refresh-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="mb-4">🗄️ Database Viewer</h1>
+                    
+                    <button class="refresh-btn" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh Data
+                    </button>
+                    
+                    <!-- Users Section -->
+                    <div class="db-section">
+                        <h2 class="db-title">👥 Users (<span th:text="${users.size()}">0</span> records)</h2>
+                        <div class="table-responsive">
+                            <table class="db-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Full Name</th>
+                                        <th>Phone</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="user : ${users}">
+                                        <td th:text="${user.id}">1</td>
+                                        <td th:text="${user.username}">admin</td>
+                                        <td th:text="${user.email}">admin@example.com</td>
+                                        <td th:text="${user.fullName}">Admin User</td>
+                                        <td th:text="${user.phoneNumber ?: 'N/A'}">N/A</td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="${user.role.name() == 'ADMIN' ? 'badge-danger' : 'badge-primary'}"
+                                                  th:text="${user.role}">USER</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="${user.isActive ? 'badge-success' : 'badge-danger'}"
+                                                  th:text="${user.isActive ? 'Active' : 'Inactive'}">Active</span>
+                                        </td>
+                                        <td th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Categories Section -->
+                    <div class="db-section">
+                        <h2 class="db-title">📂 Categories (<span th:text="${categories.size()}">0</span> records)</h2>
+                        <div class="table-responsive">
+                            <table class="db-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Products Count</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="category : ${categories}">
+                                        <td th:text="${category.id}">1</td>
+                                        <td th:text="${category.name}">Category Name</td>
+                                        <td th:text="${category.description}">Description</td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="${category.isActive ? 'badge-success' : 'badge-danger'}"
+                                                  th:text="${category.isActive ? 'Active' : 'Inactive'}">Active</span>
+                                        </td>
+                                        <td th:text="${category.products.size()}">0</td>
+                                        <td th:text="${#temporals.format(category.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Products Section -->
+                    <div class="db-section">
+                        <h2 class="db-title">🛍️ Products (<span th:text="${products.size()}">0</span> records)</h2>
+                        <div class="table-responsive">
+                            <table class="db-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Featured</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="product : ${products}">
+                                        <td th:text="${product.id}">1</td>
+                                        <td th:text="${product.name}">Product Name</td>
+                                        <td th:text="${product.category.name}">Category</td>
+                                        <td th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</td>
+                                        <td th:text="${product.stockQuantity}">0</td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="${product.isFeatured ? 'badge-warning' : 'badge-primary'}"
+                                                  th:text="${product.isFeatured ? 'Featured' : 'Normal'}">Normal</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="${product.isActive ? 'badge-success' : 'badge-danger'}"
+                                                  th:text="${product.isActive ? 'Active' : 'Inactive'}">Active</span>
+                                        </td>
+                                        <td th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Database Stats -->
+                    <div class="db-section">
+                        <h2 class="db-title">📊 Database Statistics</h2>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 class="text-primary" th:text="${users.size()}">0</h3>
+                                    <p class="mb-0">Total Users</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 class="text-success" th:text="${categories.size()}">0</h3>
+                                    <p class="mb-0">Categories</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 class="text-warning" th:text="${products.size()}">0</h3>
+                                    <p class="mb-0">Products</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 class="text-info" th:text="${#lists.size(#lists.select(products, p -> p.isFeatured))}">0</h3>
+                                    <p class="mb-0">Featured Products</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

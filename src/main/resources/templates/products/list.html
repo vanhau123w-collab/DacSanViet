@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Sản Phẩm - Đặc Sản Quê Hương</title>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <div class="container py-4">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/}">Trang Chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Sản Phẩm</li>
+                </ol>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h1 class="fw-bold">Sản Phẩm Đặc Sản</h1>
+                    <p class="text-muted" th:if="${products != null}" role="status" aria-live="polite">
+                        Hiển thị <span th:text="${products.numberOfElements}">0</span> 
+                        trong tổng số <span th:text="${products.totalElements}">0</span> sản phẩm
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <!-- Sort dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
+                                data-bs-toggle="dropdown" aria-expanded="false" id="sortDropdown"
+                                aria-label="Sắp xếp sản phẩm">
+                            <i class="bi bi-sort-down me-2" aria-hidden="true"></i>Sắp xếp
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="sortDropdown">
+                            <li role="none"><a class="dropdown-item" th:href="@{/products(sort='name')}" role="menuitem">Tên A-Z</a></li>
+                            <li role="none"><a class="dropdown-item" th:href="@{/products(sort='name,desc')}" role="menuitem">Tên Z-A</a></li>
+                            <li role="none"><a class="dropdown-item" th:href="@{/products(sort='price')}" role="menuitem">Giá thấp đến cao</a></li>
+                            <li role="none"><a class="dropdown-item" th:href="@{/products(sort='price,desc')}" role="menuitem">Giá cao đến thấp</a></li>
+                            <li role="none"><a class="dropdown-item" th:href="@{/products(sort='createdDate,desc')}" role="menuitem">Mới nhất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Sidebar Filters -->
+                <aside class="col-lg-3 mb-4" role="complementary" aria-label="Bộ lọc sản phẩm">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="mb-0 h5"><i class="bi bi-funnel me-2" aria-hidden="true"></i>Bộ Lọc</h2>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/products}" method="get" role="search" aria-label="Lọc và tìm kiếm sản phẩm">
+                                <!-- Search -->
+                                <div class="mb-3">
+                                    <label for="keyword" class="form-label">Tìm kiếm</label>
+                                    <input type="text" class="form-control" id="keyword" name="keyword" 
+                                           th:value="${param.keyword}" placeholder="Nhập từ khóa..."
+                                           aria-describedby="keyword-help">
+                                    <div id="keyword-help" class="form-text">Tìm kiếm theo tên hoặc mô tả sản phẩm</div>
+                                </div>
+
+                                <!-- Category Filter -->
+                                <fieldset class="mb-3">
+                                    <legend class="form-label">Danh mục</legend>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="category" value="" id="category-all"
+                                               th:checked="${param.category == null or param.category[0] == ''}">
+                                        <label class="form-check-label" for="category-all">Tất cả</label>
+                                    </div>
+                                    <div class="form-check" th:each="category : ${categories}">
+                                        <input class="form-check-input" type="radio" name="category" 
+                                               th:value="${category.id}" th:id="'category-' + ${category.id}"
+                                               th:checked="${param.category != null and param.category[0] == category.id.toString()}">
+                                        <label class="form-check-label" th:for="'category-' + ${category.id}" 
+                                               th:text="${category.name}">Category</label>
+                                    </div>
+                                </fieldset>
+
+                                <!-- Price Range -->
+                                <fieldset class="mb-3">
+                                    <legend class="form-label">Khoảng giá</legend>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <label for="minPrice" class="visually-hidden">Giá từ</label>
+                                            <input type="number" class="form-control" name="minPrice" id="minPrice"
+                                                   th:value="${param.minPrice}" placeholder="Từ" min="0"
+                                                   aria-label="Giá tối thiểu">
+                                        </div>
+                                        <div class="col-6">
+                                            <label for="maxPrice" class="visually-hidden">Giá đến</label>
+                                            <input type="number" class="form-control" name="maxPrice" id="maxPrice"
+                                                   th:value="${param.maxPrice}" placeholder="Đến" min="0"
+                                                   aria-label="Giá tối đa">
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <!-- Availability -->
+                                <fieldset class="mb-3">
+                                    <legend class="visually-hidden">Tình trạng hàng hóa</legend>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="inStock" value="true" id="inStock"
+                                               th:checked="${param.inStock != null and param.inStock[0] == 'true'}">
+                                        <label class="form-check-label" for="inStock">Chỉ hiển thị sản phẩm còn hàng</label>
+                                    </div>
+                                </fieldset>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-search me-2" aria-hidden="true"></i>Áp dụng
+                                    </button>
+                                    <a th:href="@{/products}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-clockwise me-2" aria-hidden="true"></i>Xóa bộ lọc
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Products Grid -->
+                <main class="col-lg-9" role="main">
+                    <!-- Products -->
+                    <div class="row g-4" th:if="${products != null and !products.empty}" role="region" aria-label="Danh sách sản phẩm">
+                        <div class="col-lg-4 col-md-6" th:each="product : ${products.content}">
+                            <div th:replace="~{fragments/components :: product-card(${product})}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div th:if="${products == null or products.empty}" class="text-center py-5" role="status">
+                        <div class="mb-4" aria-hidden="true">
+                            <i class="bi bi-search display-1 text-muted"></i>
+                        </div>
+                        <h2 class="text-muted h3">Không tìm thấy sản phẩm</h2>
+                        <p class="text-muted mb-4">
+                            Không có sản phẩm nào phù hợp với tiêu chí tìm kiếm của bạn.
+                        </p>
+                        <a th:href="@{/products}" class="btn btn-primary">
+                            <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>Xem tất cả sản phẩm
+                        </a>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div th:if="${products != null and products.totalPages > 1}" class="mt-5">
+                        <div th:replace="~{fragments/components :: pagination(${products})}"></div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="scripts-extra">
+        <script>
+            // Auto-submit form when filters change
+            document.querySelectorAll('input[name="category"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            });
+
+            document.querySelector('input[name="inStock"]').addEventListener('change', function() {
+                this.form.submit();
+            });
+        </script>
+    </th:block>
+</body>
+</html>

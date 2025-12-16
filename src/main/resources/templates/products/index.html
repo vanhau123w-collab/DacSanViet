@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản Phẩm - Đặc Sản Quê Hương</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        .navbar-brand { font-weight: 700; }
+        .nav-link { font-weight: 500; }
+        .btn-danger { background: #dc3545; border: none; }
+        .btn-danger:hover { background: #c82333; }
+        
+        .page-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 60px 0;
+        }
+        
+        .product-card {
+            transition: transform 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .product-img {
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .filter-card {
+            background: #f8f9fa;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger sticky-top">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                <i class="bi bi-shop me-2"></i>Đặc Sản Quê Hương
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">
+                            <i class="bi bi-house me-1"></i>Trang Chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/products}">
+                            <i class="bi bi-grid me-1"></i>Sản Phẩm
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/categories}">
+                            <i class="bi bi-tags me-1"></i>Danh Mục
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/orders}">
+                            <i class="bi bi-bag me-1"></i>Đơn Hàng
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Search Form -->
+                <form class="d-flex me-3" th:action="@{/products/search}" method="get">
+                    <div class="input-group">
+                        <input class="form-control" type="search" name="keyword" placeholder="Tìm kiếm sản phẩm..." th:value="${searchKeyword}">
+                        <button class="btn btn-outline-light" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- User Menu -->
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" th:href="@{/cart}">
+                            <i class="bi bi-cart3 fs-5"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span sec:authentication="name">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" th:href="@{/profile}">
+                                <i class="bi bi-person me-2"></i>Thông Tin Cá Nhân
+                            </a></li>
+                            <li sec:authorize="hasRole('ADMIN')">
+                                <a class="dropdown-item" th:href="@{/admin/dashboard}">
+                                    <i class="bi bi-speedometer2 me-2"></i>Quản Trị
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/logout}" method="post" class="d-inline">
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Đăng Xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Page Header -->
+    <section class="page-header text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">Sản Phẩm Đặc Sản</h1>
+            <p class="lead mb-0">Khám phá hương vị đặc trưng từ khắp các vùng miền Việt Nam</p>
+        </div>
+    </section>
+    
+    <!-- Main Content -->
+    <main class="container my-5">
+        <div class="row">
+            <!-- Sidebar Filters -->
+            <div class="col-lg-3 mb-4">
+                <div class="card filter-card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Bộ Lọc</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Category Filter -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Danh Mục</h6>
+                            <div class="list-group list-group-flush">
+                                <a th:href="@{/products}" class="list-group-item list-group-item-action border-0 ps-0" 
+                                   th:classappend="${selectedCategory == null ? 'active' : ''}">
+                                    <i class="bi bi-grid me-2"></i>Tất Cả Sản Phẩm
+                                </a>
+                                <a th:href="@{/products?category=1}" class="list-group-item list-group-item-action border-0 ps-0"
+                                   th:classappend="${selectedCategory == '1' ? 'active' : ''}">
+                                    <i class="bi bi-geo-alt me-2 text-primary"></i>Đặc Sản Miền Bắc
+                                </a>
+                                <a th:href="@{/products?category=2}" class="list-group-item list-group-item-action border-0 ps-0"
+                                   th:classappend="${selectedCategory == '2' ? 'active' : ''}">
+                                    <i class="bi bi-sun me-2 text-warning"></i>Đặc Sản Miền Trung
+                                </a>
+                                <a th:href="@{/products?category=3}" class="list-group-item list-group-item-action border-0 ps-0"
+                                   th:classappend="${selectedCategory == '3' ? 'active' : ''}">
+                                    <i class="bi bi-water me-2 text-success"></i>Đặc Sản Miền Nam
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div>
+                            <h6 class="fw-bold mb-3">Thao Tác Nhanh</h6>
+                            <div class="d-grid gap-2">
+                                <a th:href="@{/categories}" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-tags me-1"></i>Xem Danh Mục
+                                </a>
+                                <a th:href="@{/cart}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-cart me-1"></i>Giỏ Hàng
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Products Grid -->
+            <div class="col-lg-9">
+                <!-- Results Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="mb-1">
+                            <span th:if="${searchKeyword != null}">Kết quả tìm kiếm: "<span th:text="${searchKeyword}"></span>"</span>
+                            <span th:if="${searchKeyword == null and selectedCategory == '1'}">Đặc Sản Miền Bắc</span>
+                            <span th:if="${searchKeyword == null and selectedCategory == '2'}">Đặc Sản Miền Trung</span>
+                            <span th:if="${searchKeyword == null and selectedCategory == '3'}">Đặc Sản Miền Nam</span>
+                            <span th:if="${searchKeyword == null and selectedCategory == null}">Tất Cả Sản Phẩm</span>
+                        </h4>
+                        <p class="text-muted mb-0">
+                            Tìm thấy <strong th:text="${totalElements ?: 0}">0</strong> sản phẩm
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Products Grid -->
+                <div class="row g-4" th:if="${products != null and !products.empty}">
+                    <div class="col-lg-4 col-md-6" th:each="product : ${products}">
+                        <div class="card product-card h-100">
+                            <div class="position-relative">
+                                <img th:src="${product.imageUrl}" 
+                                     th:alt="${product.name}"
+                                     class="card-img-top product-img" 
+                                     onerror="this.src='https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&q=80'">
+                                <span class="badge bg-success position-absolute top-0 start-0 m-2" 
+                                      th:if="${product.isFeatured}">Nổi bật</span>
+                                <span class="badge bg-warning position-absolute top-0 end-0 m-2" 
+                                      th:if="${product.stockQuantity <= 10 and product.stockQuantity > 0}">Sắp hết</span>
+                                <span class="badge bg-danger position-absolute top-0 end-0 m-2" 
+                                      th:if="${product.stockQuantity == 0}">Hết hàng</span>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title fw-bold" th:text="${product.name}">Tên sản phẩm</h6>
+                                <p class="card-text text-muted small" th:text="${product.description}">Mô tả sản phẩm</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-danger fs-5" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                                    <button class="btn btn-danger" 
+                                            th:disabled="${product.stockQuantity == 0}">
+                                        <i class="bi bi-cart-plus me-1"></i>Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty State -->
+                <div class="text-center py-5" th:if="${products == null or products.empty}">
+                    <i class="bi bi-inbox display-1 text-muted mb-3"></i>
+                    <h4 class="text-muted">Không tìm thấy sản phẩm nào</h4>
+                    <p class="text-muted mb-4">Hãy thử tìm kiếm với từ khóa khác hoặc xem tất cả sản phẩm</p>
+                    <a th:href="@{/products}" class="btn btn-danger">
+                        <i class="bi bi-grid me-2"></i>Xem Tất Cả Sản Phẩm
+                    </a>
+                </div>
+                
+                <!-- Pagination -->
+                <nav th:if="${totalPages > 1}" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/products(page=${currentPage - 1}, category=${selectedCategory}, keyword=${searchKeyword})}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                            th:classappend="${i == currentPage ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/products(page=${i}, category=${selectedCategory}, keyword=${searchKeyword})}" 
+                               th:text="${i + 1}">1</a>
+                        </li>
+                        
+                        <li class="page-item" th:classappend="${currentPage >= totalPages - 1 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/products(page=${currentPage + 1}, category=${selectedCategory}, keyword=${searchKeyword})}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container text-center">
+            <h5><i class="bi bi-shop me-2"></i>Đặc Sản Quê Hương</h5>
+            <p class="text-muted mb-0">&copy; 2024 Đặc Sản Quê Hương. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Chi Tiết Đơn Hàng - Đặc Sản Quê Hương</title>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <div class="container-fluid py-4">
+            <!-- Page Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="fw-bold">
+                                <i class="bi bi-receipt me-2"></i>Chi Tiết Đơn Hàng #<span th:text="${order.id}">123</span>
+                            </h1>
+                            <p class="text-muted">Thông tin chi tiết và quản lý đơn hàng</p>
+                        </div>
+                        <div>
+                            <a th:href="@{/admin/orders}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Về Danh Sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Order Information -->
+                <div class="col-lg-8">
+                    <!-- Order Status & Actions -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Trạng Thái Đơn Hàng</h5>
+                            <span class="badge fs-6" 
+                                  th:classappend="${order.status.name() == 'PENDING' ? 'bg-warning' : 
+                                                   order.status.name() == 'CONFIRMED' ? 'bg-info' : 
+                                                   order.status.name() == 'SHIPPED' ? 'bg-primary' : 
+                                                   order.status.name() == 'DELIVERED' ? 'bg-success' : 'bg-danger'}"
+                                  th:text="${order.status.name() == 'PENDING' ? 'Chờ xác nhận' : 
+                                            order.status.name() == 'CONFIRMED' ? 'Đã xác nhận' : 
+                                            order.status.name() == 'SHIPPED' ? 'Đang giao' : 
+                                            order.status.name() == 'DELIVERED' ? 'Đã giao' : 'Đã hủy'}">Status</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Ngày đặt hàng:</strong> <span th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:30</span></p>
+                                    <p><strong>Tổng tiền:</strong> <span class="text-success fw-bold" th:text="${#numbers.formatCurrency(order.totalAmount)}">$0.00</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-success" 
+                                                th:if="${order.status.name() == 'PENDING'}"
+                                                onclick="updateOrderStatus('CONFIRMED')">
+                                            <i class="bi bi-check-circle me-2"></i>Xác Nhận Đơn Hàng
+                                        </button>
+                                        <button type="button" class="btn btn-primary" 
+                                                th:if="${order.status.name() == 'CONFIRMED'}"
+                                                onclick="updateOrderStatus('SHIPPED')">
+                                            <i class="bi bi-truck me-2"></i>Đánh Dấu Đã Giao
+                                        </button>
+                                        <button type="button" class="btn btn-info" 
+                                                th:if="${order.status.name() == 'SHIPPED'}"
+                                                onclick="updateOrderStatus('DELIVERED')">
+                                            <i class="bi bi-check2-all me-2"></i>Hoàn Thành Đơn Hàng
+                                        </button>
+                                        <button type="button" class="btn btn-danger" 
+                                                th:if="${order.status.name() == 'PENDING' or order.status.name() == 'CONFIRMED'}"
+                                                onclick="updateOrderStatus('CANCELLED')">
+                                            <i class="bi bi-x-circle me-2"></i>Hủy Đơn Hàng
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-list-ul me-2"></i>Sản Phẩm Trong Đơn Hàng
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Sản Phẩm</th>
+                                            <th>Đơn Giá</th>
+                                            <th>Số Lượng</th>
+                                            <th>Thành Tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="item : ${order.orderItems}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img th:src="${item.product.imageUrl != null ? item.product.imageUrl : '/images/placeholder-product.jpg'}" 
+                                                         class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;"
+                                                         th:alt="${item.product.name}">
+                                                    <div>
+                                                        <h6 class="mb-0" th:text="${item.product.name}">Product Name</h6>
+                                                        <small class="text-muted" th:text="${item.product.category.name}">Category</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td th:text="${#numbers.formatCurrency(item.price)}">$0.00</td>
+                                            <td>
+                                                <span class="badge bg-secondary" th:text="${item.quantity}">1</span>
+                                            </td>
+                                            <td>
+                                                <strong th:text="${#numbers.formatCurrency(item.price * item.quantity)}">$0.00</strong>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot class="table-light">
+                                        <tr>
+                                            <th colspan="3" class="text-end">Tổng cộng:</th>
+                                            <th>
+                                                <span class="text-success fs-5" th:text="${#numbers.formatCurrency(order.totalAmount)}">$0.00</span>
+                                            </th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer & Shipping Information -->
+                <div class="col-lg-4">
+                    <!-- Customer Information -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-person me-2"></i>Thông Tin Khách Hàng
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="bi bi-person fs-3"></i>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <h6 class="mb-1" th:text="${order.user.fullName}">Customer Name</h6>
+                                <p class="text-muted mb-2" th:text="${order.user.email}">email@example.com</p>
+                                <p class="text-muted mb-3" th:text="${order.user.phoneNumber}">+84 123 456 789</p>
+                                <a th:href="@{/admin/customers/{id}(id=${order.user.id})}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye me-1"></i>Xem Hồ Sơ
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="card" th:if="${order.shippingAddress != null}">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-geo-alt me-2"></i>Địa Chỉ Giao Hàng
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <address class="mb-0">
+                                <strong th:text="${order.shippingAddress.recipientName}">Recipient Name</strong><br>
+                                <span th:text="${order.shippingAddress.streetAddress}">Street Address</span><br>
+                                <span th:text="${order.shippingAddress.ward + ', ' + order.shippingAddress.district}">Ward, District</span><br>
+                                <span th:text="${order.shippingAddress.city + ', ' + order.shippingAddress.province}">City, Province</span><br>
+                                <span th:if="${order.shippingAddress.postalCode != null}" th:text="${order.shippingAddress.postalCode}">Postal Code</span><br>
+                                <i class="bi bi-telephone me-1"></i><span th:text="${order.shippingAddress.phoneNumber}">Phone</span>
+                            </address>
+                        </div>
+                    </div>
+
+                    <!-- Order Timeline -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-clock-history me-2"></i>Lịch Sử Đơn Hàng
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-success"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Đơn hàng được tạo</h6>
+                                        <small class="text-muted" th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:30</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item" th:if="${order.status.name() != 'PENDING'}">
+                                    <div class="timeline-marker" 
+                                         th:classappend="${order.status.name() == 'CANCELLED' ? 'bg-danger' : 'bg-info'}"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1" th:text="${order.status.name() == 'CANCELLED' ? 'Đơn hàng bị hủy' : 'Đơn hàng được xác nhận'}">Confirmed</h6>
+                                        <small class="text-muted">Cập nhật bởi admin</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item" th:if="${order.status.name() == 'SHIPPED' or order.status.name() == 'DELIVERED'}">
+                                    <div class="timeline-marker bg-primary"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Đơn hàng đang được giao</h6>
+                                        <small class="text-muted">Đang trên đường giao hàng</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item" th:if="${order.status.name() == 'DELIVERED'}">
+                                    <div class="timeline-marker bg-success"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Đơn hàng đã được giao</h6>
+                                        <small class="text-muted">Hoàn thành thành công</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="styles-extra">
+        <style>
+            .timeline {
+                position: relative;
+                padding-left: 30px;
+            }
+            
+            .timeline::before {
+                content: '';
+                position: absolute;
+                left: 15px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: #dee2e6;
+            }
+            
+            .timeline-item {
+                position: relative;
+                margin-bottom: 20px;
+            }
+            
+            .timeline-marker {
+                position: absolute;
+                left: -23px;
+                top: 5px;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                border: 2px solid #fff;
+                box-shadow: 0 0 0 2px #dee2e6;
+            }
+            
+            .timeline-content h6 {
+                margin-bottom: 5px;
+            }
+        </style>
+    </th:block>
+
+    <th:block layout:fragment="scripts-extra">
+        <script>
+            function updateOrderStatus(newStatus) {
+                const orderId = [[${order.id}]];
+                
+                if (confirm('Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng này?')) {
+                    fetch(`/api/admin/orders/${orderId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ status: newStatus })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        } else {
+                            alert('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng');
+                    });
+                }
+            }
+        </script>
+    </th:block>
+</body>
+</html>

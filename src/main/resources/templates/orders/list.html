@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Đơn Hàng Của Tôi - Đặc Sản Quê Hương</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+        
+        .orders-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .page-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin: 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .orders-icon {
+            font-size: 3rem;
+            margin-right: 1rem;
+            opacity: 0.9;
+        }
+        
+        .filter-tabs {
+            background: white;
+            border-radius: 15px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .filter-tabs .nav-link {
+            color: #6c757d;
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .filter-tabs .nav-link:hover {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .filter-tabs .nav-link.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .order-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(52, 152, 219, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        
+        .order-info h5 {
+            color: #2c3e50;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .order-id {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #3498db;
+            margin-bottom: 0.25rem;
+        }
+        
+        .order-date {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .status-pending { 
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+        .status-confirmed { 
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+        .status-shipping { 
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        .status-delivered { 
+            background: linear-gradient(135deg, #1abc9c, #16a085);
+            color: white;
+        }
+        .status-cancelled { 
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .order-items {
+            margin-bottom: 1.5rem;
+        }
+        
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .order-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .order-item img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-right: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .item-info h6 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .item-quantity {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .item-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #27ae60;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 2px solid;
+        }
+        
+        .btn-detail {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-color: #3498db;
+            color: white;
+        }
+        
+        .btn-detail:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-reorder {
+            background: transparent;
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+        
+        .btn-reorder:hover {
+            background: #27ae60;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-review {
+            background: transparent;
+            border-color: #f39c12;
+            color: #f39c12;
+        }
+        
+        .btn-review:hover {
+            background: #f39c12;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .order-total {
+            text-align: right;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #e74c3c;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1));
+            padding: 1rem;
+            border-radius: 15px;
+            border: 2px solid rgba(231, 76, 60, 0.2);
+        }
+        
+        .empty-orders {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6c757d;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .empty-orders i {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            color: #3498db;
+            opacity: 0.7;
+        }
+        
+        .empty-orders h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-orders .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .order-card {
+            animation: slideInUp 0.6s ease forwards;
+        }
+        
+        .order-card:nth-child(2) { animation-delay: 0.1s; }
+        .order-card:nth-child(3) { animation-delay: 0.2s; }
+        .order-card:nth-child(4) { animation-delay: 0.3s; }
+        
+        @media (max-width: 768px) {
+            .filter-tabs {
+                flex-direction: column;
+            }
+            
+            .filter-tabs .nav-link {
+                min-width: auto;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .order-actions {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <!-- Orders Header -->
+        <div class="orders-header">
+            <div class="container">
+                <h1 class="page-title">
+                    <i class="bi bi-bag-check orders-icon"></i>Đơn Hàng Của Tôi
+                </h1>
+            </div>
+        </div>
+        
+        <div class="container">
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <a class="nav-link active" href="#all">
+                    <i class="bi bi-list-ul me-1"></i>Tất cả
+                </a>
+                <a class="nav-link" href="#pending">
+                    <i class="bi bi-clock me-1"></i>Chờ xác nhận
+                </a>
+                <a class="nav-link" href="#shipping">
+                    <i class="bi bi-truck me-1"></i>Đang giao
+                </a>
+                <a class="nav-link" href="#delivered">
+                    <i class="bi bi-check-circle me-1"></i>Đã giao
+                </a>
+                <a class="nav-link" href="#cancelled">
+                    <i class="bi bi-x-circle me-1"></i>Đã hủy
+                </a>
+            </div>
+            
+            <!-- Empty Orders -->
+            <div class="empty-orders" th:if="${orders == null or orders.empty}">
+                <i class="bi bi-bag-x text-muted"></i>
+                <h3>Chưa có đơn hàng nào</h3>
+                <p>Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm ngay!</p>
+                <a th:href="@{/products}" class="btn btn-primary">
+                    <i class="bi bi-arrow-left me-1"></i>Tiếp tục mua sắm
+                </a>
+            </div>
+            
+            <!-- Orders List -->
+            <div class="row" th:if="${orders != null and !orders.empty}">
+                <div class="col-12">
+                    <!-- Sample Order (for demo) -->
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <div class="order-id">#ĐH001</div>
+                                <div class="order-date">
+                                    <i class="bi bi-calendar3 me-1"></i>Đặt hàng: 15/12/2024
+                                </div>
+                            </div>
+                            <span class="order-status status-confirmed">
+                                <i class="bi bi-check-circle me-1"></i>Đã xác nhận
+                            </span>
+                        </div>
+                        
+                        <div class="order-items">
+                            <div class="order-item">
+                                <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=300&q=80" alt="Bánh chưng">
+                                <div class="item-info flex-grow-1">
+                                    <h6>Bánh Chưng Truyền Thống</h6>
+                                    <span class="item-quantity">Số lượng: 2</span>
+                                </div>
+                                <div class="item-price">300.000₫</div>
+                            </div>
+                            <div class="order-item">
+                                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&q=80" alt="Nem chua">
+                                <div class="item-info flex-grow-1">
+                                    <h6>Nem Chua Thanh Hóa</h6>
+                                    <span class="item-quantity">Số lượng: 1</span>
+                                </div>
+                                <div class="item-price">80.000₫</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div class="order-actions">
+                                <button class="btn action-btn btn-detail">
+                                    <i class="bi bi-eye me-1"></i>Xem chi tiết
+                                </button>
+                                <button class="btn action-btn btn-reorder">
+                                    <i class="bi bi-arrow-repeat me-1"></i>Mua lại
+                                </button>
+                            </div>
+                            <div class="order-total">
+                                <i class="bi bi-cash-coin me-2"></i>Tổng: 410.000₫
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Another Sample Order -->
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <div class="order-id">#ĐH002</div>
+                                <div class="order-date">
+                                    <i class="bi bi-calendar3 me-1"></i>Đặt hàng: 10/12/2024
+                                </div>
+                            </div>
+                            <span class="order-status status-delivered">
+                                <i class="bi bi-check-circle-fill me-1"></i>Đã giao
+                            </span>
+                        </div>
+                        
+                        <div class="order-items">
+                            <div class="order-item">
+                                <img src="https://images.unsplash.com/photo-1559847844-d721426d6edc?w=300&q=80" alt="Bánh tráng">
+                                <div class="item-info flex-grow-1">
+                                    <h6>Bánh Tráng Nướng Đà Lạt</h6>
+                                    <span class="item-quantity">Số lượng: 3</span>
+                                </div>
+                                <div class="item-price">135.000₫</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div class="order-actions">
+                                <button class="btn action-btn btn-detail">
+                                    <i class="bi bi-eye me-1"></i>Xem chi tiết
+                                </button>
+                                <button class="btn action-btn btn-reorder">
+                                    <i class="bi bi-arrow-repeat me-1"></i>Mua lại
+                                </button>
+                                <button class="btn action-btn btn-review">
+                                    <i class="bi bi-star me-1"></i>Đánh giá
+                                </button>
+                            </div>
+                            <div class="order-total">
+                                <i class="bi bi-cash-coin me-2"></i>Tổng: 165.000₫
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pending Order -->
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <div class="order-id">#ĐH003</div>
+                                <div class="order-date">
+                                    <i class="bi bi-calendar3 me-1"></i>Đặt hàng: 17/12/2024
+                                </div>
+                            </div>
+                            <span class="order-status status-pending">
+                                <i class="bi bi-clock me-1"></i>Chờ xác nhận
+                            </span>
+                        </div>
+                        
+                        <div class="order-items">
+                            <div class="order-item">
+                                <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&q=80" alt="Đặc sản">
+                                <div class="item-info flex-grow-1">
+                                    <h6>Combo Đặc Sản Miền Bắc</h6>
+                                    <span class="item-quantity">Số lượng: 1</span>
+                                </div>
+                                <div class="item-price">250.000₫</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div class="order-actions">
+                                <button class="btn action-btn btn-detail">
+                                    <i class="bi bi-eye me-1"></i>Xem chi tiết
+                                </button>
+                                <button class="btn action-btn" style="border-color: #e74c3c; color: #e74c3c;">
+                                    <i class="bi bi-x-circle me-1"></i>Hủy đơn
+                                </button>
+                            </div>
+                            <div class="order-total">
+                                <i class="bi bi-cash-coin me-2"></i>Tổng: 250.000₫
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+    
+    <th:block layout:fragment="scripts-extra">
+        <script>
+            // Filter functionality
+            document.querySelectorAll('.filter-tabs .nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Update active tab
+                    document.querySelectorAll('.filter-tabs .nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter orders (placeholder)
+                    console.log('Filter by:', this.getAttribute('href').substring(1));
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>

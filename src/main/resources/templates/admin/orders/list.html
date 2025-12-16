@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Quản Lý Đơn Hàng - Đặc Sản Quê Hương</title>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <div class="container-fluid py-4">
+            <!-- Page Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="fw-bold">
+                                <i class="bi bi-bag me-2"></i>Quản Lý Đơn Hàng
+                            </h1>
+                            <p class="text-muted">Theo dõi và xử lý các đơn hàng</p>
+                        </div>
+                        <div>
+                            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Về Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form th:action="@{/admin/orders}" method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Trạng thái</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">Tất cả trạng thái</option>
+                                <option th:each="orderStatus : ${orderStatuses}" 
+                                        th:value="${orderStatus}" 
+                                        th:text="${orderStatus.name() == 'PENDING' ? 'Chờ xác nhận' : 
+                                                  orderStatus.name() == 'CONFIRMED' ? 'Đã xác nhận' : 
+                                                  orderStatus.name() == 'SHIPPED' ? 'Đang giao' : 
+                                                  orderStatus.name() == 'DELIVERED' ? 'Đã giao' : 'Đã hủy'}"
+                                        th:selected="${currentStatus != null and currentStatus == orderStatus}">Status</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="startDate" class="form-label">Từ ngày</label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" th:value="${startDate}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="endDate" class="form-label">Đến ngày</label>
+                            <input type="date" class="form-control" id="endDate" name="endDate" th:value="${endDate}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search me-2"></i>Lọc
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        Danh Sách Đơn Hàng
+                        <span class="badge bg-secondary ms-2" th:text="${orders.totalElements}">0</span>
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                            Sắp xếp: <span th:text="${sortBy == 'orderDate' ? 'Ngày đặt' : 
+                                                     sortBy == 'totalAmount' ? 'Tổng tiền' : 
+                                                     sortBy == 'status' ? 'Trạng thái' : 'Mặc định'}">Ngày đặt</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/admin/orders(sortBy='orderDate', sortDir=${sortDir})}">Ngày đặt</a></li>
+                            <li><a class="dropdown-item" th:href="@{/admin/orders(sortBy='totalAmount', sortDir=${sortDir})}">Tổng tiền</a></li>
+                            <li><a class="dropdown-item" th:href="@{/admin/orders(sortBy='status', sortDir=${sortDir})}">Trạng thái</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>
+                                        <a th:href="@{/admin/orders(sortBy='id', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                           class="text-decoration-none text-dark">
+                                            Mã ĐH
+                                            <i th:class="${sortBy == 'id' ? (sortDir == 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down') : 'bi bi-sort'}"></i>
+                                        </a>
+                                    </th>
+                                    <th>Khách Hàng</th>
+                                    <th>
+                                        <a th:href="@{/admin/orders(sortBy='orderDate', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                           class="text-decoration-none text-dark">
+                                            Ngày Đặt
+                                            <i th:class="${sortBy == 'orderDate' ? (sortDir == 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down') : 'bi bi-sort'}"></i>
+                                        </a>
+                                    </th>
+                                    <th>Trạng Thái</th>
+                                    <th>
+                                        <a th:href="@{/admin/orders(sortBy='totalAmount', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                           class="text-decoration-none text-dark">
+                                            Tổng Tiền
+                                            <i th:class="${sortBy == 'totalAmount' ? (sortDir == 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down') : 'bi bi-sort'}"></i>
+                                        </a>
+                                    </th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="order : ${orders.content}">
+                                    <td>
+                                        <strong>#<span th:text="${order.id}">123</span></strong>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <div class="fw-medium" th:text="${order.user.fullName}">Customer Name</div>
+                                            <small class="text-muted" th:text="${order.user.email}">email@example.com</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy')}">01/01/2024</div>
+                                        <small class="text-muted" th:text="${#temporals.format(order.orderDate, 'HH:mm')}">10:30</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${order.status.name() == 'PENDING' ? 'bg-warning' : 
+                                                               order.status.name() == 'CONFIRMED' ? 'bg-info' : 
+                                                               order.status.name() == 'SHIPPED' ? 'bg-primary' : 
+                                                               order.status.name() == 'DELIVERED' ? 'bg-success' : 'bg-danger'}"
+                                              th:text="${order.status.name() == 'PENDING' ? 'Chờ xác nhận' : 
+                                                        order.status.name() == 'CONFIRMED' ? 'Đã xác nhận' : 
+                                                        order.status.name() == 'SHIPPED' ? 'Đang giao' : 
+                                                        order.status.name() == 'DELIVERED' ? 'Đã giao' : 'Đã hủy'}">Status</span>
+                                    </td>
+                                    <td>
+                                        <strong th:text="${#numbers.formatCurrency(order.totalAmount)}">$0.00</strong>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a th:href="@{/admin/orders/{id}(id=${order.id})}" 
+                                               class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-success" 
+                                                    th:if="${order.status.name() == 'PENDING'}"
+                                                    onclick="updateOrderStatus([[${order.id}]], 'CONFIRMED')" 
+                                                    title="Xác nhận đơn hàng">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    th:if="${order.status.name() == 'PENDING' or order.status.name() == 'CONFIRMED'}"
+                                                    onclick="updateOrderStatus([[${order.id}]], 'CANCELLED')" 
+                                                    title="Hủy đơn hàng">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${orders.content.empty}">
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        <i class="bi bi-inbox me-2"></i>Không có đơn hàng nào
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="card-footer" th:if="${orders.totalPages > 1}">
+                    <nav aria-label="Orders pagination">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item" th:classappend="${orders.first} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/orders(page=${orders.number - 1}, size=${orders.size}, sortBy=${sortBy}, sortDir=${sortDir}, status=${currentStatus}, startDate=${startDate}, endDate=${endDate})}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, orders.totalPages - 1)}" 
+                                th:if="${pageNum >= orders.number - 2 and pageNum <= orders.number + 2}"
+                                th:classappend="${pageNum == orders.number} ? 'active'">
+                                <a class="page-link" th:href="@{/admin/orders(page=${pageNum}, size=${orders.size}, sortBy=${sortBy}, sortDir=${sortDir}, status=${currentStatus}, startDate=${startDate}, endDate=${endDate})}" 
+                                   th:text="${pageNum + 1}">1</a>
+                            </li>
+                            
+                            <li class="page-item" th:classappend="${orders.last} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/orders(page=${orders.number + 1}, size=${orders.size}, sortBy=${sortBy}, sortDir=${sortDir}, status=${currentStatus}, startDate=${startDate}, endDate=${endDate})}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="scripts-extra">
+        <script>
+            function updateOrderStatus(orderId, newStatus) {
+                if (confirm('Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng này?')) {
+                    fetch(`/api/admin/orders/${orderId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ status: newStatus })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        } else {
+                            alert('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng');
+                    });
+                }
+            }
+        </script>
+    </th:block>
+</body>
+</html>

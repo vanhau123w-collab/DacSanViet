@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Tìm Kiếm Sản Phẩm - Đặc Sản Quê Hương</title>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <!-- Page Header -->
+        <section class="bg-primary text-white py-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h1 class="display-5 fw-bold mb-2 holographic">Kết Quả Tìm Kiếm</h1>
+                        <p class="lead mb-0" th:if="${searchKeyword}">
+                            Kết quả cho từ khóa: "<span th:text="${searchKeyword}"></span>"
+                        </p>
+                        <p class="lead mb-0" th:unless="${searchKeyword}">
+                            Nhập từ khóa để tìm kiếm sản phẩm
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Form -->
+        <section class="py-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <form th:action="@{/products/search}" method="get" class="d-flex gap-3">
+                            <div class="flex-grow-1">
+                                <input type="search" name="keyword" class="form-control form-control-lg" 
+                                       placeholder="Tìm kiếm sản phẩm..." th:value="${searchKeyword}"
+                                       aria-label="Tìm kiếm sản phẩm">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-search me-2"></i>Tìm Kiếm
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Results -->
+        <section class="py-5" th:if="${searchKeyword}">
+            <div class="container">
+                <div class="row g-4">
+                    <!-- Search results with real food images -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card h-100">
+                            <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
+                                 class="card-img-top" alt="Bánh chưng truyền thống">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">Bánh Chưng Truyền Thống</h5>
+                                <p class="card-text text-muted flex-grow-1">
+                                    Bánh chưng làm từ gạo nếp, đậu xanh và thịt heo
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="price-tag">150.000 ₫</span>
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="bi bi-cart-plus me-1"></i>Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card h-100">
+                            <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
+                                 class="card-img-top" alt="Nem chua Thanh Hóa">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">Nem Chua Thanh Hóa</h5>
+                                <p class="card-text text-muted flex-grow-1">
+                                    Nem chua được làm từ thịt heo tươi, gia vị đặc biệt
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="price-tag">80.000 ₫</span>
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="bi bi-cart-plus me-1"></i>Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card h-100">
+                            <img src="https://images.unsplash.com/photo-1559847844-d721426d6edc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
+                                 class="card-img-top" alt="Bánh tráng nướng">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">Bánh Tráng Nướng Đà Lạt</h5>
+                                <p class="card-text text-muted flex-grow-1">
+                                    Bánh tráng nướng giòn rụm với tương ớt đặc biệt
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="price-tag">45.000 ₫</span>
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="bi bi-cart-plus me-1"></i>Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card h-100">
+                            <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
+                                 class="card-img-top" alt="Bún bò Huế">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">Bún Bò Huế (Gói gia vị)</h5>
+                                <p class="card-text text-muted flex-grow-1">
+                                    Gói gia vị bún bò Huế đậm đà, cay nồng
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <span class="price-tag">35.000 ₫</span>
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="bi bi-cart-plus me-1"></i>Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- No results message -->
+                <div class="text-center py-5" th:if="${searchKeyword and searchKeyword.length() > 0}">
+                    <div class="d-none" id="no-results">
+                        <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="mt-3 text-muted">Không tìm thấy kết quả</h4>
+                        <p class="text-muted">Thử tìm kiếm với từ khóa khác</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </th:block>
+</body>
+</html>

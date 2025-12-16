@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Quản Lý Sản Phẩm - Đặc Sản Quê Hương</title>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <div class="container-fluid py-4">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/admin}">Quản Trị</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Quản Lý Sản Phẩm</li>
+                </ol>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h1 class="fw-bold">
+                        <i class="bi bi-box me-2"></i>Quản Lý Sản Phẩm
+                    </h1>
+                    <p class="text-muted" th:if="${products != null}">
+                        Hiển thị <span th:text="${products.numberOfElements}">0</span> 
+                        trong tổng số <span th:text="${products.totalElements}">0</span> sản phẩm
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a th:href="@{/admin/products/new}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Thêm Sản Phẩm Mới
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class
