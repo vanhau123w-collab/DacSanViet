@@ -3,39 +3,267 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 <head>
-    <title>Quản Lý Sản Phẩm - Đặc Sản Quê Hương</title>
+    <title>Quản Lý Sản Phẩm - Admin</title>
+    <style>
+        .product-table {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .featured-badge {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .stock-low {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .stock-out {
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            margin: 0.1rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+        
+        .search-box {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
     <th:block layout:fragment="content">
-        <div class="container-fluid py-4">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a th:href="@{/admin}">Quản Trị</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Quản Lý Sản Phẩm</li>
-                </ol>
-            </nav>
-
-            <!-- Page Header -->
-            <div class="row mb-4">
-                <div class="col-md-8">
-                    <h1 class="fw-bold">
-                        <i class="bi bi-box me-2"></i>Quản Lý Sản Phẩm
-                    </h1>
-                    <p class="text-muted" th:if="${products != null}">
-                        Hiển thị <span th:text="${products.numberOfElements}">0</span> 
-                        trong tổng số <span th:text="${products.totalElements}">0</span> sản phẩm
-                    </p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <a th:href="@{/admin/products/new}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i>Thêm Sản Phẩm Mới
+        <div class="container-fluid mt-4">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-box-seam me-2"></i>Quản Lý Sản Phẩm
+                </h1>
+                <div>
+                    <a th:href="@{/admin/products/create}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Thêm Sản Phẩm
+                    </a>
+                    <a th:href="@{/admin/products/low-stock}" class="btn btn-warning">
+                        <i class="bi bi-exclamation-triangle me-1"></i>Sắp Hết Hàng
+                    </a>
+                    <a th:href="@{/admin/products/out-of-stock}" class="btn btn-danger">
+                        <i class="bi bi-x-circle me-1"></i>Hết Hàng
                     </a>
                 </div>
             </div>
-
-            <!-- Filters -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class
+            
+            <!-- Search and Filter -->
+            <div class="search-box">
+                <form th:action="@{/admin/products}" method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">Tìm kiếm sản phẩm</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               th:value="${search}" placeholder="Tên sản phẩm, mô tả...">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="size" class="form-label">Số lượng/trang</label>
+                        <select class="form-select" id="size" name="size">
+                            <option value="10" th:selected="${param.size == null or param.size[0] == '10'}">10</option>
+                            <option value="25" th:selected="${param.size != null and param.size[0] == '25'}">25</option>
+                            <option value="50" th:selected="${param.size != null and param.size[0] == '50'}">50</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="sortBy" class="form-label">Sắp xếp theo</label>
+                        <select class="form-select" id="sortBy" name="sortBy">
+                            <option value="name" th:selected="${sortBy == 'name'}">Tên</option>
+                            <option value="price" th:selected="${sortBy == 'price'}">Giá</option>
+                            <option value="stockQuantity" th:selected="${sortBy == 'stockQuantity'}">Kho</option>
+                            <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày tạo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search me-1"></i>Tìm kiếm
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Products Table -->
+            <div class="product-table">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>
+                                    <a th:href="@{/admin/products(sortBy='name', sortDir=${sortBy == 'name' and sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, size=${param.size})}" 
+                                       class="text-white text-decoration-none">
+                                        Tên sản phẩm
+                                        <i class="bi bi-arrow-up" th:if="${sortBy == 'name' and sortDir == 'asc'}"></i>
+                                        <i class="bi bi-arrow-down" th:if="${sortBy == 'name' and sortDir == 'desc'}"></i>
+                                    </a>
+                                </th>
+                                <th>Danh mục</th>
+                                <th>
+                                    <a th:href="@{/admin/products(sortBy='price', sortDir=${sortBy == 'price' and sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, size=${param.size})}" 
+                                       class="text-white text-decoration-none">
+                                        Giá
+                                        <i class="bi bi-arrow-up" th:if="${sortBy == 'price' and sortDir == 'asc'}"></i>
+                                        <i class="bi bi-arrow-down" th:if="${sortBy == 'price' and sortDir == 'desc'}"></i>
+                                    </a>
+                                </th>
+                                <th>
+                                    <a th:href="@{/admin/products(sortBy='stockQuantity', sortDir=${sortBy == 'stockQuantity' and sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, size=${param.size})}" 
+                                       class="text-white text-decoration-none">
+                                        Kho
+                                        <i class="bi bi-arrow-up" th:if="${sortBy == 'stockQuantity' and sortDir == 'asc'}"></i>
+                                        <i class="bi bi-arrow-down" th:if="${sortBy == 'stockQuantity' and sortDir == 'desc'}"></i>
+                                    </a>
+                                </th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="product : ${products.content}">
+                                <td>
+                                    <img th:src="${product.imageUrl}" 
+                                         th:alt="${product.name}"
+                                         class="product-image"
+                                         onerror="this.src='https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&q=80'">
+                                </td>
+                                <td>
+                                    <div class="fw-bold" th:text="${product.name}">Tên sản phẩm</div>
+                                    <small class="text-muted" th:if="${product.isFeatured}">
+                                        <span class="status-badge featured-badge">
+                                            <i class="bi bi-star-fill me-1"></i>Nổi bật
+                                        </span>
+                                    </small>
+                                </td>
+                                <td>
+                                    <span th:text="${product.category != null ? product.category.name : 'Chưa phân loại'}">Danh mục</span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-success" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                                </td>
+                                <td>
+                                    <span th:class="${product.stockQuantity == 0 ? 'stock-out' : (product.stockQuantity <= 10 ? 'stock-low' : '')}"
+                                          th:text="${product.stockQuantity}">0</span>
+                                </td>
+                                <td>
+                                    <span th:class="'status-badge ' + (${product.isActive} ? 'status-active' : 'status-inactive')"
+                                          th:text="${product.isActive ? 'Hoạt động' : 'Vô hiệu'}">Trạng thái</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/admin/products/{id}(id=${product.id})}" 
+                                           class="btn btn-sm btn-outline-info action-btn" title="Xem chi tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a th:href="@{/admin/products/{id}/edit(id=${product.id})}" 
+                                           class="btn btn-sm btn-outline-primary action-btn" title="Chỉnh sửa">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form th:action="@{/admin/products/{id}/toggle-status(id=${product.id})}" 
+                                              method="post" class="d-inline">
+                                            <button type="submit" 
+                                                    th:class="'btn btn-sm action-btn ' + (${product.isActive} ? 'btn-outline-warning' : 'btn-outline-success')"
+                                                    th:title="${product.isActive ? 'Vô hiệu hóa' : 'Kích hoạt'}">
+                                                <i th:class="'bi ' + (${product.isActive} ? 'bi-pause' : 'bi-play')"></i>
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/admin/products/{id}/delete(id=${product.id})}" 
+                                              method="post" class="d-inline"
+                                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger action-btn" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${products.content.empty}">
+                                <td colspan="7" class="text-center py-4">
+                                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                                    <p class="text-muted mt-2">Không có sản phẩm nào</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center p-3 border-top" th:if="${products.totalPages > 1}">
+                    <div>
+                        <small class="text-muted">
+                            Hiển thị <span th:text="${products.numberOfElements}">0</span> 
+                            trong tổng số <span th:text="${products.totalElements}">0</span> sản phẩm
+                        </small>
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" th:classappend="${products.first} ? 'disabled'">
+                                <a class="page-link" 
+                                   th:href="@{/admin/products(page=${currentPage - 1}, size=${param.size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}">
+                                    Trước
+                                </a>
+                            </li>
+                            
+                            <li th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}" 
+                                class="page-item" 
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link" 
+                                   th:href="@{/admin/products(page=${i}, size=${param.size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}"
+                                   th:text="${i + 1}">1</a>
+                            </li>
+                            
+                            <li class="page-item" th:classappend="${products.last} ? 'disabled'">
+                                <a class="page-link" 
+                                   th:href="@{/admin/products(page=${currentPage + 1}, size=${param.size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}">
+                                    Sau
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

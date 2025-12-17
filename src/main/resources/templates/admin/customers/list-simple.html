@@ -124,7 +124,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="customer : ${customers}" th:if="${customers != null}">
+                            <tr th:each="customer : ${customers.content}" th:if="${customers != null and !customers.empty}">
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="user-avatar me-3" th:text="${#strings.substring(customer.fullName != null ? customer.fullName : customer.username, 0, 1)}">U</div>
@@ -138,8 +138,8 @@
                                 <td th:text="${customer.email}">email@example.com</td>
                                 <td th:text="${customer.phoneNumber != null ? customer.phoneNumber : 'Chưa cập nhật'}">Chưa cập nhật</td>
                                 <td>
-                                    <span class="badge" th:classappend="${customer.role.name() == 'ADMIN' ? 'bg-danger' : 'bg-primary'}" 
-                                          th:text="${customer.role}">USER</span>
+                                    <span class="badge" th:classappend="${customer.admin ? 'bg-danger' : 'bg-primary'}" 
+                                          th:text="${customer.admin ? 'ADMIN' : 'USER'}">USER</span>
                                 </td>
                                 <td th:text="${#temporals.format(customer.createdAt, 'dd/MM/yyyy')}">01/01/2024</td>
                                 <td>
@@ -152,7 +152,7 @@
                                     </a>
                                 </td>
                             </tr>
-                            <tr th:if="${customers == null or customers.empty}">
+                            <tr th:if="${customers == null or customers.content.empty}">
                                 <td colspan="7" class="text-center py-4">
                                     <i class="bi bi-people fs-1 text-muted mb-3 d-block"></i>
                                     <p class="text-muted">Không có khách hàng nào</p>

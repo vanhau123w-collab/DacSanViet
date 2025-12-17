@@ -1,8 +1,9 @@
 package com.specialtyfood.controller;
 
-import com.specialtyfood.dto.*;
+import com.specialtyfood.dao.*;
+import com.specialtyfood.dto.UpdateOrderStatusRequest;
 import com.specialtyfood.model.OrderStatus;
-import com.specialtyfood.model.Role;
+// Removed Role import - using admin boolean instead
 import com.specialtyfood.service.OrderService;
 import com.specialtyfood.service.UserService;
 import com.specialtyfood.service.ProductService;
@@ -77,7 +78,7 @@ public class AdminController {
      * Requirements: 5.1 - Order management dashboard
      */
     @GetMapping("/orders")
-    public ResponseEntity<Page<OrderDto>> getAllOrders(
+    public ResponseEntity<Page<OrderDao>> getAllOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "orderDate") String sortBy,
@@ -90,7 +91,7 @@ public class AdminController {
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
             
-            Page<OrderDto> orders;
+            Page<OrderDao> orders;
             
             // Apply filters based on parameters
             if (status != null && startDate != null && endDate != null) {
@@ -118,7 +119,7 @@ public class AdminController {
      * Requirements: 5.3 - Search for specific orders
      */
     @GetMapping("/orders/search")
-    public ResponseEntity<Page<OrderDto>> searchOrders(
+    public ResponseEntity<Page<OrderDao>> searchOrders(
             @RequestParam String searchTerm,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -129,7 +130,7 @@ public class AdminController {
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
             
-            Page<OrderDto> orders = orderService.searchOrders(searchTerm, pageable);
+            Page<OrderDao> orders = orderService.searchOrders(searchTerm, pageable);
             return ResponseEntity.ok(orders);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -141,9 +142,9 @@ public class AdminController {
      * Requirements: 5.1 - Order management dashboard
      */
     @GetMapping("/orders/{orderId}")
-    public ResponseEntity<OrderDto> getOrderDetails(@PathVariable Long orderId) {
+    public ResponseEntity<OrderDao> getOrderDetails(@PathVariable Long orderId) {
         try {
-            OrderDto order = orderService.getOrderById(orderId);
+            OrderDao order = orderService.getOrderById(orderId);
             return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -155,16 +156,80 @@ public class AdminController {
      * Requirements: 5.2 - Order status update with notifications
      */
     @PutMapping("/orders/{orderId}/status")
-    public ResponseEntity<OrderDto> updateOrderStatus(
+    public ResponseEntity<OrderDao> updateOrderStatus(
             @PathVariable Long orderId,
             @RequestBody UpdateOrderStatusRequest request,
             Authentication authentication) {
         try {
             String adminUsername = authentication.getName();
-            OrderDto updatedOrder = adminService.updateOrderStatusWithNotifications(orderId, request, adminUsername);
+            OrderDao updatedOrder = adminService.updateOrderStatusWithNotifications(orderId, request, adminUsername);
             return ResponseEntity.ok(updatedOrder);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    /**
+     * Approve COD order - change status from PROCESSING to SHIPPED
+     * Requirements: COD workflow management
+     */
+    @PostMapping("/orders/{orderId}/approve-cod")
+    public ResponseEntity<Map<String, Object>> approveCODOrder(
+            @PathVariable Long orderId,
+            @RequestBody(required = false) Map<String, Object> requestBody) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            OrderDao order = orderService.getOrderById(orderId);
+            
+            // Validate it's a COD order in PROCESSING status
+            if (!"COD".equals(order.getPaymentMethod())) {
+                response.put("success", false);
+                response.put("message", "Đây không phải đơn hàng COD");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            if (order.getStatus() != OrderStatus.PROCESSING && order.getStatus() != OrderStatus.PENDING) {
+                response.put("success", false);
+                response.put("message", "Đơn hàng phải ở trạng thái PENDING hoặc PROCESSING để phê duyệt COD");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Extract shipping carrier and tracking info from request
+            String shippingCarrier = null;
+            String trackingNumber = null;
+            String notes = "Đơn hàng COD đã được phê duyệt và chuyển giao cho đơn vị vận chuyển";
+            
+            if (requestBody != null) {
+                shippingCarrier = (String) requestBody.get("shippingCarrier");
+                trackingNumber = (String) requestBody.get("trackingNumber");
+                String customNotes = (String) requestBody.get("notes");
+                if (customNotes != null && !customNotes.trim().isEmpty()) {
+                    notes = customNotes;
+                }
+            }
+            
+            // Update status to SHIPPED
+            UpdateOrderStatusRequest updateRequest = new UpdateOrderStatusRequest();
+            updateRequest.setStatus(OrderStatus.SHIPPED);
+            updateRequest.setNotes(notes);
+            
+            if (trackingNumber != null && !trackingNumber.trim().isEmpty()) {
+                updateRequest.setTrackingNumber(trackingNumber);
+            }
+            
+            OrderDao updatedOrder = orderService.updateOrderStatus(orderId, updateRequest);
+            
+            response.put("success", true);
+            response.put("message", "Đơn hàng COD đã được phê duyệt thành công");
+            response.put("order", updatedOrder);
+            response.put("shippingCarrier", shippingCarrier);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Lỗi khi phê duyệt đơn hàng: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
         }
     }
     
@@ -175,7 +240,7 @@ public class AdminController {
      * Requirements: 5.4 - Customer information display
      */
     @GetMapping("/customers")
-    public ResponseEntity<Page<UserDto>> getAllCustomers(
+    public ResponseEntity<Page<UserDao>> getAllCustomers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -186,7 +251,7 @@ public class AdminController {
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
             
-            Page<UserDto> customers;
+            Page<UserDao> customers;
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
                 customers = userService.searchUsers(searchTerm, pageable);
             } else {
@@ -218,7 +283,7 @@ public class AdminController {
      * Requirements: 5.4 - Customer information display
      */
     @GetMapping("/customers/{customerId}/orders")
-    public ResponseEntity<Page<OrderDto>> getCustomerOrderHistory(
+    public ResponseEntity<Page<OrderDao>> getCustomerOrderHistory(
             @PathVariable Long customerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -229,7 +294,7 @@ public class AdminController {
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
             
-            Page<OrderDto> orders = orderService.getOrdersByUser(customerId, pageable);
+            Page<OrderDao> orders = orderService.getOrdersByUser(customerId, pageable);
             return ResponseEntity.ok(orders);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -241,9 +306,9 @@ public class AdminController {
      * Requirements: 5.4 - Customer management operations
      */
     @PutMapping("/customers/{customerId}/toggle-status")
-    public ResponseEntity<UserDto> toggleCustomerStatus(@PathVariable Long customerId) {
+    public ResponseEntity<UserDao> toggleCustomerStatus(@PathVariable Long customerId) {
         try {
-            UserDto updatedCustomer = userService.toggleUserStatus(customerId);
+            UserDao updatedCustomer = userService.toggleUserStatus(customerId);
             return ResponseEntity.ok(updatedCustomer);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -280,7 +345,7 @@ public class AdminController {
             salesReport.put("revenueAnalytics", revenueAnalytics);
             
             // Popular products
-            Page<ProductDto> popularProducts = orderService.getPopularProducts(startDateTime, endDateTime, PageRequest.of(0, 10));
+            Page<ProductDao> popularProducts = orderService.getPopularProducts(startDateTime, endDateTime, PageRequest.of(0, 10));
             salesReport.put("popularProducts", popularProducts.getContent());
             
             // Customer trends
@@ -292,7 +357,7 @@ public class AdminController {
             salesReport.put("orderStatusBreakdown", orderStatusBreakdown);
             
             // Top customers by spending
-            Page<UserDto> topCustomers = orderService.getTopCustomersBySpending(startDateTime, endDateTime, PageRequest.of(0, 10));
+            Page<UserDao> topCustomers = orderService.getTopCustomersBySpending(startDateTime, endDateTime, PageRequest.of(0, 10));
             salesReport.put("topCustomers", topCustomers.getContent());
             
             // Report metadata
@@ -365,7 +430,7 @@ public class AdminController {
             
             // Popular products by sales volume
             Pageable pageable = PageRequest.of(page, size);
-            Page<ProductDto> popularProducts = orderService.getPopularProducts(startDateTime, endDateTime, pageable);
+            Page<ProductDao> popularProducts = orderService.getPopularProducts(startDateTime, endDateTime, pageable);
             productReport.put("popularProducts", popularProducts);
             
             // Product category performance
@@ -373,7 +438,7 @@ public class AdminController {
             productReport.put("categoryPerformance", categoryPerformance);
             
             // Low performing products
-            Page<ProductDto> lowPerformingProducts = orderService.getLowPerformingProducts(startDateTime, endDateTime, pageable);
+            Page<ProductDao> lowPerformingProducts = orderService.getLowPerformingProducts(startDateTime, endDateTime, pageable);
             productReport.put("lowPerformingProducts", lowPerformingProducts);
             
             return ResponseEntity.ok(productReport);
@@ -410,7 +475,7 @@ public class AdminController {
             customerReport.put("customerTrends", customerTrends);
             
             // Top customers by spending
-            Page<UserDto> topCustomers = orderService.getTopCustomersBySpending(startDateTime, endDateTime, PageRequest.of(0, 20));
+            Page<UserDao> topCustomers = orderService.getTopCustomersBySpending(startDateTime, endDateTime, PageRequest.of(0, 20));
             customerReport.put("topCustomers", topCustomers);
             
             // New vs returning customers
@@ -460,7 +525,7 @@ public class AdminController {
      * Requirements: 5.3 - Customer management operations
      */
     @PutMapping("/customers/{customerId}/manage-status")
-    public ResponseEntity<UserDto> manageCustomerStatus(
+    public ResponseEntity<UserDao> manageCustomerStatus(
             @PathVariable Long customerId,
             @RequestBody Map<String, Object> request,
             Authentication authentication) {
@@ -469,7 +534,7 @@ public class AdminController {
             String reason = (String) request.get("reason");
             String adminUsername = authentication.getName();
             
-            UserDto updatedCustomer = adminService.manageCustomerStatus(customerId, activate, reason, adminUsername);
+            UserDao updatedCustomer = adminService.manageCustomerStatus(customerId, activate, reason, adminUsername);
             return ResponseEntity.ok(updatedCustomer);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -481,7 +546,7 @@ public class AdminController {
      * Requirements: 5.3 - Search for specific customers
      */
     @GetMapping("/customers/advanced-search")
-    public ResponseEntity<Page<UserDto>> advancedCustomerSearch(
+    public ResponseEntity<Page<UserDao>> advancedCustomerSearch(
             @RequestParam(required = false) String searchTerm,
             @RequestParam(required = false) String role,
             @RequestParam(required = false) Boolean isActive,
@@ -496,10 +561,10 @@ public class AdminController {
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
             
-            Role roleEnum = role != null ? Role.valueOf(role) : null;
+            Boolean adminFilter = role != null ? "ADMIN".equalsIgnoreCase(role) : null;
             
-            Page<UserDto> customers = adminService.searchCustomersAdvanced(
-                searchTerm, roleEnum, isActive, registeredAfter, registeredBefore, pageable);
+            Page<UserDao> customers = adminService.searchCustomersAdvanced(
+                searchTerm, adminFilter, isActive, registeredAfter, registeredBefore, pageable);
             
             return ResponseEntity.ok(customers);
         } catch (Exception e) {

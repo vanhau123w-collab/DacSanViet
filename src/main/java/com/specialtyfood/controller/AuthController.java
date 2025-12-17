@@ -1,5 +1,6 @@
 package com.specialtyfood.controller;
 
+import com.specialtyfood.dao.UserDao;
 import com.specialtyfood.dto.*;
 import com.specialtyfood.security.JwtTokenProvider;
 import com.specialtyfood.service.UserService;
@@ -66,21 +67,21 @@ public class AuthController {
             String refreshToken = tokenProvider.generateRefreshToken(authentication.getName());
             
             // Get user details
-            UserDto userDto = userService.findByUsernameOrEmail(loginRequest.getUsernameOrEmail())
-                    .map(user -> new UserDto(
+            UserDao UserDao = userService.findByUsernameOrEmail(loginRequest.getUsernameOrEmail())
+                    .map(user -> new UserDao(
                         user.getId(),
                         user.getUsername(),
                         user.getEmail(),
                         user.getFullName(),
                         user.getPhoneNumber(),
-                        user.getRole(),
+                        user.getAdmin(),
                         user.getIsActive(),
                         user.getCreatedAt(),
                         user.getUpdatedAt()
                     ))
                     .orElseThrow(() -> new RuntimeException("User not found"));
             
-            JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(accessToken, refreshToken, userDto);
+            JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(accessToken, refreshToken, UserDao);
             
             // Store token in cookie for browser requests
             jakarta.servlet.http.Cookie tokenCookie = new jakarta.servlet.http.Cookie("accessToken", accessToken);
@@ -92,7 +93,7 @@ public class AuthController {
             
             // Store token in session for form-based requests
             request.getSession().setAttribute("accessToken", accessToken);
-            request.getSession().setAttribute("user", userDto);
+            request.getSession().setAttribute("user", UserDao);
             
             // Log successful authentication
             securityAuditService.logSuccessfulAuthentication(
@@ -155,13 +156,13 @@ public class AuthController {
             }
             
             // Register user
-            UserDto userDto = userService.registerUser(registerRequest);
+            UserDao UserDao = userService.registerUser(registerRequest);
             
             // Generate tokens
-            String accessToken = tokenProvider.generateTokenFromUsername(userDto.getUsername());
-            String refreshToken = tokenProvider.generateRefreshToken(userDto.getUsername());
+            String accessToken = tokenProvider.generateTokenFromUsername(UserDao.getUsername());
+            String refreshToken = tokenProvider.generateRefreshToken(UserDao.getUsername());
             
-            JwtAuthenticationResponse response = new JwtAuthenticationResponse(accessToken, refreshToken, userDto);
+            JwtAuthenticationResponse response = new JwtAuthenticationResponse(accessToken, refreshToken, UserDao);
             
             logger.info("User {} registered successfully", registerRequest.getUsername());
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -207,21 +208,21 @@ public class AuthController {
                 String newAccessToken = tokenProvider.generateTokenFromUsername(username);
                 
                 // Get user details
-                UserDto userDto = userService.findByUsernameOrEmail(username)
-                        .map(user -> new UserDto(
+                UserDao UserDao = userService.findByUsernameOrEmail(username)
+                        .map(user -> new UserDao(
                             user.getId(),
                             user.getUsername(),
                             user.getEmail(),
                             user.getFullName(),
                             user.getPhoneNumber(),
-                            user.getRole(),
+                            user.getAdmin(),
                             user.getIsActive(),
                             user.getCreatedAt(),
                             user.getUpdatedAt()
                         ))
                         .orElseThrow(() -> new RuntimeException("User not found"));
                 
-                JwtAuthenticationResponse response = new JwtAuthenticationResponse(newAccessToken, refreshToken, userDto);
+                JwtAuthenticationResponse response = new JwtAuthenticationResponse(newAccessToken, refreshToken, UserDao);
                 
                 logger.info("Token refreshed for user: {}", username);
                 return ResponseEntity.ok(response);
@@ -279,21 +280,21 @@ public class AuthController {
             }
             
             String username = authentication.getName();
-            UserDto userDto = userService.findByUsernameOrEmail(username)
-                    .map(user -> new UserDto(
+            UserDao UserDao = userService.findByUsernameOrEmail(username)
+                    .map(user -> new UserDao(
                         user.getId(),
                         user.getUsername(),
                         user.getEmail(),
                         user.getFullName(),
                         user.getPhoneNumber(),
-                        user.getRole(),
+                        user.getAdmin(),
                         user.getIsActive(),
                         user.getCreatedAt(),
                         user.getUpdatedAt()
                     ))
                     .orElseThrow(() -> new RuntimeException("User not found"));
             
-            return ResponseEntity.ok(userDto);
+            return ResponseEntity.ok(UserDao);
             
         } catch (Exception e) {
             logger.error("Get current user error: ", e);

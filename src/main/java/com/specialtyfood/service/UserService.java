@@ -1,8 +1,10 @@
 package com.specialtyfood.service;
 
+import com.specialtyfood.dto.CreateUserRequest;
 import com.specialtyfood.dto.RegisterRequest;
-import com.specialtyfood.dto.UserDto;
-import com.specialtyfood.model.Role;
+import com.specialtyfood.dto.UpdateUserRequest;
+import com.specialtyfood.dao.UserDao;
+// Removed Role import - using admin boolean instead
 import com.specialtyfood.model.User;
 import com.specialtyfood.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class UserService {
     /**
      * Register a new user
      */
-    public UserDto registerUser(RegisterRequest registerRequest) {
+    public UserDao registerUser(RegisterRequest registerRequest) {
         // Check if username already exists
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             throw new RuntimeException("Tên đăng nhập đã được sử dụng!");
@@ -63,7 +65,7 @@ public class UserService {
             user.setPhoneNumber(null);
         }
         
-        user.setRole(Role.USER);
+        user.setAdmin(false);
         user.setIsActive(true);
         
         User savedUser = userRepository.save(user);
@@ -87,10 +89,10 @@ public class UserService {
     }
     
     /**
-     * Get user DTO by ID
+     * Get user DAO by ID
      */
     @Transactional(readOnly = true)
-    public UserDto getUserById(Long id) {
+    public UserDao getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
         return convertToDto(user);
@@ -99,7 +101,7 @@ public class UserService {
     /**
      * Update user profile
      */
-    public UserDto updateProfile(Long userId, RegisterRequest updateRequest) {
+    public UserDao updateProfile(Long userId, RegisterRequest updateRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         
@@ -150,7 +152,7 @@ public class UserService {
     /**
      * Activate/Deactivate user
      */
-    public UserDto toggleUserStatus(Long userId) {
+    public UserDao toggleUserStatus(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         
@@ -163,7 +165,7 @@ public class UserService {
      * Search users (admin function)
      */
     @Transactional(readOnly = true)
-    public Page<UserDto> searchUsers(String searchTerm, Pageable pageable) {
+    public Page<UserDao> searchUsers(String searchTerm, Pageable pageable) {
         Page<User> users = userRepository.searchUsers(searchTerm, pageable);
         return users.map(this::convertToDto);
     }
@@ -172,7 +174,7 @@ public class UserService {
      * Get all users (admin function)
      */
     @Transactional(readOnly = true)
-    public Page<UserDto> getAllUsers(Pageable pageable) {
+    public Page<UserDao> getAllUsers(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
         return users.map(this::convertToDto);
     }
@@ -183,6 +185,83 @@ public class UserService {
     @Transactional(readOnly = true)
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+    
+    /**
+     * Create a new user (admin function)
+     */
+    public UserDao createUser(CreateUserRequest request) {
+        // Check if username already exists
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Tên đăng nhập '" + request.getUsername() + "' đã tồn tại!");
+        }
+        
+        // Check if email already exists
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email '" + request.getEmail() + "' đã tồn tại!");
+        }
+        
+        // Create new user
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFullName(request.getFullName());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setAdmin(request.getAdmin() != null ? request.getAdmin() : false);
+        user.setIsActive(request.getIsActive() != null ? request.getIsActive() : true);
+        
+        User savedUser = userRepository.save(user);
+        return convertToDto(savedUser);
+    }
+    
+    /**
+     * Update user (admin function)
+     */
+    public UserDao updateUser(Long id, UpdateUserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng với ID: " + id));
+        
+        // Check if new username is taken by another user
+        if (!user.getUsername().equals(request.getUsername()) && 
+            userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Tên đăng nhập '" + request.getUsername() + "' đã tồn tại!");
+        }
+        
+        // Check if new email is taken by another user
+        if (!user.getEmail().equals(request.getEmail()) && 
+            userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email '" + request.getEmail() + "' đã tồn tại!");
+        }
+        
+        // Update user fields
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        
+        // Only update password if provided
+        if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+        
+        user.setFullName(request.getFullName());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setAdmin(request.getAdmin() != null ? request.getAdmin() : false);
+        user.setIsActive(request.getIsActive() != null ? request.getIsActive() : true);
+        
+        User updatedUser = userRepository.save(user);
+        return convertToDto(updatedUser);
+    }
+    
+    /**
+     * Delete user (soft delete by deactivating)
+     */
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khách hàng với ID: " + id));
+        
+        // Soft delete by deactivating
+        user.setIsActive(false);
+        userRepository.save(user);
     }
     
     /**
@@ -205,16 +284,16 @@ public class UserService {
     }
     
     /**
-     * Convert User entity to UserDto
+     * Convert User entity to UserDao
      */
-    private UserDto convertToDto(User user) {
-        return new UserDto(
+    private UserDao convertToDto(User user) {
+        return new UserDao(
             user.getId(),
             user.getUsername(),
             user.getEmail(),
             user.getFullName(),
             user.getPhoneNumber(),
-            user.getRole(),
+            user.getAdmin(),
             user.getIsActive(),
             user.getCreatedAt(),
             user.getUpdatedAt()

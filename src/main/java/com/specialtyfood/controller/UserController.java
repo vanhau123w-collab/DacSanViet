@@ -31,10 +31,10 @@ public class UserController {
                 return "redirect:/login";
             }
             
-            return "user/profile";
+            return "user/simple-profile";
         } catch (Exception e) {
             model.addAttribute("error", "Không thể tải thông tin cá nhân: " + e.getMessage());
-            return "user/profile";
+            return "user/simple-profile";
         }
     }
     
@@ -45,7 +45,7 @@ public class UserController {
             public String getFullName() { return "Người dùng " + username; }
             public String getEmail() { return username + "@example.com"; }
             public String getPhoneNumber() { return "0123456789"; }
-            public String getRole() { return "USER"; }
+            public Boolean getAdmin() { return false; }
             public boolean isActive() { return true; }
             public java.time.LocalDateTime getCreatedAt() { return java.time.LocalDateTime.now().minusDays(30); }
         };

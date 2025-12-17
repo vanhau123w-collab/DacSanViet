@@ -1,6 +1,6 @@
 package com.specialtyfood.service;
 
-import com.specialtyfood.dto.CategoryDto;
+import com.specialtyfood.dao.CategoryDao;
 import com.specialtyfood.dto.CreateCategoryRequest;
 import com.specialtyfood.dto.UpdateCategoryRequest;
 import com.specialtyfood.model.Category;
@@ -30,16 +30,24 @@ public class CategoryService {
      */
     @Cacheable(value = "categories", key = "'active'")
     @Transactional(readOnly = true)
-    public List<CategoryDto> getAllActiveCategories() {
+    public List<CategoryDao> getAllActiveCategories() {
         List<Category> categories = categoryRepository.findByIsActiveTrueOrderByName();
         return categories.stream().map(this::convertToDto).toList();
+    }
+    
+    /**
+     * Get all categories (for admin)
+     */
+    @Transactional(readOnly = true)
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
     }
     
     /**
      * Get all categories with pagination
      */
     @Transactional(readOnly = true)
-    public Page<CategoryDto> getAllCategories(Pageable pageable) {
+    public Page<CategoryDao> getAllCategories(Pageable pageable) {
         Page<Category> categories = categoryRepository.findAll(pageable);
         return categories.map(this::convertToDto);
     }
@@ -48,7 +56,7 @@ public class CategoryService {
      * Get category by ID
      */
     @Transactional(readOnly = true)
-    public CategoryDto getCategoryById(Long id) {
+    public CategoryDao getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
         return convertToDto(category);
@@ -58,7 +66,7 @@ public class CategoryService {
      * Get category by name
      */
     @Transactional(readOnly = true)
-    public CategoryDto getCategoryByName(String name) {
+    public CategoryDao getCategoryByName(String name) {
         Category category = categoryRepository.findByName(name)
                 .orElseThrow(() -> new RuntimeException("Category not found with name: " + name));
         return convertToDto(category);
@@ -68,7 +76,7 @@ public class CategoryService {
      * Search categories by keyword
      */
     @Transactional(readOnly = true)
-    public Page<CategoryDto> searchCategories(String keyword, Pageable pageable) {
+    public Page<CategoryDao> searchCategories(String keyword, Pageable pageable) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return getAllCategories(pageable);
         }
@@ -82,7 +90,7 @@ public class CategoryService {
      */
     @Cacheable(value = "categories", key = "'withProducts'")
     @Transactional(readOnly = true)
-    public List<CategoryDto> getCategoriesWithProducts() {
+    public List<CategoryDao> getCategoriesWithProducts() {
         List<Category> categories = categoryRepository.findCategoriesWithActiveProducts();
         return categories.stream().map(this::convertToDto).toList();
     }
@@ -91,13 +99,13 @@ public class CategoryService {
      * Get categories with product count
      */
     @Transactional(readOnly = true)
-    public List<CategoryDto> getCategoriesWithProductCount() {
+    public List<CategoryDao> getCategoriesWithProductCount() {
         List<Object[]> results = categoryRepository.findCategoriesWithProductCount();
         return results.stream().map(result -> {
             Category category = (Category) result[0];
             Long productCount = (Long) result[1];
             
-            CategoryDto dto = convertToDto(category);
+            CategoryDao dto = convertToDto(category);
             dto.setProductCount(productCount);
             return dto;
         }).toList();
@@ -107,7 +115,7 @@ public class CategoryService {
      * Get categories ordered by product count
      */
     @Transactional(readOnly = true)
-    public List<CategoryDto> getCategoriesOrderedByProductCount() {
+    public List<CategoryDao> getCategoriesOrderedByProductCount() {
         List<Category> categories = categoryRepository.findCategoriesOrderedByProductCount();
         return categories.stream().map(this::convertToDto).toList();
     }
@@ -116,7 +124,7 @@ public class CategoryService {
      * Get empty categories (no products)
      */
     @Transactional(readOnly = true)
-    public List<CategoryDto> getEmptyCategories() {
+    public List<CategoryDao> getEmptyCategories() {
         List<Category> categories = categoryRepository.findEmptyCategories();
         return categories.stream().map(this::convertToDto).toList();
     }
@@ -125,7 +133,7 @@ public class CategoryService {
      * Create a new category
      */
     @CacheEvict(value = "categories", allEntries = true)
-    public CategoryDto createCategory(CreateCategoryRequest request) {
+    public CategoryDao createCategory(CreateCategoryRequest request) {
         // Check if category name already exists
         if (categoryRepository.existsByName(request.getName())) {
             throw new RuntimeException("Category with name '" + request.getName() + "' already exists!");
@@ -145,7 +153,7 @@ public class CategoryService {
      * Update an existing category
      */
     @CacheEvict(value = "categories", allEntries = true)
-    public CategoryDto updateCategory(Long id, UpdateCategoryRequest request) {
+    public CategoryDao updateCategory(Long id, UpdateCategoryRequest request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
         
@@ -185,7 +193,7 @@ public class CategoryService {
     /**
      * Toggle category active status
      */
-    public CategoryDto toggleCategoryStatus(Long id) {
+    public CategoryDao toggleCategoryStatus(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
         
@@ -211,10 +219,10 @@ public class CategoryService {
     }
     
     /**
-     * Convert Category entity to CategoryDto
+     * Convert Category entity to CategoryDao
      */
-    private CategoryDto convertToDto(Category category) {
-        return new CategoryDto(
+    private CategoryDao convertToDto(Category category) {
+        return new CategoryDao(
             category.getId(),
             category.getName(),
             category.getDescription(),

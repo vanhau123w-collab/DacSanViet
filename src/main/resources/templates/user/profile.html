@@ -2,8 +2,8 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org" 
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
-<head>
-    <title>Thông Tin Cá Nhân - Đặc Sản Quê Hương</title>
+
+<th:block layout:fragment="head-extra">
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -164,9 +164,9 @@
             margin-bottom: 0.5rem;
         }
     </style>
-</head>
-<body>
-    <th:block layout:fragment="content">
+</th:block>
+
+<th:block layout:fragment="content">
         <!-- Profile Header -->
         <div class="profile-header">
             <div class="container">
@@ -298,5 +298,5 @@
             }
         </script>
     </th:block>
-</body>
+
 </html>

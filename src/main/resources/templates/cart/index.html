@@ -2,8 +2,8 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org" 
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
-<head>
-    <title>Giỏ Hàng - Đặc Sản Quê Hương</title>
+
+<th:block layout:fragment="head-extra">
     <style>
         body {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -278,8 +278,7 @@
         .cart-item:nth-child(3) { animation-delay: 0.2s; }
         .cart-item:nth-child(4) { animation-delay: 0.3s; }
     </style>
-</head>
-<body>
+</th:block>
     <th:block layout:fragment="content">
         <!-- Cart Header -->
         <div class="cart-header">
@@ -465,5 +464,5 @@
             }
         </script>
     </th:block>
-</body>
+
 </html>

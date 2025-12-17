@@ -1,6 +1,7 @@
 package com.specialtyfood.service;
 
-import com.specialtyfood.dto.*;
+import com.specialtyfood.dao.*;
+import com.specialtyfood.dto.UpdateOrderStatusRequest;
 import com.specialtyfood.model.*;
 import com.specialtyfood.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public class AdminService {
      * Update order status with comprehensive notifications
      * Requirements: 5.2 - Order status update with notifications
      */
-    public OrderDto updateOrderStatusWithNotifications(Long orderId, UpdateOrderStatusRequest request, String adminUsername) {
+    public OrderDao updateOrderStatusWithNotifications(Long orderId, UpdateOrderStatusRequest request, String adminUsername) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
         
@@ -133,7 +134,7 @@ public class AdminService {
         Map<String, Object> analytics = new HashMap<>();
         
         // Basic customer info
-        UserDto customerDto = convertToUserDto(customer);
+        UserDao customerDto = convertToUserDto(customer);
         analytics.put("customer", customerDto);
         
         // Order statistics
@@ -154,7 +155,7 @@ public class AdminService {
         
         // Recent activity
         Pageable recentOrdersPageable = PageRequest.of(0, 5, Sort.by("orderDate").descending());
-        Page<OrderDto> recentOrders = orderService.getOrdersByUser(customerId, recentOrdersPageable);
+        Page<OrderDao> recentOrders = orderService.getOrdersByUser(customerId, recentOrdersPageable);
         analytics.put("recentOrders", recentOrders.getContent());
         
         // Customer behavior metrics
@@ -168,7 +169,7 @@ public class AdminService {
      * Manage customer account status with notifications
      * Requirements: 5.3 - Customer management operations
      */
-    public UserDto manageCustomerStatus(Long customerId, boolean activate, String reason, String adminUsername) {
+    public UserDao manageCustomerStatus(Long customerId, boolean activate, String reason, String adminUsername) {
         User customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Customer not found with id: " + customerId));
         
@@ -193,11 +194,11 @@ public class AdminService {
      * Search customers with advanced filters
      * Requirements: 5.3 - Search for specific orders and customers
      */
-    public Page<UserDto> searchCustomersAdvanced(String searchTerm, Role role, Boolean isActive, 
+    public Page<UserDao> searchCustomersAdvanced(String searchTerm, Boolean admin, Boolean isActive, 
                                                LocalDateTime registeredAfter, LocalDateTime registeredBefore,
                                                Pageable pageable) {
         Page<User> customers = userRepository.searchCustomersAdvanced(
-            searchTerm, role, isActive, registeredAfter, registeredBefore, pageable);
+            searchTerm, admin, isActive, registeredAfter, registeredBefore, pageable);
         
         return customers.map(this::convertToUserDto);
     }
@@ -247,41 +248,59 @@ public class AdminService {
      * Requirements: 5.1 - Order management dashboard
      */
     public Map<String, Object> generateDashboardMetrics() {
-        Map<String, Object> metrics = new HashMap<>();
+        Map<String, Object> dashboard = new HashMap<>();
         
-        // Today's metrics
-        LocalDateTime todayStart = LocalDateTime.now().toLocalDate().atStartOfDay();
-        LocalDateTime now = LocalDateTime.now();
+        try {
+            // Main statistics that the template expects
+            Map<String, Object> statistics = new HashMap<>();
+            statistics.put("totalCustomers", userRepository.count());
+            statistics.put("totalOrders", orderRepository.count());
+            statistics.put("totalProducts", productRepository.count());
+            statistics.put("totalRevenue", orderRepository.calculateTotalRevenue() != null ? orderRepository.calculateTotalRevenue() : BigDecimal.ZERO);
+            
+            dashboard.put("statistics", statistics);
+            
+            // Low stock products (simplified to avoid complex queries)
+            try {
+                List<ProductDao> lowStockProducts = productRepository.findLowStockProducts(10)
+                    .stream()
+                    .limit(5)
+                    .map(this::convertToProductDto)
+                    .collect(Collectors.toList());
+                dashboard.put("lowStockProducts", lowStockProducts);
+            } catch (Exception e) {
+                dashboard.put("lowStockProducts", new java.util.ArrayList<>());
+            }
+            
+            // Additional metrics for future use
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime todayStart = now.toLocalDate().atStartOfDay();
+            
+            Map<String, Object> todayMetrics = new HashMap<>();
+            try {
+                todayMetrics.put("ordersToday", orderRepository.countOrdersBetweenDates(todayStart, now));
+                todayMetrics.put("revenueToday", orderRepository.calculateRevenueBetweenDates(todayStart, now));
+            } catch (Exception e) {
+                todayMetrics.put("ordersToday", 0L);
+                todayMetrics.put("revenueToday", BigDecimal.ZERO);
+            }
+            dashboard.put("today", todayMetrics);
+            
+        } catch (Exception e) {
+            // Fallback data if there are any errors
+            Map<String, Object> fallbackStats = new HashMap<>();
+            fallbackStats.put("totalCustomers", 0L);
+            fallbackStats.put("totalOrders", 0L);
+            fallbackStats.put("totalProducts", 0L);
+            fallbackStats.put("totalRevenue", BigDecimal.ZERO);
+            
+            dashboard.put("statistics", fallbackStats);
+            dashboard.put("lowStockProducts", new java.util.ArrayList<>());
+            
+            System.err.println("Error generating dashboard metrics: " + e.getMessage());
+        }
         
-        Map<String, Object> todayMetrics = new HashMap<>();
-        todayMetrics.put("ordersToday", orderRepository.countOrdersBetweenDates(todayStart, now));
-        todayMetrics.put("revenueToday", orderRepository.calculateRevenueBetweenDates(todayStart, now));
-        todayMetrics.put("newCustomersToday", userRepository.countNewCustomers(todayStart, now));
-        
-        metrics.put("today", todayMetrics);
-        
-        // This week metrics
-        LocalDateTime weekStart = LocalDateTime.now().minusDays(7);
-        Map<String, Object> weekMetrics = new HashMap<>();
-        weekMetrics.put("ordersThisWeek", orderRepository.countOrdersBetweenDates(weekStart, now));
-        weekMetrics.put("revenueThisWeek", orderRepository.calculateRevenueBetweenDates(weekStart, now));
-        weekMetrics.put("newCustomersThisWeek", userRepository.countNewCustomers(weekStart, now));
-        
-        metrics.put("thisWeek", weekMetrics);
-        
-        // Pending actions
-        Map<String, Object> pendingActions = new HashMap<>();
-        pendingActions.put("pendingOrders", orderRepository.countByStatus(OrderStatus.PENDING));
-        pendingActions.put("ordersToShip", orderRepository.countByStatus(OrderStatus.CONFIRMED));
-        pendingActions.put("lowStockProducts", productRepository.countLowStockProducts());
-        
-        metrics.put("pendingActions", pendingActions);
-        
-        // Performance indicators
-        Map<String, Object> kpis = calculateKeyPerformanceIndicators();
-        metrics.put("kpis", kpis);
-        
-        return metrics;
+        return dashboard;
     }
     
     // ===== HELPER METHODS =====
@@ -578,22 +597,38 @@ public class AdminService {
         return 92.5; // Placeholder - percentage
     }
     
-    private OrderDto convertToOrderDto(Order order) {
+    private OrderDao convertToOrderDto(Order order) {
         // Use the existing conversion method from OrderService
         return orderService.getOrderById(order.getId());
     }
     
-    private UserDto convertToUserDto(User user) {
-        return new UserDto(
+    private UserDao convertToUserDto(User user) {
+        return new UserDao(
             user.getId(),
             user.getUsername(),
             user.getEmail(),
             user.getFullName(),
             user.getPhoneNumber(),
-            user.getRole(),
+            user.getAdmin(),
             user.getIsActive(),
             user.getCreatedAt(),
             user.getUpdatedAt()
         );
+    }
+    
+    private ProductDao convertToProductDto(Product product) {
+        ProductDao dto = new ProductDao();
+        dto.setId(product.getId());
+        dto.setName(product.getName());
+        dto.setDescription(product.getDescription());
+        dto.setPrice(product.getPrice());
+        dto.setStockQuantity(product.getStockQuantity());
+        dto.setImageUrl(product.getImageUrl());
+        dto.setIsActive(product.getIsActive());
+        dto.setCategoryId(product.getCategory().getId());
+        dto.setCategoryName(product.getCategory().getName());
+        dto.setCreatedAt(product.getCreatedAt());
+        dto.setUpdatedAt(product.getUpdatedAt());
+        return dto;
     }
 }

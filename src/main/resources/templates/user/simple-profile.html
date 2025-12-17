@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Tin Cá Nhân - Đặc Sản Quê Hương</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin: 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .profile-icon {
+            font-size: 3rem;
+            margin-right: 1rem;
+            opacity: 0.9;
+        }
+        
+        .profile-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            border: 5px solid white;
+        }
+        
+        .profile-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .info-label {
+            font-weight: 700;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-label i {
+            color: #667eea;
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .info-value {
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .badge-role {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .action-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        .action-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            color: inherit;
+        }
+        
+        .action-icon {
+            font-size: 2rem;
+            color: #e74c3c;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-shop me-2"></i>Đặc Sản Quê Hương
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/products">Sản phẩm</a>
+                <a class="nav-link" href="/cart">
+                    <i class="bi bi-cart3"></i> Giỏ hàng
+                </a>
+                <a class="nav-link" href="/orders">
+                    <i class="bi bi-bag-check"></i> Đơn hàng
+                </a>
+                <a class="nav-link" href="/profile">
+                    <i class="bi bi-person"></i> Tài khoản
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="container">
+            <h1 class="page-title">
+                <i class="bi bi-person-circle profile-icon"></i>Thông Tin Cá Nhân
+            </h1>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Error Message -->
+        <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="profile-card">
+                    <div class="profile-info">
+                        <div class="profile-avatar" th:text="${user != null and user.fullName != null ? #strings.substring(user.fullName, 0, 1) : 'U'}">U</div>
+                        <h2 th:text="${user != null and user.fullName != null ? user.fullName : 'Người dùng'}">Người dùng</h2>
+                        <span class="badge-role">USER</span>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="bi bi-person me-2"></i>Tên đăng nhập
+                            </span>
+                            <span class="info-value" th:text="${user != null and user.username != null ? user.username : 'N/A'}">N/A</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="bi bi-envelope me-2"></i>Email
+                            </span>
+                            <span class="info-value" th:text="${user != null and user.email != null ? user.email : 'N/A'}">N/A</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="bi bi-telephone me-2"></i>Số điện thoại
+                            </span>
+                            <span class="info-value" th:text="${user != null and user.phoneNumber != null ? user.phoneNumber : 'Chưa cập nhật'}">Chưa cập nhật</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="bi bi-calendar me-2"></i>Ngày tham gia
+                            </span>
+                            <span class="info-value" th:text="${user != null and user.createdAt != null ? #temporals.format(user.createdAt, 'dd/MM/yyyy') : 'N/A'}">N/A</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="bi bi-shield-check me-2"></i>Trạng thái
+                            </span>
+                            <span class="info-value">
+                                <span class="badge bg-success" th:if="${user != null and user.isActive()}">Hoạt động</span>
+                                <span class="badge bg-danger" th:unless="${user != null and user.isActive()}">Tạm khóa</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary me-2" onclick="editProfile()">
+                            <i class="bi bi-pencil me-1"></i>Chỉnh sửa thông tin
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="changePassword()">
+                            <i class="bi bi-key me-1"></i>Đổi mật khẩu
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="/orders" class="action-card">
+                        <div class="action-icon">
+                            <i class="bi bi-bag"></i>
+                        </div>
+                        <h6>Đơn hàng của tôi</h6>
+                        <p class="text-muted mb-0">Xem lịch sử mua hàng</p>
+                    </a>
+                    
+                    <a href="/cart" class="action-card">
+                        <div class="action-icon">
+                            <i class="bi bi-cart"></i>
+                        </div>
+                        <h6>Giỏ hàng</h6>
+                        <p class="text-muted mb-0">Xem sản phẩm đã chọn</p>
+                    </a>
+                    
+                    <a href="/products" class="action-card">
+                        <div class="action-icon">
+                            <i class="bi bi-grid"></i>
+                        </div>
+                        <h6>Mua sắm</h6>
+                        <p class="text-muted mb-0">Khám phá sản phẩm mới</p>
+                    </a>
+                    
+                    <div class="action-card" onclick="logout()" style="cursor: pointer;">
+                        <div class="action-icon">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </div>
+                        <h6>Đăng xuất</h6>
+                        <p class="text-muted mb-0">Thoát khỏi tài khoản</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function editProfile() {
+            alert('Chức năng chỉnh sửa thông tin đang được phát triển!');
+        }
+        
+        function changePassword() {
+            alert('Chức năng đổi mật khẩu đang được phát triển!');
+        }
+        
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                window.location.href = '/logout';
+            }
+        }
+    </script>
+</body>
+</html>

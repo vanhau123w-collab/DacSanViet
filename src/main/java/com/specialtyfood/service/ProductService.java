@@ -1,6 +1,8 @@
 package com.specialtyfood.service;
 
-import com.specialtyfood.dto.*;
+import com.specialtyfood.dao.*;
+import com.specialtyfood.dto.CreateProductRequest;
+import com.specialtyfood.dto.UpdateProductRequest;
 import com.specialtyfood.model.Category;
 import com.specialtyfood.model.Product;
 import com.specialtyfood.repository.CategoryRepository;
@@ -44,7 +46,7 @@ public class ProductService {
      * Get all active products with pagination
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> getAllProducts(Pageable pageable) {
+    public Page<ProductDao> getAllProducts(Pageable pageable) {
         Page<Product> products = productRepository.findByIsActiveTrueOrderByName(pageable);
         return products.map(this::convertToDto);
     }
@@ -54,7 +56,7 @@ public class ProductService {
      */
     @Cacheable(value = "productDetails", key = "#id")
     @Transactional(readOnly = true)
-    public ProductDto getProductById(Long id) {
+    public ProductDao getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         return convertToDto(product);
@@ -65,7 +67,7 @@ public class ProductService {
      */
     @Cacheable(value = "searchResults", key = "#keyword + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
     @Transactional(readOnly = true)
-    public Page<ProductDto> searchProducts(String keyword, Pageable pageable) {
+    public Page<ProductDao> searchProducts(String keyword, Pageable pageable) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return getAllProducts(pageable);
         }
@@ -78,7 +80,7 @@ public class ProductService {
      * Search products by keyword and category
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> searchProducts(String keyword, Long categoryId, Pageable pageable) {
+    public Page<ProductDao> searchProducts(String keyword, Long categoryId, Pageable pageable) {
         if (keyword == null || keyword.trim().isEmpty()) {
             if (categoryId != null) {
                 return getProductsByCategory(categoryId, pageable);
@@ -94,7 +96,7 @@ public class ProductService {
      * Get products by category
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> getProductsByCategory(Long categoryId, Pageable pageable) {
+    public Page<ProductDao> getProductsByCategory(Long categoryId, Pageable pageable) {
         Page<Product> products = productRepository.findByCategoryIdAndIsActiveTrue(categoryId, pageable);
         return products.map(this::convertToDto);
     }
@@ -103,7 +105,7 @@ public class ProductService {
      * Get products by price range
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+    public Page<ProductDao> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
         Page<Product> products = productRepository.findByPriceRange(minPrice, maxPrice, pageable);
         return products.map(this::convertToDto);
     }
@@ -113,7 +115,7 @@ public class ProductService {
      */
     @Cacheable(value = "featuredProducts", key = "#pageable.pageNumber + '_' + #pageable.pageSize")
     @Transactional(readOnly = true)
-    public Page<ProductDto> getFeaturedProducts(Pageable pageable) {
+    public Page<ProductDao> getFeaturedProducts(Pageable pageable) {
         Page<Product> products = productRepository.findByIsFeaturedTrueAndIsActiveTrueOrderByCreatedAtDesc(pageable);
         return products.map(this::convertToDto);
     }
@@ -122,7 +124,7 @@ public class ProductService {
      * Get products in stock
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> getInStockProducts(Pageable pageable) {
+    public Page<ProductDao> getInStockProducts(Pageable pageable) {
         Page<Product> products = productRepository.findInStockProducts(pageable);
         return products.map(this::convertToDto);
     }
@@ -131,7 +133,7 @@ public class ProductService {
      * Get recent products
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> getRecentProducts(Pageable pageable) {
+    public Page<ProductDao> getRecentProducts(Pageable pageable) {
         Page<Product> products = productRepository.findRecentProducts(pageable);
         return products.map(this::convertToDto);
     }
@@ -144,7 +146,7 @@ public class ProductService {
         @CacheEvict(value = "featuredProducts", allEntries = true),
         @CacheEvict(value = "searchResults", allEntries = true)
     })
-    public ProductDto createProduct(CreateProductRequest request) {
+    public ProductDao createProduct(CreateProductRequest request) {
         // Check if product name already exists
         if (productRepository.existsByName(request.getName())) {
             throw new RuntimeException("Product with name '" + request.getName() + "' already exists!");
@@ -180,7 +182,7 @@ public class ProductService {
         @CacheEvict(value = "featuredProducts", allEntries = true),
         @CacheEvict(value = "searchResults", allEntries = true)
     })
-    public ProductDto updateProduct(Long id, UpdateProductRequest request) {
+    public ProductDao updateProduct(Long id, UpdateProductRequest request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         
@@ -230,7 +232,7 @@ public class ProductService {
     /**
      * Toggle product active status
      */
-    public ProductDto toggleProductStatus(Long id) {
+    public ProductDao toggleProductStatus(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         
@@ -242,7 +244,7 @@ public class ProductService {
     /**
      * Toggle product featured status
      */
-    public ProductDto toggleFeaturedStatus(Long id) {
+    public ProductDao toggleFeaturedStatus(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         
@@ -254,7 +256,7 @@ public class ProductService {
     /**
      * Update product stock
      */
-    public ProductDto updateStock(Long id, Integer newStock) {
+    public ProductDao updateStock(Long id, Integer newStock) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         
@@ -271,7 +273,7 @@ public class ProductService {
      * Get low stock products
      */
     @Transactional(readOnly = true)
-    public List<ProductDto> getLowStockProducts(Integer threshold) {
+    public List<ProductDao> getLowStockProducts(Integer threshold) {
         List<Product> products = productRepository.findLowStockProducts(threshold);
         return products.stream().map(this::convertToDto).toList();
     }
@@ -280,7 +282,7 @@ public class ProductService {
      * Get out of stock products
      */
     @Transactional(readOnly = true)
-    public List<ProductDto> getOutOfStockProducts() {
+    public List<ProductDao> getOutOfStockProducts() {
         List<Product> products = productRepository.findOutOfStockProducts();
         return products.stream().map(this::convertToDto).toList();
     }
@@ -316,7 +318,7 @@ public class ProductService {
      * Get similar products (for recommendations)
      */
     @Transactional(readOnly = true)
-    public List<ProductDto> getSimilarProducts(Long productId, Pageable pageable) {
+    public List<ProductDao> getSimilarProducts(Long productId, Pageable pageable) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
         
@@ -344,15 +346,15 @@ public class ProductService {
     }
     
     /**
-     * Convert Product entity to ProductDto
+     * Convert Product entity to ProductDao
      */
-    private ProductDto convertToDto(Product product) {
-        CategoryDto categoryDto = null;
+    private ProductDao convertToDto(Product product) {
+        CategoryDao CategoryDao = null;
         Long categoryId = null;
         String categoryName = null;
         
         if (product.getCategory() != null) {
-            categoryDto = new CategoryDto(
+            CategoryDao = new CategoryDao(
                 product.getCategory().getId(),
                 product.getCategory().getName()
             );
@@ -360,7 +362,7 @@ public class ProductService {
             categoryName = product.getCategory().getName();
         }
         
-        ProductDto dto = new ProductDto(
+        ProductDao dto = new ProductDao(
             product.getId(),
             product.getName(),
             product.getDescription(),
@@ -371,7 +373,7 @@ public class ProductService {
             product.getIsFeatured(),
             product.getWeightGrams(),
             product.getOrigin(),
-            categoryDto,
+            CategoryDao,
             product.getCreatedAt(),
             product.getUpdatedAt()
         );
@@ -381,5 +383,35 @@ public class ProductService {
         dto.setCategoryName(categoryName);
         
         return dto;
+    }
+    
+    /**
+     * Get all products for admin (including inactive) with pagination
+     */
+    @Transactional(readOnly = true)
+    public Page<ProductDao> getAllProductsAdmin(Pageable pageable) {
+        Page<Product> products = productRepository.findAll(pageable);
+        return products.map(this::convertToDto);
+    }
+    
+    /**
+     * Get product by ID as entity (not DTO)
+     */
+    @Transactional(readOnly = true)
+    public java.util.Optional<Product> getProductByIdEntity(Long id) {
+        return productRepository.findById(id);
+    }
+    
+    /**
+     * Save product
+     */
+    @Caching(evict = {
+        @CacheEvict(value = "products", allEntries = true),
+        @CacheEvict(value = "featuredProducts", allEntries = true),
+        @CacheEvict(value = "searchResults", allEntries = true),
+        @CacheEvict(value = "productDetails", key = "#product.id", condition = "#product.id != null")
+    })
+    public Product saveProduct(Product product) {
+        return productRepository.save(product);
     }
 }

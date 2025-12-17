@@ -1,7 +1,10 @@
 package com.specialtyfood.service;
 
 import com.specialtyfood.dto.AddToCartRequest;
-import com.specialtyfood.dto.CartDto;
+import com.specialtyfood.dao.CartDao;
+import com.specialtyfood.dao.CartItemDao;
+import com.specialtyfood.dao.ProductDao;
+import com.specialtyfood.dao.CategoryDao;
 import com.specialtyfood.dto.UpdateCartItemRequest;
 import com.specialtyfood.model.CartItem;
 import com.specialtyfood.model.Product;
@@ -43,7 +46,7 @@ public class CartService {
      * Add item to cart or update quantity if item already exists
      */
     @CacheEvict(value = "userCarts", key = "#userId")
-    public CartDto addToCart(Long userId, AddToCartRequest request) {
+    public CartDao addToCart(Long userId, AddToCartRequest request) {
         User user = getUserById(userId);
         Product product = getProductById(request.getProductId());
         
@@ -76,7 +79,7 @@ public class CartService {
      * Update cart item quantity
      */
     @CacheEvict(value = "userCarts", key = "#userId")
-    public CartDto updateCartItem(Long userId, UpdateCartItemRequest request) {
+    public CartDao updateCartItem(Long userId, UpdateCartItemRequest request) {
         User user = getUserById(userId);
         Product product = getProductById(request.getProductId());
         
@@ -99,7 +102,7 @@ public class CartService {
      * Remove item from cart
      */
     @CacheEvict(value = "userCarts", key = "#userId")
-    public CartDto removeFromCart(Long userId, Long productId) {
+    public CartDao removeFromCart(Long userId, Long productId) {
         getUserById(userId); // Validate user exists
         
         cartItemRepository.deleteByUserIdAndProductId(userId, productId);
@@ -112,7 +115,7 @@ public class CartService {
      */
     @Cacheable(value = "userCarts", key = "#userId")
     @Transactional(readOnly = true)
-    public CartDto getCart(Long userId) {
+    public CartDao getCart(Long userId) {
         getUserById(userId); // Validate user exists
         
         List<CartItem> cartItems = cartItemRepository.findByUserIdOrderByAddedDateDesc(userId);
@@ -149,7 +152,7 @@ public class CartService {
     /**
      * Remove items with insufficient stock from cart
      */
-    public CartDto removeUnavailableItems(Long userId) {
+    public CartDao removeUnavailableItems(Long userId) {
         List<CartItem> unavailableItems = cartItemRepository.findCartItemsWithInsufficientStockByUserId(userId);
         unavailableItems.addAll(cartItemRepository.findCartItemsWithInactiveProductsByUserId(userId));
         
@@ -207,22 +210,22 @@ public class CartService {
         }
     }
     
-    private CartDto convertToCartDto(Long userId, List<CartItem> cartItems) {
-        CartDto cartDto = new CartDto(userId);
+    private CartDao convertToCartDto(Long userId, List<CartItem> cartItems) {
+        CartDao CartDao = new CartDao(userId);
         
         for (CartItem item : cartItems) {
-            cartDto.addItem(convertToCartItemDto(item));
+            CartDao.addItem(convertToCartItemDto(item));
         }
         
-        return cartDto;
+        return CartDao;
     }
     
-    private com.specialtyfood.dto.CartItemDto convertToCartItemDto(CartItem cartItem) {
-        com.specialtyfood.dto.ProductDto productDto = convertToProductDto(cartItem.getProduct());
+    private CartItemDao convertToCartItemDto(CartItem cartItem) {
+        ProductDao ProductDao = convertToProductDto(cartItem.getProduct());
         
-        return new com.specialtyfood.dto.CartItemDto(
+        return new CartItemDao(
                 cartItem.getId(),
-                productDto,
+                ProductDao,
                 cartItem.getQuantity(),
                 cartItem.getUnitPrice(),
                 cartItem.getAddedDate(),
@@ -230,17 +233,17 @@ public class CartService {
         );
     }
     
-    private com.specialtyfood.dto.ProductDto convertToProductDto(Product product) {
-        com.specialtyfood.dto.CategoryDto categoryDto = null;
+    private ProductDao convertToProductDto(Product product) {
+        CategoryDao CategoryDao = null;
         if (product.getCategory() != null) {
-            categoryDto = new com.specialtyfood.dto.CategoryDto(
+            CategoryDao = new CategoryDao(
                     product.getCategory().getId(),
                     product.getCategory().getName()
             );
-            categoryDto.setDescription(product.getCategory().getDescription());
+            CategoryDao.setDescription(product.getCategory().getDescription());
         }
         
-        return new com.specialtyfood.dto.ProductDto(
+        return new ProductDao(
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
@@ -251,7 +254,7 @@ public class CartService {
                 product.getIsFeatured(),
                 product.getWeightGrams(),
                 product.getOrigin(),
-                categoryDto,
+                CategoryDao,
                 product.getCreatedAt(),
                 product.getUpdatedAt()
         );

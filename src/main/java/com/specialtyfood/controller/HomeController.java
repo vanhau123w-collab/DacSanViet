@@ -1,7 +1,7 @@
 package com.specialtyfood.controller;
 
-import com.specialtyfood.dto.CategoryDto;
-import com.specialtyfood.dto.ProductDto;
+import com.specialtyfood.dao.CategoryDao;
+import com.specialtyfood.dao.ProductDao;
 import com.specialtyfood.service.CategoryService;
 import com.specialtyfood.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +33,11 @@ public class HomeController {
         try {
             // Get featured products for homepage
             Pageable pageable = PageRequest.of(0, 4);
-            Page<ProductDto> featuredProducts = productService.getFeaturedProducts(pageable);
+            Page<ProductDao> featuredProducts = productService.getFeaturedProducts(pageable);
             model.addAttribute("featuredProducts", featuredProducts.getContent());
             
             // Get active categories
-            List<CategoryDto> categories = categoryService.getAllActiveCategories();
+            List<CategoryDao> categories = categoryService.getAllActiveCategories();
             model.addAttribute("categories", categories);
             
         } catch (Exception e) {
@@ -54,62 +54,7 @@ public class HomeController {
         return "index";
     }
     
-    @GetMapping("/products")
-    public String products(Model model, 
-                          @RequestParam(required = false) String category,
-                          @RequestParam(required = false) String keyword,
-                          @RequestParam(defaultValue = "0") int page,
-                          @RequestParam(defaultValue = "12") int size) {
-        try {
-            model.addAttribute("pageTitle", "Sản Phẩm");
-            
-            Pageable pageable = PageRequest.of(page, size);
-            Page<ProductDto> products;
-            
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                // Search products by keyword
-                Long categoryId = null;
-                if (category != null && !category.trim().isEmpty()) {
-                    try {
-                        categoryId = Long.parseLong(category);
-                    } catch (NumberFormatException e) {
-                        // Invalid category ID, ignore
-                    }
-                }
-                products = productService.searchProducts(keyword.trim(), categoryId, pageable);
-                model.addAttribute("searchKeyword", keyword);
-            } else if (category != null && !category.trim().isEmpty()) {
-                // Filter by category
-                try {
-                    Long categoryId = Long.parseLong(category);
-                    products = productService.getProductsByCategory(categoryId, pageable);
-                    model.addAttribute("selectedCategory", category);
-                } catch (NumberFormatException e) {
-                    // Invalid category ID, show all products
-                    products = productService.getAllProducts(pageable);
-                }
-            } else {
-                // Show all products
-                products = productService.getAllProducts(pageable);
-            }
-            
-            model.addAttribute("products", products.getContent());
-            model.addAttribute("currentPage", page);
-            model.addAttribute("totalPages", products.getTotalPages());
-            model.addAttribute("totalElements", products.getTotalElements());
-            
-            // Get categories for filter
-            List<CategoryDto> categories = categoryService.getAllActiveCategories();
-            model.addAttribute("categories", categories);
-            
-        } catch (Exception e) {
-            model.addAttribute("products", List.of());
-            model.addAttribute("categories", List.of());
-            model.addAttribute("error", "Không thể tải danh sách sản phẩm");
-        }
-        
-        return "products/index";
-    }
+    // Products mapping moved to ProductController
     
     @GetMapping("/products/search")
     public String searchProducts(Model model, 
@@ -122,7 +67,7 @@ public class HomeController {
             
             if (keyword != null && !keyword.trim().isEmpty()) {
                 Pageable pageable = PageRequest.of(page, size);
-                Page<ProductDto> products = productService.searchProducts(keyword.trim(), null, pageable);
+                Page<ProductDao> products = productService.searchProducts(keyword.trim(), null, pageable);
                 
                 model.addAttribute("products", products.getContent());
                 model.addAttribute("currentPage", page);
@@ -146,7 +91,7 @@ public class HomeController {
             model.addAttribute("pageTitle", "Danh Mục Sản Phẩm");
             
             // Get categories with product count
-            List<CategoryDto> categories = categoryService.getCategoriesWithProductCount();
+            List<CategoryDao> categories = categoryService.getCategoriesWithProductCount();
             model.addAttribute("categories", categories);
             
         } catch (Exception e) {

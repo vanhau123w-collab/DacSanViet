@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Khách Hàng - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .admin-container {
+            padding: 2rem;
+        }
+        
+        .admin-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .admin-title {
+            color: white;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1 class="admin-title">
+            <i class="bi bi-person-plus me-3"></i>
+            Thêm Khách Hàng Mới
+        </h1>
+
+        <div class="admin-card">
+            <!-- Navigation -->
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <a href="/admin/customers" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+
+            <!-- Error Messages -->
+            <div class="alert alert-danger alert-dismissible fade show" th:if="${error}">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Create Form -->
+            <form th:action="@{/admin/customers/create}" method="post" th:object="${customer}">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="username" class="form-label">
+                            <i class="bi bi-person me-1"></i>Tên đăng nhập *
+                        </label>
+                        <input type="text" class="form-control" id="username" th:field="*{username}" 
+                               placeholder="Nhập tên đăng nhập..." required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope me-1"></i>Email *
+                        </label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" 
+                               placeholder="Nhập email..." required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="password" class="form-label">
+                            <i class="bi bi-lock me-1"></i>Mật khẩu *
+                        </label>
+                        <input type="password" class="form-control" id="password" th:field="*{password}" 
+                               placeholder="Nhập mật khẩu..." required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="fullName" class="form-label">
+                            <i class="bi bi-person-badge me-1"></i>Họ và tên
+                        </label>
+                        <input type="text" class="form-control" id="fullName" th:field="*{fullName}" 
+                               placeholder="Nhập họ và tên...">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="phoneNumber" class="form-label">
+                        <i class="bi bi-telephone me-1"></i>Số điện thoại
+                    </label>
+                    <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}" 
+                           placeholder="Nhập số điện thoại...">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="admin" th:field="*{admin}">
+                            <label class="form-check-label" for="admin">
+                                <i class="bi bi-shield-check me-1"></i>Quyền quản trị viên
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">Cấp quyền admin cho khách hàng này</small>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="isActive" th:field="*{isActive}" checked>
+                            <label class="form-check-label" for="isActive">
+                                <i class="bi bi-check-circle me-1"></i>Kích hoạt tài khoản
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">Tài khoản được kích hoạt có thể đăng nhập</small>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-2"></i>Tạo Khách Hàng
+                    </button>
+                    <a href="/admin/customers" class="btn btn-secondary">
+                        <i class="bi bi-x-lg me-2"></i>Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

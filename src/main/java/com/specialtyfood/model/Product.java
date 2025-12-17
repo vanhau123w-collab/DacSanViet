@@ -5,6 +5,9 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -23,6 +26,9 @@ import java.util.List;
     @Index(name = "idx_product_active", columnList = "is_active"),
     @Index(name = "idx_product_price", columnList = "price")
 })
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
     
     @Id
@@ -82,83 +88,19 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    // Default constructor
-    public Product() {}
-    
     // Constructor with required fields
     public Product(String name, BigDecimal price, Category category) {
         this.name = name;
         this.price = price;
         this.category = category;
+        this.stockQuantity = 0;
+        this.isActive = true;
+        this.isFeatured = false;
+        this.cartItems = new ArrayList<>();
+        this.orderItems = new ArrayList<>();
     }
     
-    // All args constructor
-    public Product(Long id, String name, String description, BigDecimal price, Integer stockQuantity, 
-                   String imageUrl, Boolean isActive, Boolean isFeatured, Integer weightGrams, 
-                   String origin, Category category, List<CartItem> cartItems, List<OrderItem> orderItems, 
-                   LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.stockQuantity = stockQuantity;
-        this.imageUrl = imageUrl;
-        this.isActive = isActive;
-        this.isFeatured = isFeatured;
-        this.weightGrams = weightGrams;
-        this.origin = origin;
-        this.category = category;
-        this.cartItems = cartItems;
-        this.orderItems = orderItems;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-    
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    
-    public BigDecimal getPrice() { return price; }
-    public void setPrice(BigDecimal price) { this.price = price; }
-    
-    public Integer getStockQuantity() { return stockQuantity; }
-    public void setStockQuantity(Integer stockQuantity) { this.stockQuantity = stockQuantity; }
-    
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-    
-    public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-    
-    public Boolean getIsFeatured() { return isFeatured; }
-    public void setIsFeatured(Boolean isFeatured) { this.isFeatured = isFeatured; }
-    
-    public Integer getWeightGrams() { return weightGrams; }
-    public void setWeightGrams(Integer weightGrams) { this.weightGrams = weightGrams; }
-    
-    public String getOrigin() { return origin; }
-    public void setOrigin(String origin) { this.origin = origin; }
-    
-    public Category getCategory() { return category; }
-    public void setCategory(Category category) { this.category = category; }
-    
-    public List<CartItem> getCartItems() { return cartItems; }
-    public void setCartItems(List<CartItem> cartItems) { this.cartItems = cartItems; }
-    
-    public List<OrderItem> getOrderItems() { return orderItems; }
-    public void setOrderItems(List<OrderItem> orderItems) { this.orderItems = orderItems; }
-    
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
     
     // Helper methods
     public boolean isInStock() {

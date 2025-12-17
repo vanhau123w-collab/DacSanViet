@@ -1,10 +1,12 @@
 package com.specialtyfood.model;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,6 +22,9 @@ import java.util.List;
     @Index(name = "idx_user_email", columnList = "email"),
     @Index(name = "idx_user_username", columnList = "username")
 })
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     
     @Id
@@ -48,11 +53,7 @@ public class User {
     @Size(max = 20, message = "Phone number must not exceed 20 characters")
     private String phoneNumber;
     
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role = Role.USER;
-    
-    @Column(name = "admin")
+    @Column(name = "is_admin")
     private Boolean admin = false;
     
     @Column(name = "is_active")
@@ -75,78 +76,17 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    // Default constructor
-    public User() {}
-    
     // Custom Constructor for required fields
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.admin = false;
+        this.isActive = true;
+        this.addresses = new ArrayList<>();
+        this.orders = new ArrayList<>();
+        this.cartItems = new ArrayList<>();
     }
-    
-    // All args constructor
-    public User(Long id, String username, String email, String password, String fullName, String phoneNumber,
-                Role role, Boolean admin, Boolean isActive, List<Address> addresses, List<Order> orders,
-                List<CartItem> cartItems, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.fullName = fullName;
-        this.phoneNumber = phoneNumber;
-        this.role = role;
-        this.admin = admin;
-        this.isActive = isActive;
-        this.addresses = addresses;
-        this.orders = orders;
-        this.cartItems = cartItems;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-    
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-    
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-    
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
-    
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-    
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
-    
-    public Boolean getAdmin() { return admin; }
-    public void setAdmin(Boolean admin) { this.admin = admin; }
-    
-    public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-    
-    public List<Address> getAddresses() { return addresses; }
-    public void setAddresses(List<Address> addresses) { this.addresses = addresses; }
-    
-    public List<Order> getOrders() { return orders; }
-    public void setOrders(List<Order> orders) { this.orders = orders; }
-    
-    public List<CartItem> getCartItems() { return cartItems; }
-    public void setCartItems(List<CartItem> cartItems) { this.cartItems = cartItems; }
-    
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     
     // Helper methods
     public void addAddress(Address address) {

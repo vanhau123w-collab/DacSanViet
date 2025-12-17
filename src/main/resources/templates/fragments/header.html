@@ -1,14 +1,7 @@
-<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
-<head>
-    <meta charset="UTF-8">
-</head>
-
-<body>
-    <!-- Navigation Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top" role="navigation"
-        aria-label="Điều hướng chính" th:fragment="navbar">
+<!-- Navigation Header Fragment -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top" role="navigation"
+    aria-label="Điều hướng chính" th:fragment="navbar">
         <div class="container">
             <!-- Brand -->
             <a class="navbar-brand fw-bold" th:href="@{/}" aria-label="Trang chủ Đặc Sản Quê Hương">
@@ -26,17 +19,12 @@
                 <!-- Left navigation -->
                 <ul class="navbar-nav me-auto" role="menubar">
                     <li class="nav-item" role="none">
-                        <a class="nav-link" th:href="@{/}"
-                            th:classappend="${#httpServletRequest.requestURI == '/' ? 'active' : ''}" role="menuitem"
-                            th:aria-current="${#httpServletRequest.requestURI == '/' ? 'page' : null}">
+                        <a class="nav-link" th:href="@{/}" role="menuitem">
                             <i class="bi bi-house me-1" aria-hidden="true"></i>Trang Chủ
                         </a>
                     </li>
                     <li class="nav-item" role="none">
-                        <a class="nav-link" th:href="@{/products}"
-                            th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/products') ? 'active' : ''}"
-                            role="menuitem"
-                            th:aria-current="${#strings.startsWith(#httpServletRequest.requestURI, '/products') ? 'page' : null}">
+                        <a class="nav-link" th:href="@{/products}" role="menuitem">
                             <i class="bi bi-grid me-1" aria-hidden="true"></i>Sản Phẩm
                         </a>
                     </li>
@@ -61,10 +49,7 @@
                     </li>
                     <!-- Additional navigation for authenticated users -->
                     <li class="nav-item" sec:authorize="isAuthenticated()" role="none">
-                        <a class="nav-link" th:href="@{/orders}"
-                            th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/orders') ? 'active' : ''}"
-                            role="menuitem"
-                            th:aria-current="${#strings.startsWith(#httpServletRequest.requestURI, '/orders') ? 'page' : null}">
+                        <a class="nav-link" th:href="@{/orders}" role="menuitem">
                             <i class="bi bi-bag me-1" aria-hidden="true"></i>Đơn Hàng
                         </a>
                     </li>
@@ -188,6 +173,4 @@
             </div>
         </div>
     </nav>
-</body>
-
 </html>

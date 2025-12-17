@@ -1,8 +1,8 @@
 package com.specialtyfood.service;
 
-import com.specialtyfood.dto.InventoryStatisticsDto;
-import com.specialtyfood.dto.ProductDto;
-import com.specialtyfood.dto.CategoryDto;
+import com.specialtyfood.dao.InventoryStatisticsDao;
+import com.specialtyfood.dao.ProductDao;
+import com.specialtyfood.dao.CategoryDao;
 import com.specialtyfood.model.Product;
 import com.specialtyfood.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class InventoryService {
     /**
      * Update product stock quantity
      */
-    public ProductDto updateStock(Long productId, Integer newQuantity) {
+    public ProductDao updateStock(Long productId, Integer newQuantity) {
         Product product = getProductById(productId);
         
         if (newQuantity < 0) {
@@ -60,7 +60,7 @@ public class InventoryService {
     /**
      * Increase stock quantity (e.g., when receiving new inventory)
      */
-    public ProductDto increaseStock(Long productId, Integer quantity) {
+    public ProductDao increaseStock(Long productId, Integer quantity) {
         if (quantity <= 0) {
             throw new RuntimeException("Quantity to increase must be positive");
         }
@@ -77,7 +77,7 @@ public class InventoryService {
      * Decrease stock quantity (e.g., when processing orders)
      * This method prevents overselling by checking availability first
      */
-    public ProductDto decreaseStock(Long productId, Integer quantity) {
+    public ProductDao decreaseStock(Long productId, Integer quantity) {
         if (quantity <= 0) {
             throw new RuntimeException("Quantity to decrease must be positive");
         }
@@ -124,7 +124,7 @@ public class InventoryService {
     /**
      * Release reserved stock (e.g., when order is cancelled)
      */
-    public ProductDto releaseReservedStock(Long productId, Integer quantity) {
+    public ProductDao releaseReservedStock(Long productId, Integer quantity) {
         return increaseStock(productId, quantity);
     }
     
@@ -141,7 +141,7 @@ public class InventoryService {
      * Get products with low stock
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> getLowStockProducts(Pageable pageable) {
+    public Page<ProductDao> getLowStockProducts(Pageable pageable) {
         Page<Product> products = productRepository.findByStockQuantityLessThanAndIsActiveTrue(LOW_STOCK_THRESHOLD, pageable);
         return products.map(this::convertToProductDto);
     }
@@ -150,7 +150,7 @@ public class InventoryService {
      * Get out of stock products
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> getOutOfStockProducts(Pageable pageable) {
+    public Page<ProductDao> getOutOfStockProducts(Pageable pageable) {
         Page<Product> products = productRepository.findByStockQuantityAndIsActiveTrue(0, pageable);
         return products.map(this::convertToProductDto);
     }
@@ -159,7 +159,7 @@ public class InventoryService {
      * Get all products with stock information
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> getAllProductsWithStock(Pageable pageable) {
+    public Page<ProductDao> getAllProductsWithStock(Pageable pageable) {
         Page<Product> products = productRepository.findAll(pageable);
         return products.map(this::convertToProductDto);
     }
@@ -167,7 +167,7 @@ public class InventoryService {
     /**
      * Bulk update stock quantities
      */
-    public List<ProductDto> bulkUpdateStock(List<StockUpdateRequest> stockUpdates) {
+    public List<ProductDao> bulkUpdateStock(List<StockUpdateRequest> stockUpdates) {
         return stockUpdates.stream()
                 .map(update -> updateStock(update.getProductId(), update.getNewQuantity()))
                 .collect(Collectors.toList());
@@ -188,13 +188,13 @@ public class InventoryService {
      * Get inventory summary statistics
      */
     @Transactional(readOnly = true)
-    public InventoryStatisticsDto getInventoryStatistics() {
+    public InventoryStatisticsDao getInventoryStatistics() {
         Long totalProducts = productRepository.countByIsActiveTrue();
         Long lowStockProducts = productRepository.countByStockQuantityLessThanAndIsActiveTrue(LOW_STOCK_THRESHOLD);
         Long outOfStockProducts = productRepository.countByStockQuantityAndIsActiveTrue(0);
         Long totalStockValue = productRepository.calculateTotalStockValue();
         
-        InventoryStatisticsDto stats = new InventoryStatisticsDto();
+        InventoryStatisticsDao stats = new InventoryStatisticsDao();
         stats.setTotalProducts(totalProducts);
         stats.setLowStockProducts(lowStockProducts);
         stats.setOutOfStockProducts(outOfStockProducts);
@@ -227,10 +227,10 @@ public class InventoryService {
         // or use a proper logging framework
     }
     
-    private ProductDto convertToProductDto(Product product) {
-        // Convert Product entity to ProductDto
+    private ProductDao convertToProductDto(Product product) {
+        // Convert Product entity to ProductDao
         // This is a simplified conversion - you might want to use a mapper library like MapStruct
-        ProductDto dto = new ProductDto();
+        ProductDao dto = new ProductDao();
         dto.setId(product.getId());
         dto.setName(product.getName());
         dto.setDescription(product.getDescription());
@@ -246,11 +246,11 @@ public class InventoryService {
         
         // Convert category if present
         if (product.getCategory() != null) {
-            CategoryDto categoryDto = new CategoryDto();
-            categoryDto.setId(product.getCategory().getId());
-            categoryDto.setName(product.getCategory().getName());
-            categoryDto.setDescription(product.getCategory().getDescription());
-            dto.setCategory(categoryDto);
+            CategoryDao CategoryDao = new CategoryDao();
+            CategoryDao.setId(product.getCategory().getId());
+            CategoryDao.setName(product.getCategory().getName());
+            CategoryDao.setDescription(product.getCategory().getDescription());
+            dto.setCategory(CategoryDao);
         }
         
         return dto;

@@ -4,6 +4,9 @@ import com.specialtyfood.config.EncryptedStringConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -17,6 +20,9 @@ import java.time.LocalDateTime;
     @Index(name = "idx_payment_user_id", columnList = "user_id"),
     @Index(name = "idx_payment_order_id", columnList = "order_id")
 })
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentInfo {
     
     @Id
@@ -86,94 +92,11 @@ public class PaymentInfo {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    // Default constructor
-    public PaymentInfo() {}
-    
     // Constructor with required fields
     public PaymentInfo(User user, String paymentMethod) {
         this.user = user;
         this.paymentMethod = paymentMethod;
     }
-    
-    // All args constructor
-    public PaymentInfo(Long id, User user, Order order, String paymentMethod, String cardNumber, 
-                       String cardHolderName, Integer expiryMonth, Integer expiryYear, String cvv,
-                       String billingAddress, String paymentProcessor, String processorPaymentId,
-                       String transactionStatus, Boolean isDefaultPayment, Boolean isActive,
-                       String maskedCardNumber, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.user = user;
-        this.order = order;
-        this.paymentMethod = paymentMethod;
-        this.cardNumber = cardNumber;
-        this.cardHolderName = cardHolderName;
-        this.expiryMonth = expiryMonth;
-        this.expiryYear = expiryYear;
-        this.cvv = cvv;
-        this.billingAddress = billingAddress;
-        this.paymentProcessor = paymentProcessor;
-        this.processorPaymentId = processorPaymentId;
-        this.transactionStatus = transactionStatus;
-        this.isDefaultPayment = isDefaultPayment;
-        this.isActive = isActive;
-        this.maskedCardNumber = maskedCardNumber;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-    
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
-    
-    public Order getOrder() { return order; }
-    public void setOrder(Order order) { this.order = order; }
-    
-    public String getPaymentMethod() { return paymentMethod; }
-    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
-    
-    public String getCardNumber() { return cardNumber; }
-    
-    public String getCardHolderName() { return cardHolderName; }
-    public void setCardHolderName(String cardHolderName) { this.cardHolderName = cardHolderName; }
-    
-    public Integer getExpiryMonth() { return expiryMonth; }
-    public void setExpiryMonth(Integer expiryMonth) { this.expiryMonth = expiryMonth; }
-    
-    public Integer getExpiryYear() { return expiryYear; }
-    public void setExpiryYear(Integer expiryYear) { this.expiryYear = expiryYear; }
-    
-    public String getCvv() { return cvv; }
-    public void setCvv(String cvv) { this.cvv = cvv; }
-    
-    public String getBillingAddress() { return billingAddress; }
-    public void setBillingAddress(String billingAddress) { this.billingAddress = billingAddress; }
-    
-    public String getPaymentProcessor() { return paymentProcessor; }
-    public void setPaymentProcessor(String paymentProcessor) { this.paymentProcessor = paymentProcessor; }
-    
-    public String getProcessorPaymentId() { return processorPaymentId; }
-    public void setProcessorPaymentId(String processorPaymentId) { this.processorPaymentId = processorPaymentId; }
-    
-    public String getTransactionStatus() { return transactionStatus; }
-    public void setTransactionStatus(String transactionStatus) { this.transactionStatus = transactionStatus; }
-    
-    public Boolean getIsDefaultPayment() { return isDefaultPayment; }
-    public void setIsDefaultPayment(Boolean isDefaultPayment) { this.isDefaultPayment = isDefaultPayment; }
-    
-    public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-    
-    public String getMaskedCardNumber() { return maskedCardNumber; }
-    public void setMaskedCardNumber(String maskedCardNumber) { this.maskedCardNumber = maskedCardNumber; }
-    
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     
     // Custom setter to handle masking
     public void setCardNumber(String cardNumber) {

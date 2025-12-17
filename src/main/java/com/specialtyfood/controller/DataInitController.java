@@ -108,7 +108,7 @@ public class DataInitController {
                       .append(", Username: ").append(user.getUsername())
                       .append(", Email: ").append(user.getEmail())
                       .append(", Phone: ").append(user.getPhoneNumber())
-                      .append(", Role: ").append(user.getRole())
+                      .append(", Admin: ").append(user.getAdmin())
                       .append(", Active: ").append(user.getIsActive())
                       .append("\n");
             });
@@ -231,7 +231,7 @@ public class DataInitController {
         admin.setEmail("admin@dacsanquenhuong.vn");
         admin.setPassword(passwordEncoder.encode("admin123"));
         admin.setFullName("Quản Trị Viên");
-        admin.setRole(Role.ADMIN);
+        admin.setAdmin(true);
         admin.setIsActive(true);
         
         userRepository.save(admin);

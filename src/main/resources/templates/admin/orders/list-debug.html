@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Orders - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-shop me-2"></i>Đặc Sản Quê Hương - Admin
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                <a class="nav-link" href="/admin/orders">Đơn hàng</a>
+                <a class="nav-link" href="/">Về trang chính</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2><i class="bi bi-list-ul me-2"></i>Debug Orders</h2>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="/admin/dashboard" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-1"></i>Về Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                        
+                        <div th:if="${orders != null and !orders.empty}">
+                            <p>Tổng số orders: <span th:text="${orders.totalElements}">0</span></p>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Order Number</th>
+                                            <th>User</th>
+                                            <th>Status</th>
+                                            <th>Payment Method</th>
+                                            <th>Total</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="order : ${orders}">
+                                            <td th:text="${order.id}">1</td>
+                                            <td th:text="${order.orderNumber}">ORD123</td>
+                                            <td th:text="${order.userFullName}">User</td>
+                                            <td>
+                                                <span class="badge bg-warning" th:if="${order.status.name() == 'PROCESSING'}" th:text="${order.status}">PROCESSING</span>
+                                                <span class="badge bg-info" th:if="${order.status.name() == 'PENDING'}" th:text="${order.status}">PENDING</span>
+                                                <span class="badge bg-success" th:if="${order.status.name() == 'SHIPPED'}" th:text="${order.status}">SHIPPED</span>
+                                                <span class="badge bg-primary" th:if="${order.status.name() == 'DELIVERED'}" th:text="${order.status}">DELIVERED</span>
+                                                <span class="badge bg-secondary" th:unless="${order.status.name() == 'PROCESSING' or order.status.name() == 'PENDING' or order.status.name() == 'SHIPPED' or order.status.name() == 'DELIVERED'}" th:text="${order.status}">OTHER</span>
+                                            </td>
+                                            <td>
+                                                <span th:if="${order.paymentMethod == 'COD'}" class="badge bg-success">
+                                                    <i class="bi bi-cash-coin me-1"></i>COD
+                                                </span>
+                                                <span th:unless="${order.paymentMethod == 'COD'}" class="badge bg-info" th:text="${order.paymentMethod}">Other</span>
+                                            </td>
+                                            <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '₫'">100,000₫</td>
+                                            <td>
+                                                <div class="btn-group-vertical" role="group">
+                                                    <a th:href="@{/admin/orders/{id}(id=${order.id})}" class="btn btn-sm btn-outline-primary mb-1">
+                                                        <i class="bi bi-eye"></i> Xem chi tiết
+                                                    </a>
+                                                    <!-- COD Approval Button -->
+                                                    <button th:if="${order.paymentMethod == 'COD' and (order.status.name() == 'PROCESSING' or order.status.name() == 'PENDING')}" 
+                                                            class="btn btn-sm btn-success mb-1"
+                                                            th:data-order-id="${order.id}"
+                                                            th:data-order-number="${order.orderNumber}"
+                                                            onclick="showCODApprovalModal(this.dataset.orderId, this.dataset.orderNumber)">
+                                                        <i class="bi bi-check-circle"></i> Phê duyệt COD
+                                                    </button>
+                                                    
+                                                    <!-- Delivery Confirmation Button -->
+                                                    <button th:if="${order.status.name() == 'SHIPPED'}" 
+                                                            class="btn btn-sm btn-warning mb-1"
+                                                            th:data-order-id="${order.id}"
+                                                            th:data-order-number="${order.orderNumber}"
+                                                            onclick="confirmDelivery(this.dataset.orderId, this.dataset.orderNumber)">
+                                                        <i class="bi bi-truck"></i> Xác nhận giao hàng
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div th:if="${orders == null or orders.empty}" class="text-center py-4">
+                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">Chưa có đơn hàng nào</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COD Approval Modal -->
+    <div class="modal fade" id="codApprovalModal" tabindex="-1" aria-labelledby="codApprovalModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="codApprovalModalLabel">Phê Duyệt Đơn Hàng COD</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Đơn hàng: <span id="modalOrderNumber" class="fw-bold"></span></p>
+                    
+                    <div class="mb-3">
+                        <label for="shippingCarrier" class="form-label">Chọn nhà vận chuyển:</label>
+                        <select id="shippingCarrier" class="form-select" required>
+                            <option value="">-- Chọn nhà vận chuyển --</option>
+                            <option value="GIAO_HANG_NHANH">Giao Hàng Nhanh</option>
+                            <option value="GIAO_HANG_TIET_KIEM">Giao Hàng Tiết Kiệm</option>
+                            <option value="VIETTEL_POST">Viettel Post</option>
+                            <option value="VIETNAM_POST">Vietnam Post</option>
+                            <option value="J_T_EXPRESS">J&T Express</option>
+                            <option value="SHOPEE_EXPRESS">Shopee Express</option>
+                            <option value="BEST_EXPRESS">Best Express</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="trackingNumber" class="form-label">Mã vận đơn (tùy chọn):</label>
+                        <input type="text" id="trackingNumber" class="form-control" placeholder="Nhập mã vận đơn nếu có">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="approvalNotes" class="form-label">Ghi chú:</label>
+                        <textarea id="approvalNotes" rows="3" class="form-control" placeholder="Ghi chú thêm về việc phê duyệt..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-success" onclick="confirmCODApproval()">
+                        <i class="bi bi-check-circle me-1"></i>Phê Duyệt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentOrderId = null;
+        
+        function showCODApprovalModal(orderId, orderNumber) {
+            currentOrderId = orderId;
+            document.getElementById('modalOrderNumber').textContent = orderNumber;
+            
+            // Reset form
+            document.getElementById('shippingCarrier').value = '';
+            document.getElementById('trackingNumber').value = '';
+            document.getElementById('approvalNotes').value = '';
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('codApprovalModal'));
+            modal.show();
+        }
+        
+        function confirmCODApproval() {
+            const shippingCarrier = document.getElementById('shippingCarrier').value;
+            const trackingNumber = document.getElementById('trackingNumber').value;
+            const notes = document.getElementById('approvalNotes').value;
+            
+            if (!shippingCarrier) {
+                alert('Vui lòng chọn nhà vận chuyển!');
+                return;
+            }
+            
+            const requestData = {
+                shippingCarrier: shippingCarrier,
+                trackingNumber: trackingNumber || null,
+                notes: notes || `Đơn hàng COD đã được phê duyệt và giao cho ${getCarrierName(shippingCarrier)}`
+            };
+            
+            fetch(`/api/admin/orders/${currentOrderId}/approve-cod`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Đơn hàng COD đã được phê duyệt và giao cho ${getCarrierName(shippingCarrier)}!`);
+                    // Hide modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('codApprovalModal'));
+                    modal.hide();
+                    // Reload page
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + (data.message || 'Không thể phê duyệt đơn hàng'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi phê duyệt đơn hàng COD');
+            });
+        }
+        
+        function getCarrierName(carrierCode) {
+            const carriers = {
+                'GIAO_HANG_NHANH': 'Giao Hàng Nhanh',
+                'GIAO_HANG_TIET_KIEM': 'Giao Hàng Tiết Kiệm',
+                'VIETTEL_POST': 'Viettel Post',
+                'VIETNAM_POST': 'Vietnam Post',
+                'J_T_EXPRESS': 'J&T Express',
+                'SHOPEE_EXPRESS': 'Shopee Express',
+                'BEST_EXPRESS': 'Best Express'
+            };
+            return carriers[carrierCode] || carrierCode;
+        }
+        
+        function confirmDelivery(orderId, orderNumber) {
+            if (confirm(`Xác nhận đơn hàng ${orderNumber} đã được giao thành công?`)) {
+                const requestData = {
+                    status: 'DELIVERED',
+                    notes: 'Đơn hàng đã được giao thành công và xác nhận bởi nhà vận chuyển'
+                };
+                
+                fetch(`/api/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.id) { // Success response contains order data
+                        alert(`Đơn hàng ${orderNumber} đã được xác nhận giao thành công!`);
+                        location.reload();
+                    } else {
+                        alert('Lỗi: Không thể xác nhận giao hàng');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xác nhận giao hàng');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

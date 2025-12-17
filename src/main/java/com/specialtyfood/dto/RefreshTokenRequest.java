@@ -1,29 +1,18 @@
 package com.specialtyfood.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * Refresh token request DTO
+ * Request DTO for refreshing JWT token
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RefreshTokenRequest {
     
-    @NotBlank(message = "Refresh token is required")
+    @NotBlank(message = "Refresh token không được để trống")
     private String refreshToken;
-    
-    // Default constructor
-    public RefreshTokenRequest() {}
-    
-    // Constructor
-    public RefreshTokenRequest(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-    
-    // Getters and Setters
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-    
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
 }

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Khách Hàng - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .admin-container {
+            padding: 2rem;
+        }
+        
+        .admin-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .admin-title {
+            color: white;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .customer-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            border: 5px solid white;
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-label i {
+            color: #667eea;
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .info-value {
+            color: #495057;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1 class="admin-title">
+            <i class="bi bi-person-circle me-3"></i>
+            Chi Tiết Khách Hàng
+        </h1>
+
+        <div class="admin-card">
+            <!-- Navigation -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <a href="/admin/customers" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách
+                    </a>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a th:href="@{'/admin/customers/' + ${customer.id} + '/edit'}" class="btn btn-primary">
+                        <i class="bi bi-pencil me-1"></i>Chỉnh sửa
+                    </a>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+            <!-- Customer Info -->
+            <div class="text-center mb-4">
+                <div class="customer-avatar" th:text="${customer.fullName != null ? #strings.substring(customer.fullName, 0, 1) : #strings.substring(customer.username, 0, 1)}">U</div>
+                <h2 th:text="${customer.fullName != null ? customer.fullName : customer.username}">Tên khách hàng</h2>
+                <span class="badge fs-6" th:classappend="${customer.admin ? 'bg-danger' : 'bg-primary'}" 
+                      th:text="${customer.admin ? 'ADMIN' : 'USER'}">USER</span>
+            </div>
+
+            <!-- Customer Details -->
+            <div class="info-card">
+                <h5 class="mb-3">
+                    <i class="bi bi-info-circle me-2 text-primary"></i>
+                    Thông Tin Cơ Bản
+                </h5>
+                
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-hash"></i>ID
+                    </span>
+                    <span class="info-value" th:text="${customer.id}">1</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-person"></i>Tên đăng nhập
+                    </span>
+                    <span class="info-value" th:text="${customer.username}">username</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-envelope"></i>Email
+                    </span>
+                    <span class="info-value" th:text="${customer.email}">email@example.com</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-person-badge"></i>Họ và tên
+                    </span>
+                    <span class="info-value" th:text="${customer.fullName != null ? customer.fullName : 'Chưa cập nhật'}">Chưa cập nhật</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-telephone"></i>Số điện thoại
+                    </span>
+                    <span class="info-value" th:text="${customer.phoneNumber != null ? customer.phoneNumber : 'Chưa cập nhật'}">Chưa cập nhật</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-shield-check"></i>Vai trò
+                    </span>
+                    <span class="badge" th:classappend="${customer.admin ? 'bg-danger' : 'bg-primary'}" 
+                          th:text="${customer.admin ? 'Quản trị viên' : 'Khách hàng'}">Khách hàng</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-check-circle"></i>Trạng thái
+                    </span>
+                    <span class="badge" th:classappend="${customer.isActive ? 'bg-success' : 'bg-secondary'}" 
+                          th:text="${customer.isActive ? 'Hoạt động' : 'Tạm khóa'}">Hoạt động</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-calendar-plus"></i>Ngày đăng ký
+                    </span>
+                    <span class="info-value" th:text="${customer.createdAt != null ? #temporals.format(customer.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}">01/01/2024 10:00</span>
+                </div>
+                
+                <div class="info-item" th:if="${customer.updatedAt != null}">
+                    <span class="info-label">
+                        <i class="bi bi-calendar-check"></i>Cập nhật lần cuối
+                    </span>
+                    <span class="info-value" th:text="${#temporals.format(customer.updatedAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="info-card" th:if="${customer.orderCount != null or customer.totalSpent != null}">
+                <h5 class="mb-3">
+                    <i class="bi bi-graph-up me-2 text-success"></i>
+                    Thống Kê Mua Hàng
+                </h5>
+                
+                <div class="info-item" th:if="${customer.orderCount != null}">
+                    <span class="info-label">
+                        <i class="bi bi-bag-check"></i>Tổng số đơn hàng
+                    </span>
+                    <span class="info-value" th:text="${customer.orderCount}">0</span>
+                </div>
+                
+                <div class="info-item" th:if="${customer.totalSpent != null}">
+                    <span class="info-label">
+                        <i class="bi bi-currency-dollar"></i>Tổng chi tiêu
+                    </span>
+                    <span class="info-value" th:text="${#numbers.formatDecimal(customer.totalSpent, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="text-center mt-4">
+                <a th:href="@{'/admin/customers/' + ${customer.id} + '/edit'}" class="btn btn-primary me-2">
+                    <i class="bi bi-pencil me-1"></i>Chỉnh sửa thông tin
+                </a>
+                <form th:action="@{'/admin/customers/' + ${customer.id} + '/toggle-status'}" method="post" class="d-inline">
+                    <button type="submit" class="btn me-2" 
+                            th:classappend="${customer.isActive ? 'btn-warning' : 'btn-success'}"
+                            th:text="${customer.isActive ? 'Tạm khóa tài khoản' : 'Kích hoạt tài khoản'}">
+                        Thay đổi trạng thái
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

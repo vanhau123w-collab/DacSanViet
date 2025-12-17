@@ -72,9 +72,28 @@ public class Order {
     @Size(max = 50, message = "Payment method must not exceed 50 characters")
     private String paymentMethod;
     
-    @Column(name = "payment_status", length = 20)
-    @Size(max = 20, message = "Payment status must not exceed 20 characters")
-    private String paymentStatus = "PENDING";
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status")
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+    
+    @Column(name = "delivery_confirmed_at")
+    private LocalDateTime deliveryConfirmedAt;
+    
+    @Column(name = "customer_name", length = 100)
+    @Size(max = 100, message = "Customer name must not exceed 100 characters")
+    private String customerName;
+    
+    @Column(name = "customer_phone", length = 20)
+    @Size(max = 20, message = "Customer phone must not exceed 20 characters")
+    private String customerPhone;
+    
+    @Column(name = "customer_email", length = 100)
+    @Size(max = 100, message = "Customer email must not exceed 100 characters")
+    private String customerEmail;
+    
+    @Column(name = "shipping_address_text", length = 500)
+    @Size(max = 500, message = "Shipping address must not exceed 500 characters")
+    private String shippingAddressText;
     
     @Column(name = "notes", length = 1000)
     @Size(max = 1000, message = "Notes must not exceed 1000 characters")
@@ -105,8 +124,8 @@ public class Order {
     public Order(Long id, String orderNumber, User user, BigDecimal totalAmount, BigDecimal shippingFee,
                  BigDecimal taxAmount, OrderStatus status, List<OrderItem> orderItems, Address shippingAddress,
                  LocalDateTime orderDate, LocalDateTime shippedDate, LocalDateTime deliveredDate,
-                 String trackingNumber, String paymentMethod, String paymentStatus, String notes,
-                 LocalDateTime createdAt, LocalDateTime updatedAt) {
+                 String trackingNumber, String paymentMethod, PaymentStatus paymentStatus, String notes,
+                 LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deliveryConfirmedAt) {
         this.id = id;
         this.orderNumber = orderNumber;
         this.user = user;
@@ -125,6 +144,7 @@ public class Order {
         this.notes = notes;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.deliveryConfirmedAt = deliveryConfirmedAt;
     }
     
     // Getters and Setters
@@ -169,8 +189,23 @@ public class Order {
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
     
-    public String getPaymentStatus() { return paymentStatus; }
-    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
+    public PaymentStatus getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; }
+    
+    public LocalDateTime getDeliveryConfirmedAt() { return deliveryConfirmedAt; }
+    public void setDeliveryConfirmedAt(LocalDateTime deliveryConfirmedAt) { this.deliveryConfirmedAt = deliveryConfirmedAt; }
+    
+    public String getCustomerName() { return customerName; }
+    public void setCustomerName(String customerName) { this.customerName = customerName; }
+    
+    public String getCustomerPhone() { return customerPhone; }
+    public void setCustomerPhone(String customerPhone) { this.customerPhone = customerPhone; }
+    
+    public String getCustomerEmail() { return customerEmail; }
+    public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
+    
+    public String getShippingAddressText() { return shippingAddressText; }
+    public void setShippingAddressText(String shippingAddressText) { this.shippingAddressText = shippingAddressText; }
     
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

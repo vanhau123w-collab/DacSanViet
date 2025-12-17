@@ -1,6 +1,8 @@
 package com.specialtyfood.service;
 
-import com.specialtyfood.dto.*;
+import com.specialtyfood.dao.*;
+import com.specialtyfood.dto.CreateOrderRequest;
+import com.specialtyfood.dto.UpdateOrderStatusRequest;
 import com.specialtyfood.model.*;
 import com.specialtyfood.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +52,10 @@ public class OrderService {
     }
     
     /**
-     * Create order from user's cart
+     * Create order from user's cart (OLD VERSION - DEPRECATED)
      */
-    public OrderDto createOrder(Long userId, CreateOrderRequest request) {
+    /*
+    public OrderDao createOrder(Long userId, CreateOrderRequest request) {
         User user = getUserById(userId);
         Address shippingAddress = getAddressById(request.getShippingAddressId());
         
@@ -111,11 +114,12 @@ public class OrderService {
         
         return convertToOrderDto(order);
     }
+    */
     
     /**
      * Update order status
      */
-    public OrderDto updateOrderStatus(Long orderId, UpdateOrderStatusRequest request) {
+    public OrderDao updateOrderStatus(Long orderId, UpdateOrderStatusRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
         
@@ -145,7 +149,7 @@ public class OrderService {
      * Get order by ID
      */
     @Transactional(readOnly = true)
-    public OrderDto getOrderById(Long orderId) {
+    public OrderDao getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
         return convertToOrderDto(order);
@@ -155,7 +159,7 @@ public class OrderService {
      * Get order by order number
      */
     @Transactional(readOnly = true)
-    public OrderDto getOrderByOrderNumber(String orderNumber) {
+    public OrderDao getOrderByOrderNumber(String orderNumber) {
         Order order = orderRepository.findByOrderNumber(orderNumber)
                 .orElseThrow(() -> new RuntimeException("Order not found with order number: " + orderNumber));
         return convertToOrderDto(order);
@@ -165,7 +169,7 @@ public class OrderService {
      * Get orders by user
      */
     @Transactional(readOnly = true)
-    public Page<OrderDto> getOrdersByUser(Long userId, Pageable pageable) {
+    public Page<OrderDao> getOrdersByUser(Long userId, Pageable pageable) {
         getUserById(userId); // Validate user exists
         Page<Order> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId, pageable);
         return orders.map(this::convertToOrderDto);
@@ -175,7 +179,7 @@ public class OrderService {
      * Get orders by user and status
      */
     @Transactional(readOnly = true)
-    public Page<OrderDto> getOrdersByUserAndStatus(Long userId, OrderStatus status, Pageable pageable) {
+    public Page<OrderDao> getOrdersByUserAndStatus(Long userId, OrderStatus status, Pageable pageable) {
         getUserById(userId); // Validate user exists
         Page<Order> orders = orderRepository.findByUserIdAndStatusOrderByOrderDateDesc(userId, status, pageable);
         return orders.map(this::convertToOrderDto);
@@ -185,7 +189,7 @@ public class OrderService {
      * Get all orders (admin)
      */
     @Transactional(readOnly = true)
-    public Page<OrderDto> getAllOrders(Pageable pageable) {
+    public Page<OrderDao> getAllOrders(Pageable pageable) {
         Page<Order> orders = orderRepository.findAll(pageable);
         return orders.map(this::convertToOrderDto);
     }
@@ -194,7 +198,7 @@ public class OrderService {
      * Get orders by status (admin)
      */
     @Transactional(readOnly = true)
-    public Page<OrderDto> getOrdersByStatus(OrderStatus status, Pageable pageable) {
+    public Page<OrderDao> getOrdersByStatus(OrderStatus status, Pageable pageable) {
         Page<Order> orders = orderRepository.findByStatusOrderByOrderDateDesc(status, pageable);
         return orders.map(this::convertToOrderDto);
     }
@@ -203,7 +207,7 @@ public class OrderService {
      * Search orders (admin)
      */
     @Transactional(readOnly = true)
-    public Page<OrderDto> searchOrders(String searchTerm, Pageable pageable) {
+    public Page<OrderDao> searchOrders(String searchTerm, Pageable pageable) {
         Page<Order> orders = orderRepository.searchOrders(searchTerm, pageable);
         return orders.map(this::convertToOrderDto);
     }
@@ -211,7 +215,7 @@ public class OrderService {
     /**
      * Cancel order
      */
-    public OrderDto cancelOrder(Long orderId, Long userId) {
+    public OrderDao cancelOrder(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
         
@@ -245,7 +249,7 @@ public class OrderService {
      * Get order statistics
      */
     @Transactional(readOnly = true)
-    public OrderStatisticsDto getOrderStatistics() {
+    public OrderStatisticsDao getOrderStatistics() {
         Long totalOrders = orderRepository.count();
         Long pendingOrders = orderRepository.countByStatus(OrderStatus.PENDING);
         Long confirmedOrders = orderRepository.countByStatus(OrderStatus.CONFIRMED);
@@ -254,7 +258,7 @@ public class OrderService {
         Long cancelledOrders = orderRepository.countByStatus(OrderStatus.CANCELLED);
         BigDecimal totalRevenue = orderRepository.calculateTotalRevenue();
         
-        OrderStatisticsDto stats = new OrderStatisticsDto();
+        OrderStatisticsDao stats = new OrderStatisticsDao();
         stats.setTotalOrders(totalOrders);
         stats.setPendingOrders(pendingOrders);
         stats.setConfirmedOrders(confirmedOrders);
@@ -266,6 +270,58 @@ public class OrderService {
         return stats;
     }
     
+    /**
+     * Confirm delivery for COD orders
+     */
+    public OrderDao confirmDelivery(Long orderId, Long userId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
+        
+        // Validate user owns the order
+        if (!order.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Order does not belong to user");
+        }
+        
+        // Validate order status
+        if (order.getStatus() != OrderStatus.SHIPPED) {
+            throw new RuntimeException("Order must be in SHIPPED status to confirm delivery. Current status: " + order.getStatus());
+        }
+        
+        // Validate payment method is COD
+        if (!"COD".equals(order.getPaymentMethod())) {
+            throw new RuntimeException("Delivery confirmation is only available for COD orders");
+        }
+        
+        // Update order status and payment status
+        order.setStatus(OrderStatus.DELIVERED);
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order.setDeliveryConfirmedAt(LocalDateTime.now());
+        
+        order = orderRepository.save(order);
+        
+        // Send notification about delivery confirmation
+        notificationService.sendOrderStatusNotification(order, "Cảm ơn bạn đã xác nhận nhận hàng. Đơn hàng đã được hoàn tất.");
+        
+        return convertToOrderDto(order);
+    }
+    
+    /**
+     * Validate COD order requirements
+     */
+    private void validateCODOrder(CreateOrderRequest request) {
+        if ("COD".equals(request.getPaymentMethod())) {
+            if (request.getCustomerName() == null || request.getCustomerName().trim().isEmpty()) {
+                throw new RuntimeException("Customer name is required for COD orders");
+            }
+            if (request.getCustomerPhone() == null || request.getCustomerPhone().trim().isEmpty()) {
+                throw new RuntimeException("Customer phone is required for COD orders");
+            }
+            if (request.getShippingAddress() == null || request.getShippingAddress().trim().isEmpty()) {
+                throw new RuntimeException("Shipping address is required for COD orders");
+            }
+        }
+    }
+
     // Helper methods
     
     private User getUserById(Long userId) {
@@ -326,6 +382,11 @@ public class OrderService {
                     throw new RuntimeException("Invalid status transition from PENDING to " + newStatus);
                 }
                 break;
+            case PROCESSING:
+                if (newStatus != OrderStatus.SHIPPED && newStatus != OrderStatus.CANCELLED) {
+                    throw new RuntimeException("Invalid status transition from PROCESSING to " + newStatus);
+                }
+                break;
             case CONFIRMED:
                 if (newStatus != OrderStatus.SHIPPED && newStatus != OrderStatus.CANCELLED) {
                     throw new RuntimeException("Invalid status transition from CONFIRMED to " + newStatus);
@@ -344,8 +405,8 @@ public class OrderService {
         }
     }
     
-    private OrderDto convertToOrderDto(Order order) {
-        OrderDto dto = new OrderDto();
+    private OrderDao convertToOrderDto(Order order) {
+        OrderDao dto = new OrderDao();
         dto.setId(order.getId());
         dto.setOrderNumber(order.getOrderNumber());
         dto.setUserId(order.getUser().getId());
@@ -361,6 +422,11 @@ public class OrderService {
         dto.setTrackingNumber(order.getTrackingNumber());
         dto.setPaymentMethod(order.getPaymentMethod());
         dto.setPaymentStatus(order.getPaymentStatus());
+        dto.setDeliveryConfirmedAt(order.getDeliveryConfirmedAt());
+        dto.setCustomerName(order.getCustomerName());
+        dto.setCustomerPhone(order.getCustomerPhone());
+        dto.setCustomerEmail(order.getCustomerEmail());
+        dto.setShippingAddressText(order.getShippingAddressText());
         dto.setNotes(order.getNotes());
         dto.setCreatedAt(order.getCreatedAt());
         dto.setUpdatedAt(order.getUpdatedAt());
@@ -371,7 +437,7 @@ public class OrderService {
         }
         
         // Convert order items
-        List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
+        List<OrderItemDao> orderItemDtos = order.getOrderItems().stream()
                 .map(this::convertToOrderItemDto)
                 .collect(Collectors.toList());
         dto.setOrderItems(orderItemDtos);
@@ -379,8 +445,8 @@ public class OrderService {
         return dto;
     }
     
-    private OrderItemDto convertToOrderItemDto(OrderItem orderItem) {
-        OrderItemDto dto = new OrderItemDto();
+    private OrderItemDao convertToOrderItemDto(OrderItem orderItem) {
+        OrderItemDao dto = new OrderItemDao();
         dto.setId(orderItem.getId());
         dto.setOrderId(orderItem.getOrder().getId());
         dto.setProductId(orderItem.getProduct().getId());
@@ -393,8 +459,8 @@ public class OrderService {
         return dto;
     }
     
-    private AddressDto convertToAddressDto(Address address) {
-        AddressDto dto = new AddressDto();
+    private AddressDao convertToAddressDto(Address address) {
+        AddressDao dto = new AddressDao();
         dto.setId(address.getId());
         dto.setFullName(address.getFullName());
         dto.setPhoneNumber(address.getPhoneNumber());
@@ -445,7 +511,7 @@ public class OrderService {
      * Get orders by status and date range
      */
     @Transactional(readOnly = true)
-    public Page<OrderDto> getOrdersByStatusAndDateRange(OrderStatus status, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+    public Page<OrderDao> getOrdersByStatusAndDateRange(OrderStatus status, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         Page<Order> orders = orderRepository.findOrdersByStatusAndDateRange(status, startDate, endDate, pageable);
         return orders.map(this::convertToOrderDto);
     }
@@ -454,7 +520,7 @@ public class OrderService {
      * Get orders by date range
      */
     @Transactional(readOnly = true)
-    public Page<OrderDto> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+    public Page<OrderDao> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         Page<Order> orders = orderRepository.findOrdersBetweenDates(startDate, endDate, pageable);
         return orders.map(this::convertToOrderDto);
     }
@@ -522,14 +588,14 @@ public class OrderService {
      * Get popular products
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> getPopularProducts(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+    public Page<ProductDao> getPopularProducts(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         Page<Object[]> popularProductsData = orderRepository.findPopularProducts(startDate, endDate, pageable);
         return popularProductsData.map(data -> {
             Product product = (Product) data[0];
             Long totalSold = (Long) data[1];
             BigDecimal totalRevenue = (BigDecimal) data[2];
             
-            ProductDto dto = convertToProductDto(product);
+            ProductDao dto = convertToProductDto(product);
             dto.setTotalSold(totalSold);
             dto.setTotalRevenue(totalRevenue);
             return dto;
@@ -577,14 +643,14 @@ public class OrderService {
      * Get top customers by spending
      */
     @Transactional(readOnly = true)
-    public Page<UserDto> getTopCustomersBySpending(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+    public Page<UserDao> getTopCustomersBySpending(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         Page<Object[]> topCustomersData = orderRepository.findTopCustomersBySpendingInPeriod(startDate, endDate, pageable);
         return topCustomersData.map(data -> {
             User user = (User) data[0];
             Long orderCount = (Long) data[1];
             BigDecimal totalSpent = (BigDecimal) data[2];
             
-            UserDto dto = convertToUserDto(user);
+            UserDao dto = convertToUserDto(user);
             dto.setOrderCount(orderCount);
             dto.setTotalSpent(totalSpent);
             return dto;
@@ -617,13 +683,13 @@ public class OrderService {
      * Get low performing products
      */
     @Transactional(readOnly = true)
-    public Page<ProductDto> getLowPerformingProducts(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+    public Page<ProductDao> getLowPerformingProducts(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         Page<Object[]> lowPerformingData = orderRepository.findLowPerformingProducts(startDate, endDate, pageable);
         return lowPerformingData.map(data -> {
             Product product = (Product) data[0];
             Long totalSold = (Long) data[1];
             
-            ProductDto dto = convertToProductDto(product);
+            ProductDao dto = convertToProductDto(product);
             dto.setTotalSold(totalSold);
             return dto;
         });
@@ -674,8 +740,8 @@ public class OrderService {
     
     // Helper conversion methods
     
-    private ProductDto convertToProductDto(Product product) {
-        ProductDto dto = new ProductDto();
+    private ProductDao convertToProductDto(Product product) {
+        ProductDao dto = new ProductDao();
         dto.setId(product.getId());
         dto.setName(product.getName());
         dto.setDescription(product.getDescription());
@@ -690,17 +756,103 @@ public class OrderService {
         return dto;
     }
     
-    private UserDto convertToUserDto(User user) {
-        return new UserDto(
+    private UserDao convertToUserDto(User user) {
+        return new UserDao(
             user.getId(),
             user.getUsername(),
             user.getEmail(),
             user.getFullName(),
             user.getPhoneNumber(),
-            user.getRole(),
+            user.getAdmin(),
             user.getIsActive(),
             user.getCreatedAt(),
             user.getUpdatedAt()
         );
+    }
+    
+    /**
+     * Create order from cart with customer information
+     */
+    public OrderDao createOrderFromCart(CreateOrderRequest request) {
+        User user = getUserById(request.getUserId());
+        
+        // Debug logging
+        System.out.println("Creating order with payment method: " + request.getPaymentMethod());
+        
+        // Validate COD order requirements
+        validateCODOrder(request);
+        
+        // Get cart items
+        List<CartItem> cartItems = cartItemRepository.findByUserIdOrderByAddedDateDesc(request.getUserId());
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("Cart is empty");
+        }
+        
+        // Validate cart items and check inventory
+        validateCartForOrder(cartItems);
+        
+        // Calculate totals
+        BigDecimal subtotal = calculateCartSubtotal(cartItems);
+        BigDecimal shippingFee = BigDecimal.ZERO; // Free shipping for now
+        BigDecimal taxAmount = BigDecimal.ZERO; // No tax for now
+        BigDecimal totalAmount = subtotal.add(shippingFee).add(taxAmount);
+        
+        // Create order
+        Order order = new Order(user, totalAmount);
+        order.setCustomerName(request.getCustomerName());
+        order.setCustomerPhone(request.getCustomerPhone());
+        order.setCustomerEmail(request.getCustomerEmail());
+        order.setShippingAddressText(request.getShippingAddress());
+        order.setShippingFee(shippingFee);
+        order.setTaxAmount(taxAmount);
+        order.setPaymentMethod(request.getPaymentMethod());
+        order.setNotes(request.getNotes());
+        
+        // Set appropriate status based on payment method
+        if ("COD".equals(request.getPaymentMethod())) {
+            order.setStatus(OrderStatus.PROCESSING);
+            order.setPaymentStatus(PaymentStatus.PENDING);
+            System.out.println("COD order created with PROCESSING status");
+        } else {
+            order.setStatus(OrderStatus.PENDING);
+            order.setPaymentStatus(PaymentStatus.PENDING);
+            System.out.println("Non-COD order created with PENDING status");
+        }
+        
+        // Generate order number
+        order.setOrderNumber(generateOrderNumber());
+        
+        // Save order
+        order = orderRepository.save(order);
+        
+        // Create order items from cart items and update inventory
+        for (CartItem cartItem : cartItems) {
+            OrderItem orderItem = new OrderItem(order, cartItem);
+            orderItemRepository.save(orderItem);
+            order.addOrderItem(orderItem);
+            
+            // Update product stock
+            Product product = cartItem.getProduct();
+            product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
+            productRepository.save(product);
+        }
+        
+        // Clear cart
+        cartItemRepository.deleteByUserId(request.getUserId());
+        
+        // Send notification
+        try {
+            // notificationService.sendOrderConfirmation(order); // TODO: Implement this method
+            System.out.println("Order created successfully: " + order.getOrderNumber());
+        } catch (Exception e) {
+            // Log error but don't fail the order
+            System.err.println("Failed to send order confirmation: " + e.getMessage());
+        }
+        
+        return convertToOrderDto(order);
+    }
+    
+    private String generateOrderNumber() {
+        return "ORD" + System.currentTimeMillis();
     }
 }

@@ -1,7 +1,7 @@
 package com.specialtyfood.controller;
 
-import com.specialtyfood.dto.InventoryStatisticsDto;
-import com.specialtyfood.dto.ProductDto;
+import com.specialtyfood.dao.InventoryStatisticsDao;
+import com.specialtyfood.dao.ProductDao;
 import com.specialtyfood.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,10 +33,10 @@ public class InventoryController {
      * Update product stock quantity
      */
     @PutMapping("/products/{productId}/stock")
-    public ResponseEntity<ProductDto> updateStock(@PathVariable Long productId,
+    public ResponseEntity<ProductDao> updateStock(@PathVariable Long productId,
                                                  @RequestParam Integer quantity) {
         try {
-            ProductDto product = inventoryService.updateStock(productId, quantity);
+            ProductDao product = inventoryService.updateStock(productId, quantity);
             return ResponseEntity.ok(product);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -47,10 +47,10 @@ public class InventoryController {
      * Increase product stock quantity
      */
     @PutMapping("/products/{productId}/stock/increase")
-    public ResponseEntity<ProductDto> increaseStock(@PathVariable Long productId,
+    public ResponseEntity<ProductDao> increaseStock(@PathVariable Long productId,
                                                    @RequestParam Integer quantity) {
         try {
-            ProductDto product = inventoryService.increaseStock(productId, quantity);
+            ProductDao product = inventoryService.increaseStock(productId, quantity);
             return ResponseEntity.ok(product);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -61,10 +61,10 @@ public class InventoryController {
      * Decrease product stock quantity
      */
     @PutMapping("/products/{productId}/stock/decrease")
-    public ResponseEntity<ProductDto> decreaseStock(@PathVariable Long productId,
+    public ResponseEntity<ProductDao> decreaseStock(@PathVariable Long productId,
                                                    @RequestParam Integer quantity) {
         try {
-            ProductDto product = inventoryService.decreaseStock(productId, quantity);
+            ProductDao product = inventoryService.decreaseStock(productId, quantity);
             return ResponseEntity.ok(product);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -89,7 +89,7 @@ public class InventoryController {
      * Get products with low stock
      */
     @GetMapping("/low-stock")
-    public ResponseEntity<Page<ProductDto>> getLowStockProducts(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<ProductDao>> getLowStockProducts(@RequestParam(defaultValue = "0") int page,
                                                                @RequestParam(defaultValue = "10") int size,
                                                                @RequestParam(defaultValue = "stockQuantity") String sortBy,
                                                                @RequestParam(defaultValue = "asc") String sortDir) {
@@ -98,7 +98,7 @@ public class InventoryController {
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
             
-            Page<ProductDto> products = inventoryService.getLowStockProducts(pageable);
+            Page<ProductDao> products = inventoryService.getLowStockProducts(pageable);
             return ResponseEntity.ok(products);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -109,7 +109,7 @@ public class InventoryController {
      * Get out of stock products
      */
     @GetMapping("/out-of-stock")
-    public ResponseEntity<Page<ProductDto>> getOutOfStockProducts(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<ProductDao>> getOutOfStockProducts(@RequestParam(defaultValue = "0") int page,
                                                                  @RequestParam(defaultValue = "10") int size,
                                                                  @RequestParam(defaultValue = "name") String sortBy,
                                                                  @RequestParam(defaultValue = "asc") String sortDir) {
@@ -118,7 +118,7 @@ public class InventoryController {
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
             
-            Page<ProductDto> products = inventoryService.getOutOfStockProducts(pageable);
+            Page<ProductDao> products = inventoryService.getOutOfStockProducts(pageable);
             return ResponseEntity.ok(products);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -129,7 +129,7 @@ public class InventoryController {
      * Get all products with stock information
      */
     @GetMapping("/products")
-    public ResponseEntity<Page<ProductDto>> getAllProductsWithStock(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<ProductDao>> getAllProductsWithStock(@RequestParam(defaultValue = "0") int page,
                                                                    @RequestParam(defaultValue = "10") int size,
                                                                    @RequestParam(defaultValue = "name") String sortBy,
                                                                    @RequestParam(defaultValue = "asc") String sortDir) {
@@ -138,7 +138,7 @@ public class InventoryController {
                     Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             Pageable pageable = PageRequest.of(page, size, sort);
             
-            Page<ProductDto> products = inventoryService.getAllProductsWithStock(pageable);
+            Page<ProductDao> products = inventoryService.getAllProductsWithStock(pageable);
             return ResponseEntity.ok(products);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -149,9 +149,9 @@ public class InventoryController {
      * Bulk update stock quantities
      */
     @PutMapping("/bulk-update")
-    public ResponseEntity<List<ProductDto>> bulkUpdateStock(@RequestBody List<InventoryService.StockUpdateRequest> stockUpdates) {
+    public ResponseEntity<List<ProductDao>> bulkUpdateStock(@RequestBody List<InventoryService.StockUpdateRequest> stockUpdates) {
         try {
-            List<ProductDto> updatedProducts = inventoryService.bulkUpdateStock(stockUpdates);
+            List<ProductDao> updatedProducts = inventoryService.bulkUpdateStock(stockUpdates);
             return ResponseEntity.ok(updatedProducts);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -175,9 +175,9 @@ public class InventoryController {
      * Get inventory statistics
      */
     @GetMapping("/statistics")
-    public ResponseEntity<InventoryStatisticsDto> getInventoryStatistics() {
+    public ResponseEntity<InventoryStatisticsDao> getInventoryStatistics() {
         try {
-            InventoryStatisticsDto statistics = inventoryService.getInventoryStatistics();
+            InventoryStatisticsDao statistics = inventoryService.getInventoryStatistics();
             return ResponseEntity.ok(statistics);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -202,10 +202,10 @@ public class InventoryController {
      * Release reserved stock for a product
      */
     @PostMapping("/products/{productId}/release")
-    public ResponseEntity<ProductDto> releaseReservedStock(@PathVariable Long productId,
+    public ResponseEntity<ProductDao> releaseReservedStock(@PathVariable Long productId,
                                                           @RequestParam Integer quantity) {
         try {
-            ProductDto product = inventoryService.releaseReservedStock(productId, quantity);
+            ProductDao product = inventoryService.releaseReservedStock(productId, quantity);
             return ResponseEntity.ok(product);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();

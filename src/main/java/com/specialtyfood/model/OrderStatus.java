@@ -5,6 +5,7 @@ package com.specialtyfood.model;
  */
 public enum OrderStatus {
     PENDING,
+    PROCESSING,
     CONFIRMED,
     SHIPPED,
     DELIVERED,

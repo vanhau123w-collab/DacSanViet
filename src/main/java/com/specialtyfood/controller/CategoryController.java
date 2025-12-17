@@ -1,6 +1,6 @@
 package com.specialtyfood.controller;
 
-import com.specialtyfood.dto.CategoryDto;
+import com.specialtyfood.dao.CategoryDao;
 import com.specialtyfood.dto.CreateCategoryRequest;
 import com.specialtyfood.dto.UpdateCategoryRequest;
 import com.specialtyfood.service.CategoryService;
@@ -40,7 +40,7 @@ public class CategoryController {
     @GetMapping("/active")
     public ResponseEntity<?> getAllActiveCategories() {
         try {
-            List<CategoryDto> categories = categoryService.getAllActiveCategories();
+            List<CategoryDao> categories = categoryService.getAllActiveCategories();
             return ResponseEntity.ok(categories);
             
         } catch (Exception e) {
@@ -65,7 +65,7 @@ public class CategoryController {
                 Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             
             Pageable pageable = PageRequest.of(page, size, sort);
-            Page<CategoryDto> categories = categoryService.getAllCategories(pageable);
+            Page<CategoryDao> categories = categoryService.getAllCategories(pageable);
             
             return ResponseEntity.ok(categories);
             
@@ -83,7 +83,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getCategoryById(@PathVariable Long id) {
         try {
-            CategoryDto category = categoryService.getCategoryById(id);
+            CategoryDao category = categoryService.getCategoryById(id);
             return ResponseEntity.ok(category);
             
         } catch (RuntimeException e) {
@@ -114,7 +114,7 @@ public class CategoryController {
                 Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
             
             Pageable pageable = PageRequest.of(page, size, sort);
-            Page<CategoryDto> categories = categoryService.searchCategories(keyword, pageable);
+            Page<CategoryDao> categories = categoryService.searchCategories(keyword, pageable);
             
             return ResponseEntity.ok(categories);
             
@@ -132,7 +132,7 @@ public class CategoryController {
     @GetMapping("/with-products")
     public ResponseEntity<?> getCategoriesWithProducts() {
         try {
-            List<CategoryDto> categories = categoryService.getCategoriesWithProducts();
+            List<CategoryDao> categories = categoryService.getCategoriesWithProducts();
             return ResponseEntity.ok(categories);
             
         } catch (Exception e) {
@@ -150,7 +150,7 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getCategoriesWithProductCount() {
         try {
-            List<CategoryDto> categories = categoryService.getCategoriesWithProductCount();
+            List<CategoryDao> categories = categoryService.getCategoriesWithProductCount();
             return ResponseEntity.ok(categories);
             
         } catch (Exception e) {
@@ -167,7 +167,7 @@ public class CategoryController {
     @GetMapping("/by-popularity")
     public ResponseEntity<?> getCategoriesOrderedByProductCount() {
         try {
-            List<CategoryDto> categories = categoryService.getCategoriesOrderedByProductCount();
+            List<CategoryDao> categories = categoryService.getCategoriesOrderedByProductCount();
             return ResponseEntity.ok(categories);
             
         } catch (Exception e) {
@@ -185,7 +185,7 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getEmptyCategories() {
         try {
-            List<CategoryDto> categories = categoryService.getEmptyCategories();
+            List<CategoryDao> categories = categoryService.getEmptyCategories();
             return ResponseEntity.ok(categories);
             
         } catch (Exception e) {
@@ -203,7 +203,7 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createCategory(@Valid @RequestBody CreateCategoryRequest request) {
         try {
-            CategoryDto category = categoryService.createCategory(request);
+            CategoryDao category = categoryService.createCategory(request);
             
             logger.info("Category created: {}", category.getName());
             return ResponseEntity.status(HttpStatus.CREATED).body(category);
@@ -229,7 +229,7 @@ public class CategoryController {
     public ResponseEntity<?> updateCategory(@PathVariable Long id, 
                                           @Valid @RequestBody UpdateCategoryRequest request) {
         try {
-            CategoryDto category = categoryService.updateCategory(id, request);
+            CategoryDao category = categoryService.updateCategory(id, request);
             
             logger.info("Category updated: {}", category.getName());
             return ResponseEntity.ok(category);
@@ -282,7 +282,7 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> toggleCategoryStatus(@PathVariable Long id) {
         try {
-            CategoryDto category = categoryService.toggleCategoryStatus(id);
+            CategoryDao category = categoryService.toggleCategoryStatus(id);
             
             logger.info("Category status toggled for ID: {}", id);
             return ResponseEntity.ok(category);

@@ -30,7 +30,7 @@ public class UserPrincipal implements UserDetails {
     
     public static UserPrincipal create(User user) {
         Collection<GrantedAuthority> authorities = new java.util.ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + (user.getAdmin() ? "ADMIN" : "USER")));
         
         if (Boolean.TRUE.equals(user.getAdmin())) {
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));

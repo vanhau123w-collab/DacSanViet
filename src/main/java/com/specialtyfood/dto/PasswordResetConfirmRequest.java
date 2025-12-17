@@ -2,68 +2,33 @@ package com.specialtyfood.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * DTO for password reset confirmation
+ * Request DTO for confirming password reset
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PasswordResetConfirmRequest {
     
-    @NotBlank(message = "Token is required")
+    @NotBlank(message = "Token không được để trống")
     private String token;
     
-    @NotBlank(message = "New password is required")
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
+    @NotBlank(message = "Mật khẩu mới không được để trống")
+    @Size(min = 6, message = "Mật khẩu phải có ít nhất 6 ký tự")
     private String newPassword;
     
-    @NotBlank(message = "Password confirmation is required")
+    @NotBlank(message = "Xác nhận mật khẩu không được để trống")
+    @Size(min = 6, message = "Xác nhận mật khẩu phải có ít nhất 6 ký tự")
     private String confirmPassword;
     
-    // Default constructor
-    public PasswordResetConfirmRequest() {}
-    
-    // Constructor
-    public PasswordResetConfirmRequest(String token, String newPassword, String confirmPassword) {
-        this.token = token;
-        this.newPassword = newPassword;
-        this.confirmPassword = confirmPassword;
-    }
-    
-    // Getters and Setters
-    public String getToken() {
-        return token;
-    }
-    
-    public void setToken(String token) {
-        this.token = token;
-    }
-    
-    public String getNewPassword() {
-        return newPassword;
-    }
-    
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
-    
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-    
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
-    }
-    
-    // Validation helper
+    /**
+     * Check if password and confirm password match
+     */
     public boolean isPasswordMatching() {
         return newPassword != null && newPassword.equals(confirmPassword);
-    }
-    
-    @Override
-    public String toString() {
-        return "PasswordResetConfirmRequest{" +
-                "token='" + token + '\'' +
-                ", newPassword='[PROTECTED]'" +
-                ", confirmPassword='[PROTECTED]'" +
-                '}';
     }
 }

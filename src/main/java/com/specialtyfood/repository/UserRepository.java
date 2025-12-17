@@ -1,6 +1,6 @@
 package com.specialtyfood.repository;
 
-import com.specialtyfood.model.Role;
+// Removed Role import - using admin boolean instead
 import com.specialtyfood.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,9 +53,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     
     /**
-     * Find users by role
+     * Find users by admin status
      */
-    List<User> findByRole(Role role);
+    List<User> findByAdmin(Boolean admin);
     
     /**
      * Find active users
@@ -63,9 +63,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByIsActiveTrue();
     
     /**
-     * Find users by role and active status
+     * Find users by admin and active status
      */
-    List<User> findByRoleAndIsActive(Role role, Boolean isActive);
+    List<User> findByAdminAndIsActive(Boolean admin, Boolean isActive);
     
     /**
      * Find users created within date range
@@ -90,10 +90,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findUsersWithOrders();
     
     /**
-     * Count users by role
+     * Count users by admin status
      */
-    @Query("SELECT COUNT(u) FROM User u WHERE u.role = :role")
-    Long countByRole(@Param("role") Role role);
+    @Query("SELECT COUNT(u) FROM User u WHERE u.admin = :admin")
+    Long countByAdmin(@Param("admin") Boolean admin);
     
     /**
      * Find users who registered in the last N days
@@ -122,12 +122,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
            " LOWER(u.username) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            " LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            " LOWER(u.fullName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
-           "(:role IS NULL OR u.role = :role) AND " +
+           "(:admin IS NULL OR u.admin = :admin) AND " +
            "(:isActive IS NULL OR u.isActive = :isActive) AND " +
            "(:registeredAfter IS NULL OR u.createdAt >= :registeredAfter) AND " +
            "(:registeredBefore IS NULL OR u.createdAt <= :registeredBefore)")
     Page<User> searchCustomersAdvanced(@Param("searchTerm") String searchTerm,
-                                      @Param("role") Role role,
+                                      @Param("admin") Boolean admin,
                                       @Param("isActive") Boolean isActive,
                                       @Param("registeredAfter") LocalDateTime registeredAfter,
                                       @Param("registeredBefore") LocalDateTime registeredBefore,

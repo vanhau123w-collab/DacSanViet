@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/base}">
+
+<head>
+    <title>Dashboard Admin - Đặc Sản Quê Hương</title>
+    <style>
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+
+<body>
+    <th:block layout:fragment="content">
+        <div class="container-fluid py-4">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="h2 mb-0">Dashboard Admin</h1>
+                    <p class="text-muted">Tổng quan hệ thống quản lý</p>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="dashboard-card text-center">
+                        <div class="stat-number text-primary" th:text="${statistics != null ? statistics.totalOrders : 0}">0</div>
+                        <div class="stat-label">Tổng đơn hàng</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="dashboard-card text-center">
+                        <div class="stat-number text-success" th:text="${statistics != null ? statistics.totalCustomers : 0}">0</div>
+                        <div class="stat-label">Khách hàng</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="dashboard-card text-center">
+                        <div class="stat-number text-info" th:text="${statistics != null ? statistics.totalProducts : 0}">0</div>
+                        <div class="stat-label">Sản phẩm</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="dashboard-card text-center">
+                        <div class="stat-number text-warning" th:text="${statistics != null ? #numbers.formatDecimal(statistics.totalRevenue, 0, 'COMMA', 0, 'POINT') : '0'}">0</div>
+                        <div class="stat-label">Doanh thu (₫)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Status Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="dashboard-card text-center">
+                        <div class="stat-number text-warning" th:text="${pendingOrdersCount ?: 0}">0</div>
+                        <div class="stat-label">Chờ xử lý</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="dashboard-card text-center">
+                        <div class="stat-number text-info" th:text="${processingOrdersCount ?: 0}">0</div>
+                        <div class="stat-label">Đang xử lý</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="dashboard-card text-center">
+                        <div class="stat-number text-primary">0</div>
+                        <div class="stat-label">Đã giao</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="dashboard-card text-center">
+                        <div class="stat-number text-success">0</div>
+                        <div class="stat-label">Hoàn thành</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="dashboard-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Đơn hàng gần đây</h5>
+                            <a href="/admin/orders" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Mã đơn hàng</th>
+                                        <th>Khách hàng</th>
+                                        <th>Trạng thái</th>
+                                        <th>Phương thức thanh toán</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="order : ${recentOrders}" th:if="${recentOrders != null}">
+                                        <td>
+                                            <strong th:text="'#' + ${order.orderNumber ?: order.id}">#123</strong>
+                                        </td>
+                                        <td th:text="${order.userFullName ?: 'N/A'}">Khách hàng</td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="${order.status == 'PENDING' ? 'bg-warning' : 
+                                                                   order.status == 'PROCESSING' ? 'bg-info' : 
+                                                                   order.status == 'SHIPPED' ? 'bg-primary' : 
+                                                                   order.status == 'DELIVERED' ? 'bg-success' : 'bg-secondary'}"
+                                                  th:text="${order.status}">PENDING</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${order.paymentMethod == 'COD'}" class="text-success">
+                                                <i class="bi bi-cash-coin me-1"></i>COD
+                                            </span>
+                                            <span th:unless="${order.paymentMethod == 'COD'}" th:text="${order.paymentMethod}">Khác</span>
+                                        </td>
+                                        <td>
+                                            <strong th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '₫'">100,000₫</strong>
+                                        </td>
+                                        <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">01/01/2024</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a th:href="@{/admin/orders/{id}(id=${order.id})}" 
+                                                   class="btn btn-outline-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <button th:if="${order.status == 'PROCESSING' and order.paymentMethod == 'COD'}" 
+                                                        class="btn btn-outline-success"
+                                                        th:onclick="'approveOrder(' + ${order.id} + ')'">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${recentOrders == null or recentOrders.empty}">
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                                            Chưa có đơn hàng nào
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="dashboard-card">
+                        <h5 class="mb-3">Thao tác nhanh</h5>
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <a href="/admin/products/create" class="btn btn-primary w-100">
+                                    <i class="bi bi-plus-circle me-2"></i>Thêm sản phẩm
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="/admin/categories/create" class="btn btn-success w-100">
+                                    <i class="bi bi-folder-plus me-2"></i>Thêm danh mục
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="/admin/orders" class="btn btn-info w-100">
+                                    <i class="bi bi-list-check me-2"></i>Quản lý đơn hàng
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="/admin/customers" class="btn btn-warning w-100">
+                                    <i class="bi bi-people me-2"></i>Quản lý khách hàng
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="scripts-extra">
+        <script>
+            function approveOrder(orderId) {
+                if (confirm('Bạn có chắc muốn phê duyệt đơn hàng COD này?')) {
+                    fetch(`/api/admin/orders/${orderId}/approve-cod`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            shippingCarrier: 'GIAO_HANG_NHANH',
+                            notes: 'Đơn hàng COD đã được phê duyệt'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Đơn hàng COD đã được phê duyệt!');
+                            location.reload();
+                        } else {
+                            alert('Lỗi: ' + (data.message || 'Không thể phê duyệt đơn hàng'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Có lỗi xảy ra khi phê duyệt đơn hàng COD');
+                    });
+                }
+            }
+        </script>
+    </th:block>
+</body>
+</html>

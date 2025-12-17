@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản Phẩm - Đặc Sản Quê Hương</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(231, 76, 60, 0.1);
+            height: 100%;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        
+        .product-category {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-add-cart {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-add-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            color: white;
+        }
+        
+        .sidebar-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(231, 76, 60, 0.1);
+        }
+        
+        .sidebar-card .card-header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .btn-outline-secondary {
+            border-color: #e74c3c;
+            color: #e74c3c;
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+        }
+        
+        .navbar-nav .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+        }
+        
+        .page-header {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .breadcrumb {
+            background: none;
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+        
+        .breadcrumb-item a {
+            color: #e74c3c;
+            text-decoration: none;
+        }
+        
+        .pagination .page-link {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-shop me-2"></i>Đặc Sản Quê Hương
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/products">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cart">
+                            <i class="bi bi-cart3"></i> Giỏ hàng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/orders">
+                            <i class="bi bi-bag-check"></i> Đơn hàng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile">
+                            <i class="bi bi-person"></i> Tài khoản
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Trang Chủ</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Sản Phẩm</li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="row">
+                <div class="col-md-8">
+                    <h1 class="fw-bold mb-2">
+                        <i class="bi bi-grid-3x3-gap me-2 text-danger"></i>Sản Phẩm Đặc Sản
+                    </h1>
+                    <p class="text-muted mb-0" th:if="${products != null}">
+                        Hiển thị <span th:text="${products.numberOfElements}">0</span> 
+                        trong tổng số <span th:text="${products.totalElements}">0</span> sản phẩm
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <!-- Sort dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-sort-down me-2"></i>Sắp xếp
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/products(sort='name')}">Tên A-Z</a></li>
+                            <li><a class="dropdown-item" th:href="@{/products(sort='name,desc')}">Tên Z-A</a></li>
+                            <li><a class="dropdown-item" th:href="@{/products(sort='price')}">Giá thấp đến cao</a></li>
+                            <li><a class="dropdown-item" th:href="@{/products(sort='price,desc')}">Giá cao đến thấp</a></li>
+                            <li><a class="dropdown-item" th:href="@{/products(sort='createdDate,desc')}">Mới nhất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Sidebar Filters -->
+            <aside class="col-lg-3 mb-4">
+                <div class="sidebar-card card">
+                    <div class="card-header">
+                        <h2 class="mb-0 h5"><i class="bi bi-funnel me-2"></i>Bộ Lọc</h2>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/products}" method="get">
+                            <!-- Search -->
+                            <div class="mb-3">
+                                <label for="keyword" class="form-label fw-bold">Tìm kiếm</label>
+                                <input type="text" class="form-control" id="keyword" name="search" 
+                                       th:value="${param.search}" placeholder="Nhập từ khóa...">
+                                <div class="form-text">Tìm kiếm theo tên hoặc mô tả sản phẩm</div>
+                            </div>
+
+                            <!-- Category Filter -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Danh mục</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="categoryId" value="" id="category-all"
+                                           th:checked="${param.categoryId == null or param.categoryId[0] == ''}">
+                                    <label class="form-check-label" for="category-all">Tất cả</label>
+                                </div>
+                                <div class="form-check" th:each="category : ${categories}">
+                                    <input class="form-check-input" type="radio" name="categoryId" 
+                                           th:value="${category.id}" th:id="'category-' + ${category.id}"
+                                           th:checked="${param.categoryId != null and param.categoryId[0] == category.id.toString()}">
+                                    <label class="form-check-label" th:for="'category-' + ${category.id}" 
+                                           th:text="${category.name}">Category</label>
+                                </div>
+                            </div>
+
+                            <!-- Price Range -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Khoảng giá</label>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" name="minPrice" 
+                                               th:value="${param.minPrice}" placeholder="Từ" min="0">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" name="maxPrice" 
+                                               th:value="${param.maxPrice}" placeholder="Đến" min="0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Availability -->
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="inStock" value="true" id="inStock"
+                                           th:checked="${param.inStock != null and param.inStock[0] == 'true'}">
+                                    <label class="form-check-label" for="inStock">Chỉ hiển thị sản phẩm còn hàng</label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search me-2"></i>Áp dụng
+                                </button>
+                                <a th:href="@{/products}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Xóa bộ lọc
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Products Grid -->
+            <main class="col-lg-9">
+                <!-- Products -->
+                <div class="row g-4" th:if="${products != null and !products.empty}">
+                    <div class="col-lg-4 col-md-6" th:each="product : ${products.content}">
+                        <div class="product-card">
+                            <img th:src="${product.imageUrl}" 
+                                 th:alt="${product.name}"
+                                 class="product-image"
+                                 onerror="this.src='https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&q=80'">
+                            
+                            <div class="product-info">
+                                <h3 class="product-title" th:text="${product.name}">Tên sản phẩm</h3>
+                                <p class="product-category" th:text="${product.category?.name}">Danh mục</p>
+                                <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
+                                
+                                <button class="btn-add-cart" 
+                                        th:onclick="'addToCart(' + ${product.id} + ')'"
+                                        th:disabled="${product.stockQuantity <= 0}">
+                                    <i class="bi bi-cart-plus me-2"></i>
+                                    <span th:if="${product.stockQuantity > 0}">Thêm vào giỏ</span>
+                                    <span th:unless="${product.stockQuantity > 0}">Hết hàng</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${products == null or products.empty}" class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-search display-1 text-muted"></i>
+                    </div>
+                    <h2 class="text-muted h3">Không tìm thấy sản phẩm</h2>
+                    <p class="text-muted mb-4">
+                        Không có sản phẩm nào phù hợp với tiêu chí tìm kiếm của bạn.
+                    </p>
+                    <a th:href="@{/products}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Xem tất cả sản phẩm
+                    </a>
+                </div>
+
+                <!-- Pagination -->
+                <div th:if="${products != null and products.totalPages > 1}" class="mt-5">
+                    <nav aria-label="Phân trang sản phẩm">
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous -->
+                            <li class="page-item" th:classappend="${products.first} ? 'disabled'">
+                                <a class="page-link" th:href="@{/products(page=${products.number - 1}, size=${products.size})}" 
+                                   th:if="${!products.first}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                                <span class="page-link" th:if="${products.first}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </span>
+                            </li>
+                            
+                            <!-- Page numbers -->
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}"
+                                th:classappend="${i == products.number} ? 'active'">
+                                <a class="page-link" th:href="@{/products(page=${i}, size=${products.size})}" 
+                                   th:text="${i + 1}" th:if="${i != products.number}">1</a>
+                                <span class="page-link" th:text="${i + 1}" th:if="${i == products.number}">1</span>
+                            </li>
+                            
+                            <!-- Next -->
+                            <li class="page-item" th:classappend="${products.last} ? 'disabled'">
+                                <a class="page-link" th:href="@{/products(page=${products.number + 1}, size=${products.size})}" 
+                                   th:if="${!products.last}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                                <span class="page-link" th:if="${products.last}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-submit form when filters change
+        document.querySelectorAll('input[name="categoryId"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                this.form.submit();
+            });
+        });
+
+        document.querySelector('input[name="inStock"]').addEventListener('change', function() {
+            this.form.submit();
+        });
+
+        // Add to cart function
+        function addToCart(productId) {
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    quantity: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showToast('success', data.message);
+                } else {
+                    showToast('error', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
+            });
+        }
+
+        // Toast notification function
+        function showToast(type, message) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(toast);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

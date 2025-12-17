@@ -132,12 +132,7 @@
             <scope>test</scope>
         </dependency>
         
-        <!-- H2 Database for Testing and Development -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+        <!-- H2 Database removed - using MySQL only -->
         
         <!-- Spring Boot Starter Cache -->
         <dependency>

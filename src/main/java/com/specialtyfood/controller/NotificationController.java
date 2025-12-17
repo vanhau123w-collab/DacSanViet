@@ -1,6 +1,6 @@
 package com.specialtyfood.controller;
 
-import com.specialtyfood.dto.NotificationDto;
+import com.specialtyfood.dao.NotificationDao;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -22,9 +22,9 @@ public class NotificationController {
      */
     @MessageMapping("/subscribe")
     @SendTo("/topic/notifications")
-    public NotificationDto subscribe(NotificationDto notification) {
+    public NotificationDao subscribe(NotificationDao notification) {
         // Echo back subscription confirmation
-        return new NotificationDto(
+        return new NotificationDao(
             "SYSTEM",
             "Successfully subscribed to notifications",
             System.currentTimeMillis()
@@ -35,7 +35,7 @@ public class NotificationController {
      * Send notification to all subscribers
      */
     public void sendGlobalNotification(String message) {
-        NotificationDto notification = new NotificationDto(
+        NotificationDao notification = new NotificationDao(
             "SYSTEM",
             message,
             System.currentTimeMillis()
@@ -47,7 +47,7 @@ public class NotificationController {
      * Send notification to specific user
      */
     public void sendUserNotification(String username, String message) {
-        NotificationDto notification = new NotificationDto(
+        NotificationDao notification = new NotificationDao(
             "PERSONAL",
             message,
             System.currentTimeMillis()
@@ -59,7 +59,7 @@ public class NotificationController {
      * Send notification to admin users
      */
     public void sendAdminNotification(String message) {
-        NotificationDto notification = new NotificationDto(
+        NotificationDao notification = new NotificationDao(
             "ADMIN",
             message,
             System.currentTimeMillis()
@@ -71,7 +71,7 @@ public class NotificationController {
      * Send order status notification
      */
     public void sendOrderStatusNotification(String username, String orderNumber, String status, String message) {
-        NotificationDto notification = new NotificationDto(
+        NotificationDao notification = new NotificationDao(
             "ORDER_STATUS",
             String.format("Order %s: %s - %s", orderNumber, status, message),
             System.currentTimeMillis()
@@ -84,7 +84,7 @@ public class NotificationController {
      */
     public void sendInventoryAlert(String productName, int stockQuantity) {
         String message = String.format("Low stock alert: %s has only %d units remaining", productName, stockQuantity);
-        NotificationDto notification = new NotificationDto(
+        NotificationDao notification = new NotificationDao(
             "INVENTORY_ALERT",
             message,
             System.currentTimeMillis()
@@ -97,7 +97,7 @@ public class NotificationController {
      */
     public void sendPaymentConfirmation(String username, String orderNumber, String amount) {
         String message = String.format("Payment confirmed for order %s. Amount: %s VND", orderNumber, amount);
-        NotificationDto notification = new NotificationDto(
+        NotificationDao notification = new NotificationDao(
             "PAYMENT_CONFIRMATION",
             message,
             System.currentTimeMillis()
@@ -109,7 +109,7 @@ public class NotificationController {
      * Send maintenance notification to all users
      */
     public void sendMaintenanceNotification(String message) {
-        NotificationDto notification = new NotificationDto(
+        NotificationDao notification = new NotificationDao(
             "MAINTENANCE",
             message,
             System.currentTimeMillis()

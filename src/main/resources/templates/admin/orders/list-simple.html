@@ -1,198 +1,275 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Đơn Hàng - Đặc Sản Quê Hương</title>
+    <title>Quản Lý Đơn Hàng - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/modern-ecommerce.css?v=1">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .admin-container {
-            padding: 2rem;
-        }
-        
-        .admin-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 2rem;
-        }
-        
-        .admin-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .admin-title {
-            color: white;
-            font-weight: 700;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-        
-        .order-table {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-confirmed { background: #d1ecf1; color: #0c5460; }
-        .status-shipped { background: #d4edda; color: #155724; }
-        .status-delivered { background: #d1ecf1; color: #0c5460; }
-        .status-cancelled { background: #f8d7da; color: #721c24; }
-    </style>
 </head>
-
 <body>
-    <div class="admin-container">
-        <div class="admin-header">
-            <h1 class="admin-title">
-                <i class="bi bi-list-check me-3"></i>
-                Quản Lý Đơn Hàng
-            </h1>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-shop me-2"></i>Đặc Sản Quê Hương - Admin
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                <a class="nav-link" href="/admin/orders">Đơn hàng</a>
+                <a class="nav-link" href="/">Về trang chính</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <a href="/admin/dashboard" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-arrow-left me-1"></i>Về Dashboard
+                </a>
+            </div>
         </div>
 
-        <div class="admin-card">
-            <!-- Navigation -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <a href="/admin/dashboard" class="btn btn-outline-primary me-2">
-                        <i class="bi bi-arrow-left me-1"></i>Về Dashboard
-                    </a>
-                </div>
-                <div class="col-md-6 text-end">
-                    <form th:action="@{/logout}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-outline-danger">
-                            <i class="bi bi-box-arrow-right me-1"></i>Đăng Xuất
-                        </button>
-                    </form>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-list-ul me-2"></i>Danh Sách Đơn Hàng
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                        
+                        <div th:if="${orders != null and !orders.empty}">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã đơn hàng</th>
+                                            <th>Khách hàng</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Trạng thái</th>
+                                            <th>Phương thức thanh toán</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="order : ${orders}">
+                                            <td th:text="${order.orderNumber ?: order.id}">#123</td>
+                                            <td th:text="${order.userFullName ?: 'Unknown User'}">Customer</td>
+                                            <td th:text="${order.orderDate != null ? #temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm') : 'N/A'}">Date</td>
+                                            <td>
+                                                <span class="badge bg-primary" th:text="${order.status}">Status</span>
+                                            </td>
+                                            <td>
+                                                <span th:if="${order.paymentMethod == 'COD'}" class="text-success">
+                                                    <i class="bi bi-cash-coin me-1"></i>COD
+                                                </span>
+                                                <span th:unless="${order.paymentMethod == 'COD'}" th:text="${order.paymentMethod ?: 'N/A'}">Other</span>
+                                                <!-- Debug info -->
+                                                <small class="text-muted d-block" th:text="'Debug: ' + ${order.paymentMethod}"></small>
+                                            </td>
+                                            <td th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + '₫' : '0₫'}">100,000₫</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a th:href="@{/admin/orders/{id}(id=${order.id})}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye"></i> Xem
+                                                    </a>
+                                                    <!-- COD Approval Button - Only show for actual COD orders -->
+                                                    <button th:if="${order.status != null and (order.status == T(com.specialtyfood.model.OrderStatus).PROCESSING or order.status == T(com.specialtyfood.model.OrderStatus).PENDING) and order.paymentMethod == 'COD'}" 
+                                                            class="btn btn-sm btn-success"
+                                                            th:onclick="'showCODApprovalModal(' + ${order.id} + ', \'' + ${order.orderNumber ?: order.id} + '\')'">
+                                                        <i class="bi bi-check-circle"></i> Phê duyệt COD
+                                                    </button>
+                                                    <!-- Show COD button for testing -->
+                                                    <button th:if="${order.status != null and (order.status == T(com.specialtyfood.model.OrderStatus).PROCESSING or order.status == T(com.specialtyfood.model.OrderStatus).PENDING)}" 
+                                                            class="btn btn-sm btn-warning"
+                                                            th:onclick="'testCODApproval(' + ${order.id} + ', \'' + ${order.orderNumber ?: order.id} + '\')'">
+                                                        <i class="bi bi-bug"></i> Test COD
+                                                    </button>
+                                                </div>
+                                                <!-- Debug info -->
+                                                <small th:if="${order.status != null and (order.status == T(com.specialtyfood.model.OrderStatus).PROCESSING or order.status == T(com.specialtyfood.model.OrderStatus).PENDING)}" 
+                                                       class="text-muted d-block mt-1" 
+                                                       th:text="'Status: ' + ${order.status} + ', Payment: [' + ${order.paymentMethod ?: 'null'} + ']'"></small>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination -->
+                            <nav th:if="${orders.totalPages > 1}">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:classappend="${orders.first} ? 'disabled'">
+                                        <a class="page-link" th:href="@{/admin/orders(page=${orders.number - 1})}">Previous</a>
+                                    </li>
+                                    <li class="page-item" th:each="i : ${#numbers.sequence(0, orders.totalPages - 1)}" 
+                                        th:classappend="${i == orders.number} ? 'active'">
+                                        <a class="page-link" th:href="@{/admin/orders(page=${i})}" th:text="${i + 1}">1</a>
+                                    </li>
+                                    <li class="page-item" th:classappend="${orders.last} ? 'disabled'">
+                                        <a class="page-link" th:href="@{/admin/orders(page=${orders.number + 1})}">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                        
+                        <div th:if="${orders == null or orders.empty}" class="text-center py-4">
+                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">Chưa có đơn hàng nào</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Filters -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <select class="form-select" name="status">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="PENDING" th:selected="${currentStatus?.name() == 'PENDING'}">Chờ xử lý</option>
-                        <option value="CONFIRMED" th:selected="${currentStatus?.name() == 'CONFIRMED'}">Đã xác nhận</option>
-                        <option value="SHIPPED" th:selected="${currentStatus?.name() == 'SHIPPED'}">Đã gửi hàng</option>
-                        <option value="DELIVERED" th:selected="${currentStatus?.name() == 'DELIVERED'}">Đã giao hàng</option>
-                        <option value="CANCELLED" th:selected="${currentStatus?.name() == 'CANCELLED'}">Đã hủy</option>
-                    </select>
+    <!-- COD Approval Modal -->
+    <div id="codApprovalModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Phê Duyệt Đơn Hàng COD</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="col-md-3">
-                    <input type="date" class="form-control" name="startDate" th:value="${startDate}">
+                <div class="modal-body">
+                    <p>Đơn hàng: <span id="modalOrderNumber" class="fw-bold"></span></p>
+                    
+                    <div class="mb-3">
+                        <label for="shippingCarrier" class="form-label">Chọn nhà vận chuyển:</label>
+                        <select id="shippingCarrier" class="form-select">
+                            <option value="">-- Chọn nhà vận chuyển --</option>
+                            <option value="GIAO_HANG_NHANH">Giao Hàng Nhanh</option>
+                            <option value="GIAO_HANG_TIET_KIEM">Giao Hàng Tiết Kiệm</option>
+                            <option value="VIETTEL_POST">Viettel Post</option>
+                            <option value="VIETNAM_POST">Vietnam Post</option>
+                            <option value="J_T_EXPRESS">J&T Express</option>
+                            <option value="SHOPEE_EXPRESS">Shopee Express</option>
+                            <option value="BEST_EXPRESS">Best Express</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="trackingNumber" class="form-label">Mã vận đơn (tùy chọn):</label>
+                        <input type="text" id="trackingNumber" class="form-control" placeholder="Nhập mã vận đơn nếu có">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="approvalNotes" class="form-label">Ghi chú:</label>
+                        <textarea id="approvalNotes" rows="3" class="form-control" placeholder="Ghi chú thêm về việc phê duyệt..."></textarea>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <input type="date" class="form-control" name="endDate" th:value="${endDate}">
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-funnel me-1"></i>Lọc
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-success" onclick="confirmCODApproval()">
+                        <i class="bi bi-check-circle me-1"></i>Phê Duyệt
                     </button>
                 </div>
-            </div>
-
-            <!-- Orders Table -->
-            <div class="order-table">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>ID</th>
-                                <th>Khách hàng</th>
-                                <th>Ngày đặt</th>
-                                <th>Trạng thái</th>
-                                <th>Tổng tiền</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="order : ${orders}" th:if="${orders != null}">
-                                <td>
-                                    <strong th:text="'#' + ${order.id}">#1234</strong>
-                                </td>
-                                <td>
-                                    <div>
-                                        <strong th:text="${order.user != null ? order.user.fullName : 'N/A'}">Tên khách hàng</strong>
-                                        <br>
-                                        <small class="text-muted" th:text="${order.user != null ? order.user.email : ''}">email@example.com</small>
-                                    </div>
-                                </td>
-                                <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
-                                <td>
-                                    <span class="status-badge" 
-                                          th:classappend="${
-                                              order.status.name() == 'PENDING' ? 'status-pending' : 
-                                              order.status.name() == 'CONFIRMED' ? 'status-confirmed' : 
-                                              order.status.name() == 'SHIPPED' ? 'status-shipped' : 
-                                              order.status.name() == 'DELIVERED' ? 'status-delivered' : 'status-cancelled'
-                                          }" 
-                                          th:text="${order.status}">PENDING</span>
-                                </td>
-                                <td>
-                                    <strong th:text="${#numbers.formatCurrency(order.totalAmount)}">100,000 ₫</strong>
-                                </td>
-                                <td>
-                                    <a th:href="@{'/admin/orders/' + ${order.id}}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye me-1"></i>Xem
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr th:if="${orders == null or orders.empty}">
-                                <td colspan="6" class="text-center py-4">
-                                    <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
-                                    <p class="text-muted">Không có đơn hàng nào</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Pagination -->
-            <div th:if="${orders != null and orders.totalPages > 1}" class="d-flex justify-content-center mt-4">
-                <nav>
-                    <ul class="pagination">
-                        <li class="page-item" th:classappend="${orders.first} ? 'disabled'">
-                            <a class="page-link" th:href="@{/admin/orders(page=${orders.number - 1}, size=${orders.size})}">Trước</a>
-                        </li>
-                        <li class="page-item" th:each="i : ${#numbers.sequence(0, orders.totalPages - 1)}" 
-                            th:classappend="${i == orders.number} ? 'active'">
-                            <a class="page-link" th:href="@{/admin/orders(page=${i}, size=${orders.size})}" th:text="${i + 1}">1</a>
-                        </li>
-                        <li class="page-item" th:classappend="${orders.last} ? 'disabled'">
-                            <a class="page-link" th:href="@{/admin/orders(page=${orders.number + 1}, size=${orders.size})}">Sau</a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentOrderId = null;
+        let codModal = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            codModal = new bootstrap.Modal(document.getElementById('codApprovalModal'));
+        });
+        
+        function showCODApprovalModal(orderId, orderNumber) {
+            currentOrderId = orderId;
+            document.getElementById('modalOrderNumber').textContent = orderNumber;
+            
+            // Reset form
+            document.getElementById('shippingCarrier').value = '';
+            document.getElementById('trackingNumber').value = '';
+            document.getElementById('approvalNotes').value = '';
+            
+            codModal.show();
+        }
+        
+        function confirmCODApproval() {
+            const shippingCarrier = document.getElementById('shippingCarrier').value;
+            const trackingNumber = document.getElementById('trackingNumber').value;
+            const notes = document.getElementById('approvalNotes').value;
+            
+            if (!shippingCarrier) {
+                alert('Vui lòng chọn nhà vận chuyển!');
+                return;
+            }
+            
+            const requestData = {
+                shippingCarrier: shippingCarrier,
+                trackingNumber: trackingNumber || null,
+                notes: notes || `Đơn hàng COD đã được phê duyệt và giao cho ${getCarrierName(shippingCarrier)}`
+            };
+            
+            fetch(`/api/admin/orders/${currentOrderId}/approve-cod`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Đơn hàng COD đã được phê duyệt và giao cho ${getCarrierName(shippingCarrier)}!`);
+                    codModal.hide();
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + (data.message || 'Không thể phê duyệt đơn hàng'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi phê duyệt đơn hàng COD');
+            });
+        }
+        
+        function getCarrierName(carrierCode) {
+            const carriers = {
+                'GIAO_HANG_NHANH': 'Giao Hàng Nhanh',
+                'GIAO_HANG_TIET_KIEM': 'Giao Hàng Tiết Kiệm',
+                'VIETTEL_POST': 'Viettel Post',
+                'VIETNAM_POST': 'Vietnam Post',
+                'J_T_EXPRESS': 'J&T Express',
+                'SHOPEE_EXPRESS': 'Shopee Express',
+                'BEST_EXPRESS': 'Best Express'
+            };
+            return carriers[carrierCode] || carrierCode;
+        }
+        
+        function testCODApproval(orderId, orderNumber) {
+            // Test function to check COD approval regardless of payment method
+            const requestData = {
+                shippingCarrier: 'GIAO_HANG_NHANH',
+                trackingNumber: 'TEST123',
+                notes: 'Test COD approval'
+            };
+            
+            fetch(`/api/admin/orders/${orderId}/approve-cod`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Test result: ' + JSON.stringify(data));
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Test error: ' + error);
+            });
+        }
+    </script>
 </body>
 </html>

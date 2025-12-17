@@ -3,51 +3,24 @@ package com.specialtyfood.dto;
 import com.specialtyfood.model.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Request DTO for updating order status
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateOrderStatusRequest {
     
-    @NotNull(message = "Order status is required")
+    @NotNull(message = "Trạng thái đơn hàng không được để trống")
     private OrderStatus status;
     
-    @Size(max = 100, message = "Tracking number must not exceed 100 characters")
+    @Size(max = 100, message = "Mã vận đơn không được quá 100 ký tự")
     private String trackingNumber;
     
-    @Size(max = 1000, message = "Notes must not exceed 1000 characters")
+    @Size(max = 1000, message = "Ghi chú không được quá 1000 ký tự")
     private String notes;
-    
-    // Default constructor
-    public UpdateOrderStatusRequest() {}
-    
-    // Constructor with required fields
-    public UpdateOrderStatusRequest(OrderStatus status) {
-        this.status = status;
-    }
-    
-    // Getters and Setters
-    public OrderStatus getStatus() {
-        return status;
-    }
-    
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-    
-    public String getTrackingNumber() {
-        return trackingNumber;
-    }
-    
-    public void setTrackingNumber(String trackingNumber) {
-        this.trackingNumber = trackingNumber;
-    }
-    
-    public String getNotes() {
-        return notes;
-    }
-    
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
 }

@@ -89,8 +89,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 
                 // User-specific endpoints
-                .requestMatchers("/profile/**", "/orders/**", "/cart/**").hasRole("USER")
-                .requestMatchers("/api/profile/**", "/api/orders/**", "/api/cart/**").hasRole("USER")
+                .requestMatchers("/profile/**", "/orders/**", "/cart/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/profile/**", "/api/orders/**", "/api/cart/**").hasAnyRole("USER", "ADMIN")
                 
                 // Admin endpoints
                 .requestMatchers("/admin/**").hasRole("ADMIN")
