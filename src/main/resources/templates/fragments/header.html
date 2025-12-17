@@ -27,16 +27,16 @@
                 <ul class="navbar-nav me-auto" role="menubar">
                     <li class="nav-item" role="none">
                         <a class="nav-link" th:href="@{/}"
-                            th:classappend="${#request.requestURI == '/' ? 'active' : ''}" role="menuitem"
-                            th:aria-current="${#request.requestURI == '/' ? 'page' : null}">
+                            th:classappend="${#httpServletRequest.requestURI == '/' ? 'active' : ''}" role="menuitem"
+                            th:aria-current="${#httpServletRequest.requestURI == '/' ? 'page' : null}">
                             <i class="bi bi-house me-1" aria-hidden="true"></i>Trang Chủ
                         </a>
                     </li>
                     <li class="nav-item" role="none">
                         <a class="nav-link" th:href="@{/products}"
-                            th:classappend="${#strings.startsWith(#request.requestURI, '/products') ? 'active' : ''}"
+                            th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/products') ? 'active' : ''}"
                             role="menuitem"
-                            th:aria-current="${#strings.startsWith(#request.requestURI, '/products') ? 'page' : null}">
+                            th:aria-current="${#strings.startsWith(#httpServletRequest.requestURI, '/products') ? 'page' : null}">
                             <i class="bi bi-grid me-1" aria-hidden="true"></i>Sản Phẩm
                         </a>
                     </li>
@@ -62,9 +62,9 @@
                     <!-- Additional navigation for authenticated users -->
                     <li class="nav-item" sec:authorize="isAuthenticated()" role="none">
                         <a class="nav-link" th:href="@{/orders}"
-                            th:classappend="${#strings.startsWith(#request.requestURI, '/orders') ? 'active' : ''}"
+                            th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/orders') ? 'active' : ''}"
                             role="menuitem"
-                            th:aria-current="${#strings.startsWith(#request.requestURI, '/orders') ? 'page' : null}">
+                            th:aria-current="${#strings.startsWith(#httpServletRequest.requestURI, '/orders') ? 'page' : null}">
                             <i class="bi bi-bag me-1" aria-hidden="true"></i>Đơn Hàng
                         </a>
                     </li>

@@ -79,10 +79,10 @@ public class AdminViewController {
             Page<ProductDto> topProductsPage = orderService.getPopularProducts(startOfMonth, endOfMonth, PageRequest.of(0, 5));
             model.addAttribute("topProducts", topProductsPage.getContent());
             
-            return "admin/dashboard";
+            return "admin/dashboard-simple";
         } catch (Exception e) {
             model.addAttribute("error", "Không thể tải dữ liệu dashboard: " + e.getMessage());
-            return "admin/dashboard";
+            return "admin/dashboard-simple";
         }
     }
     
@@ -131,10 +131,10 @@ public class AdminViewController {
             // Add order status options for filter
             model.addAttribute("orderStatuses", OrderStatus.values());
             
-            return "admin/orders/list";
+            return "admin/orders/list-simple";
         } catch (Exception e) {
             model.addAttribute("error", "Không thể tải danh sách đơn hàng: " + e.getMessage());
-            return "admin/orders/list";
+            return "admin/orders/list-simple";
         }
     }
     
@@ -183,10 +183,10 @@ public class AdminViewController {
             model.addAttribute("sortBy", sortBy);
             model.addAttribute("sortDir", sortDir);
             
-            return "admin/customers/list";
+            return "admin/customers/list-simple";
         } catch (Exception e) {
             model.addAttribute("error", "Không thể tải danh sách khách hàng: " + e.getMessage());
-            return "admin/customers/list";
+            return "admin/customers/list-simple";
         }
     }
     
@@ -237,10 +237,10 @@ public class AdminViewController {
             model.addAttribute("sortBy", sortBy);
             model.addAttribute("sortDir", sortDir);
             
-            return "admin/products/list";
+            return "admin/products/list-simple";
         } catch (Exception e) {
             model.addAttribute("error", "Không thể tải danh sách sản phẩm: " + e.getMessage());
-            return "admin/products/list";
+            return "admin/products/list-simple";
         }
     }
     
@@ -273,10 +273,10 @@ public class AdminViewController {
             model.addAttribute("endDate", endDate);
             model.addAttribute("period", period);
             
-            return "admin/reports/sales";
+            return "admin/reports/sales-simple";
         } catch (Exception e) {
             model.addAttribute("error", "Không thể tạo báo cáo: " + e.getMessage());
-            return "admin/reports/sales";
+            return "admin/reports/sales-simple";
         }
     }
 }

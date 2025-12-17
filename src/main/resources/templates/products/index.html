@@ -6,38 +6,234 @@
     <title>Sản Phẩm - Đặc Sản Quê Hương</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            --primary-color: #e74c3c;
+            --primary-dark: #c0392b;
+            --secondary-color: #34495e;
+            --accent-color: #f39c12;
+            --light-bg: #f8f9fa;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-bg);
+        }
+        
         .navbar-brand { font-weight: 700; }
         .nav-link { font-weight: 500; }
-        .btn-danger { background: #dc3545; border: none; }
-        .btn-danger:hover { background: #c82333; }
         
         .page-header {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: white;
-            padding: 60px 0;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .page-header .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .filter-sidebar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2rem;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .filter-title {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .filter-section {
+            margin-bottom: 2rem;
+        }
+        
+        .filter-section h6 {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .category-filter-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .category-filter-item:hover {
+            background: var(--light-bg);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+        
+        .category-filter-item.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-dark);
         }
         
         .product-card {
-            transition: transform 0.3s ease;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            height: 100%;
         }
         
         .product-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
         
         .product-img {
-            height: 200px;
+            height: 250px;
             object-fit: cover;
+            transition: transform 0.3s ease;
         }
         
-        .filter-card {
-            background: #f8f9fa;
+        .product-card:hover .product-img {
+            transform: scale(1.05);
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 3;
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-title {
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .product-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .product-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .add-to-cart-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #a93226);
+            transform: scale(1.05);
+        }
+        
+        .results-header {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .sort-dropdown {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.5rem 1rem;
+        }
+        
+        .pagination .page-link {
+            border-radius: 10px;
+            margin: 0 2px;
+            border: none;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .filter-sidebar {
+                position: static;
+                margin-bottom: 2rem;
+            }
+            
+            .product-card {
+                margin-bottom: 1.5rem;
+            }
+        }
+        
+        /* Loading animation */
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
     </style>
 </head>
@@ -128,6 +324,14 @@
         <div class="container">
             <h1 class="display-4 fw-bold mb-3">Sản Phẩm Đặc Sản</h1>
             <p class="lead mb-0">Khám phá hương vị đặc trưng từ khắp các vùng miền Việt Nam</p>
+            <div class="mt-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a href="/" class="text-white">Trang Chủ</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">Sản Phẩm</li>
+                    </ol>
+                </nav>
+            </div>
         </div>
     </section>
     
@@ -136,45 +340,61 @@
         <div class="row">
             <!-- Sidebar Filters -->
             <div class="col-lg-3 mb-4">
-                <div class="card filter-card">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Bộ Lọc</h5>
+                <div class="filter-sidebar">
+                    <h5 class="filter-title">
+                        <i class="bi bi-funnel me-2"></i>Bộ Lọc Sản Phẩm
+                    </h5>
+                    
+                    <!-- Category Filter -->
+                    <div class="filter-section">
+                        <h6><i class="bi bi-tags me-2"></i>Danh Mục</h6>
+                        <a th:href="@{/products}" class="category-filter-item" 
+                           th:classappend="${selectedCategory == null ? 'active' : ''}">
+                            <i class="bi bi-grid me-2"></i>Tất Cả Sản Phẩm
+                        </a>
+                        <a th:href="@{/products?category=1}" class="category-filter-item"
+                           th:classappend="${selectedCategory == '1' ? 'active' : ''}">
+                            <i class="bi bi-geo-alt me-2"></i>Đặc Sản Miền Bắc
+                        </a>
+                        <a th:href="@{/products?category=2}" class="category-filter-item"
+                           th:classappend="${selectedCategory == '2' ? 'active' : ''}">
+                            <i class="bi bi-sun me-2"></i>Đặc Sản Miền Trung
+                        </a>
+                        <a th:href="@{/products?category=3}" class="category-filter-item"
+                           th:classappend="${selectedCategory == '3' ? 'active' : ''}">
+                            <i class="bi bi-water me-2"></i>Đặc Sản Miền Nam
+                        </a>
                     </div>
-                    <div class="card-body">
-                        <!-- Category Filter -->
-                        <div class="mb-4">
-                            <h6 class="fw-bold mb-3">Danh Mục</h6>
-                            <div class="list-group list-group-flush">
-                                <a th:href="@{/products}" class="list-group-item list-group-item-action border-0 ps-0" 
-                                   th:classappend="${selectedCategory == null ? 'active' : ''}">
-                                    <i class="bi bi-grid me-2"></i>Tất Cả Sản Phẩm
-                                </a>
-                                <a th:href="@{/products?category=1}" class="list-group-item list-group-item-action border-0 ps-0"
-                                   th:classappend="${selectedCategory == '1' ? 'active' : ''}">
-                                    <i class="bi bi-geo-alt me-2 text-primary"></i>Đặc Sản Miền Bắc
-                                </a>
-                                <a th:href="@{/products?category=2}" class="list-group-item list-group-item-action border-0 ps-0"
-                                   th:classappend="${selectedCategory == '2' ? 'active' : ''}">
-                                    <i class="bi bi-sun me-2 text-warning"></i>Đặc Sản Miền Trung
-                                </a>
-                                <a th:href="@{/products?category=3}" class="list-group-item list-group-item-action border-0 ps-0"
-                                   th:classappend="${selectedCategory == '3' ? 'active' : ''}">
-                                    <i class="bi bi-water me-2 text-success"></i>Đặc Sản Miền Nam
-                                </a>
-                            </div>
+                    
+                    <!-- Price Filter -->
+                    <div class="filter-section">
+                        <h6><i class="bi bi-currency-dollar me-2"></i>Khoảng Giá</h6>
+                        <div class="d-grid gap-2">
+                            <a href="#" class="category-filter-item">
+                                <i class="bi bi-tag me-2"></i>Dưới 50.000₫
+                            </a>
+                            <a href="#" class="category-filter-item">
+                                <i class="bi bi-tag me-2"></i>50.000₫ - 100.000₫
+                            </a>
+                            <a href="#" class="category-filter-item">
+                                <i class="bi bi-tag me-2"></i>100.000₫ - 200.000₫
+                            </a>
+                            <a href="#" class="category-filter-item">
+                                <i class="bi bi-tag me-2"></i>Trên 200.000₫
+                            </a>
                         </div>
-                        
-                        <!-- Quick Actions -->
-                        <div>
-                            <h6 class="fw-bold mb-3">Thao Tác Nhanh</h6>
-                            <div class="d-grid gap-2">
-                                <a th:href="@{/categories}" class="btn btn-outline-danger btn-sm">
-                                    <i class="bi bi-tags me-1"></i>Xem Danh Mục
-                                </a>
-                                <a th:href="@{/cart}" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-cart me-1"></i>Giỏ Hàng
-                                </a>
-                            </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="filter-section">
+                        <h6><i class="bi bi-lightning me-2"></i>Thao Tác Nhanh</h6>
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/categories}" class="btn btn-outline-primary">
+                                <i class="bi bi-tags me-1"></i>Xem Danh Mục
+                            </a>
+                            <a th:href="@{/cart}" class="btn btn-primary">
+                                <i class="bi bi-cart me-1"></i>Giỏ Hàng
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -183,46 +403,82 @@
             <!-- Products Grid -->
             <div class="col-lg-9">
                 <!-- Results Header -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h4 class="mb-1">
-                            <span th:if="${searchKeyword != null}">Kết quả tìm kiếm: "<span th:text="${searchKeyword}"></span>"</span>
-                            <span th:if="${searchKeyword == null and selectedCategory == '1'}">Đặc Sản Miền Bắc</span>
-                            <span th:if="${searchKeyword == null and selectedCategory == '2'}">Đặc Sản Miền Trung</span>
-                            <span th:if="${searchKeyword == null and selectedCategory == '3'}">Đặc Sản Miền Nam</span>
-                            <span th:if="${searchKeyword == null and selectedCategory == null}">Tất Cả Sản Phẩm</span>
-                        </h4>
-                        <p class="text-muted mb-0">
-                            Tìm thấy <strong th:text="${totalElements ?: 0}">0</strong> sản phẩm
-                        </p>
+                <div class="results-header">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="mb-2 mb-md-0">
+                            <h4 class="mb-1 fw-bold">
+                                <span th:if="${searchKeyword != null}">
+                                    <i class="bi bi-search me-2 text-primary"></i>
+                                    Kết quả cho: "<span th:text="${searchKeyword}" class="text-primary"></span>"
+                                </span>
+                                <span th:if="${searchKeyword == null and selectedCategory == '1'}">
+                                    <i class="bi bi-geo-alt me-2 text-primary"></i>Đặc Sản Miền Bắc
+                                </span>
+                                <span th:if="${searchKeyword == null and selectedCategory == '2'}">
+                                    <i class="bi bi-sun me-2 text-warning"></i>Đặc Sản Miền Trung
+                                </span>
+                                <span th:if="${searchKeyword == null and selectedCategory == '3'}">
+                                    <i class="bi bi-water me-2 text-success"></i>Đặc Sản Miền Nam
+                                </span>
+                                <span th:if="${searchKeyword == null and selectedCategory == null}">
+                                    <i class="bi bi-grid me-2 text-secondary"></i>Tất Cả Sản Phẩm
+                                </span>
+                            </h4>
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-check-circle me-1 text-success"></i>
+                                Tìm thấy <strong th:text="${totalElements ?: 0}">0</strong> sản phẩm
+                            </p>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <label for="sortSelect" class="form-label mb-0 fw-semibold">Sắp xếp:</label>
+                            <select class="form-select sort-dropdown" id="sortSelect" style="width: auto;">
+                                <option value="newest">Mới nhất</option>
+                                <option value="price-low">Giá thấp đến cao</option>
+                                <option value="price-high">Giá cao đến thấp</option>
+                                <option value="popular">Phổ biến nhất</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Products Grid -->
                 <div class="row g-4" th:if="${products != null and !products.empty}">
-                    <div class="col-lg-4 col-md-6" th:each="product : ${products}">
-                        <div class="card product-card h-100">
+                    <div class="col-lg-4 col-md-6" th:each="product, iterStat : ${products}">
+                        <div class="product-card" th:attr="style='animation-delay: ' + ${iterStat.index * 0.1} + 's'">
                             <div class="position-relative">
                                 <img th:src="${product.imageUrl}" 
                                      th:alt="${product.name}"
-                                     class="card-img-top product-img" 
-                                     onerror="this.src='https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&q=80'">
-                                <span class="badge bg-success position-absolute top-0 start-0 m-2" 
-                                      th:if="${product.isFeatured}">Nổi bật</span>
-                                <span class="badge bg-warning position-absolute top-0 end-0 m-2" 
-                                      th:if="${product.stockQuantity <= 10 and product.stockQuantity > 0}">Sắp hết</span>
-                                <span class="badge bg-danger position-absolute top-0 end-0 m-2" 
-                                      th:if="${product.stockQuantity == 0}">Hết hàng</span>
+                                     class="product-img w-100" 
+                                     onerror="this.src='https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80'">
+                                <div class="product-badge">
+                                    <span class="badge bg-success mb-1" th:if="${product.isFeatured}">
+                                        <i class="bi bi-star-fill me-1"></i>Nổi bật
+                                    </span>
+                                    <span class="badge bg-warning" th:if="${product.stockQuantity <= 10 and product.stockQuantity > 0}">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>Sắp hết
+                                    </span>
+                                    <span class="badge bg-danger" th:if="${product.stockQuantity == 0}">
+                                        <i class="bi bi-x-circle me-1"></i>Hết hàng
+                                    </span>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <h6 class="card-title fw-bold" th:text="${product.name}">Tên sản phẩm</h6>
-                                <p class="card-text text-muted small" th:text="${product.description}">Mô tả sản phẩm</p>
+                            <div class="product-info">
+                                <h5 class="product-title" th:text="${product.name}">Tên sản phẩm</h5>
+                                <p class="product-description" th:text="${product.description}">Mô tả sản phẩm</p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold text-danger fs-5" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
-                                    <button class="btn btn-danger" 
-                                            th:disabled="${product.stockQuantity == 0}">
-                                        <i class="bi bi-cart-plus me-1"></i>Thêm
+                                    <span class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                                    <button class="add-to-cart-btn" 
+                                            th:disabled="${product.stockQuantity == 0}"
+                                            th:attr="data-product-id=${product.id}">
+                                        <i class="bi bi-cart-plus me-1"></i>
+                                        <span th:text="${product.stockQuantity == 0 ? 'Hết hàng' : 'Thêm vào giỏ'}">Thêm vào giỏ</span>
                                     </button>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-box me-1"></i>
+                                        Còn lại: <span th:text="${product.stockQuantity}">0</span> sản phẩm
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -230,13 +486,21 @@
                 </div>
                 
                 <!-- Empty State -->
-                <div class="text-center py-5" th:if="${products == null or products.empty}">
-                    <i class="bi bi-inbox display-1 text-muted mb-3"></i>
-                    <h4 class="text-muted">Không tìm thấy sản phẩm nào</h4>
-                    <p class="text-muted mb-4">Hãy thử tìm kiếm với từ khóa khác hoặc xem tất cả sản phẩm</p>
-                    <a th:href="@{/products}" class="btn btn-danger">
-                        <i class="bi bi-grid me-2"></i>Xem Tất Cả Sản Phẩm
-                    </a>
+                <div class="empty-state" th:if="${products == null or products.empty}">
+                    <i class="bi bi-search"></i>
+                    <h4 class="fw-bold mb-3">Không tìm thấy sản phẩm nào</h4>
+                    <p class="text-muted mb-4">
+                        Hãy thử tìm kiếm với từ khóa khác hoặc điều chỉnh bộ lọc của bạn.<br>
+                        Chúng tôi có hàng trăm sản phẩm đặc sản chất lượng đang chờ bạn khám phá!
+                    </p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a th:href="@{/products}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-grid me-2"></i>Xem Tất Cả Sản Phẩm
+                        </a>
+                        <a th:href="@{/categories}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-tags me-2"></i>Duyệt Danh Mục
+                        </a>
+                    </div>
                 </div>
                 
                 <!-- Pagination -->

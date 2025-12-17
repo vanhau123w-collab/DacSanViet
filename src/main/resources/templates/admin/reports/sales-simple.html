@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo Bán Hàng - Đặc Sản Quê Hương</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/modern-ecommerce.css?v=1">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .admin-container {
+            padding: 2rem;
+        }
+        
+        .admin-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-title {
+            color: white;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1 class="admin-title">
+                <i class="bi bi-graph-up me-3"></i>
+                Báo Cáo Bán Hàng
+            </h1>
+        </div>
+
+        <!-- Navigation -->
+        <div class="admin-card">
+            <div class="row">
+                <div class="col-md-6">
+                    <a href="/admin/dashboard" class="btn btn-outline-primary me-2">
+                        <i class="bi bi-arrow-left me-1"></i>Về Dashboard
+                    </a>
+                </div>
+                <div class="col-md-6 text-end">
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-box-arrow-right me-1"></i>Đăng Xuất
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Range Filter -->
+        <div class="admin-card">
+            <h4 class="mb-3">
+                <i class="bi bi-calendar-range me-2"></i>
+                Chọn Khoảng Thời Gian
+            </h4>
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="startDate" class="form-label">Từ ngày</label>
+                    <input type="date" class="form-control" id="startDate" name="startDate" th:value="${startDate}">
+                </div>
+                <div class="col-md-3">
+                    <label for="endDate" class="form-label">Đến ngày</label>
+                    <input type="date" class="form-control" id="endDate" name="endDate" th:value="${endDate}">
+                </div>
+                <div class="col-md-3">
+                    <label for="period" class="form-label">Chu kỳ</label>
+                    <select class="form-select" id="period" name="period">
+                        <option value="DAILY" th:selected="${period == 'DAILY'}">Theo ngày</option>
+                        <option value="WEEKLY" th:selected="${period == 'WEEKLY'}">Theo tuần</option>
+                        <option value="MONTHLY" th:selected="${period == 'MONTHLY'}">Theo tháng</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel me-1"></i>Lọc Báo Cáo
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Statistics Overview -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <i class="bi bi-currency-dollar fs-1 mb-2"></i>
+                    <div class="stat-number" th:text="${salesReport != null and salesReport.revenueAnalytics != null ? #numbers.formatCurrency(salesReport.revenueAnalytics.totalRevenue) : '0 ₫'}">0 ₫</div>
+                    <div class="stat-label">Tổng Doanh Thu</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <i class="bi bi-cart-check fs-1 mb-2"></i>
+                    <div class="stat-number" th:text="${salesReport != null and salesReport.revenueAnalytics != null ? salesReport.revenueAnalytics.totalOrders : '0'}">0</div>
+                    <div class="stat-label">Tổng Đơn Hàng</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <i class="bi bi-people fs-1 mb-2"></i>
+                    <div class="stat-number" th:text="${salesReport != null and salesReport.customerTrends != null ? salesReport.customerTrends.totalCustomers : '0'}">0</div>
+                    <div class="stat-label">Tổng Khách Hàng</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <i class="bi bi-graph-up-arrow fs-1 mb-2"></i>
+                    <div class="stat-number" th:text="${salesReport != null and salesReport.revenueAnalytics != null ? #numbers.formatCurrency(salesReport.revenueAnalytics.averageOrderValue) : '0 ₫'}">0 ₫</div>
+                    <div class="stat-label">Giá Trị Đơn Hàng TB</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Products -->
+        <div class="admin-card">
+            <h4 class="mb-4">
+                <i class="bi bi-star me-2 text-warning"></i>
+                Sản Phẩm Bán Chạy
+            </h4>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Số lượng bán</th>
+                            <th>Doanh thu</th>
+                            <th>Tỷ lệ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product, iterStat : ${salesReport != null ? salesReport.popularProducts : {}}" th:if="${salesReport != null and salesReport.popularProducts != null}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-primary me-2" th:text="${iterStat.count}">1</span>
+                                    <strong th:text="${product.name}">Tên sản phẩm</strong>
+                                </div>
+                            </td>
+                            <td th:text="${product.soldQuantity != null ? product.soldQuantity : 0}">0</td>
+                            <td th:text="${product.revenue != null ? #numbers.formatCurrency(product.revenue) : '0 ₫'}">0 ₫</td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar" role="progressbar" 
+                                         th:style="'width: ' + ${product.percentage != null ? product.percentage : 0} + '%'"
+                                         th:text="${product.percentage != null ? #numbers.formatDecimal(product.percentage, 1, 1) + '%' : '0%'}">0%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${salesReport == null or salesReport.popularProducts == null or salesReport.popularProducts.empty}">
+                            <td colspan="4" class="text-center py-4">
+                                <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                                <p class="text-muted">Chưa có dữ liệu sản phẩm bán chạy</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Order Status Breakdown -->
+        <div class="admin-card">
+            <h4 class="mb-4">
+                <i class="bi bi-pie-chart me-2 text-info"></i>
+                Phân Tích Trạng Thái Đơn Hàng
+            </h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                <tr th:each="status : ${salesReport != null ? salesReport.orderStatusBreakdown : {}}" th:if="${salesReport != null and salesReport.orderStatusBreakdown != null}">
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${status.key == 'PENDING' ? 'bg-warning' : 
+                                                             status.key == 'CONFIRMED' ? 'bg-info' : 
+                                                             status.key == 'SHIPPED' ? 'bg-primary' : 
+                                                             status.key == 'DELIVERED' ? 'bg-success' : 'bg-danger'}"
+                                              th:text="${status.key}">Status</span>
+                                    </td>
+                                    <td th:text="${status.value}">0</td>
+                                    <td>
+                                        <div class="progress" style="height: 15px;">
+                                            <div class="progress-bar" 
+                                                 th:classappend="${status.key == 'PENDING' ? 'bg-warning' : 
+                                                                status.key == 'CONFIRMED' ? 'bg-info' : 
+                                                                status.key == 'SHIPPED' ? 'bg-primary' : 
+                                                                status.key == 'DELIVERED' ? 'bg-success' : 'bg-danger'}"
+                                                 th:style="'width: ' + ${status.value * 100 / (salesReport.orderStatusBreakdown.values().sum())} + '%'">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${salesReport == null or salesReport.orderStatusBreakdown == null or salesReport.orderStatusBreakdown.empty}">
+                                    <td colspan="3" class="text-center py-4">
+                                        <p class="text-muted">Chưa có dữ liệu trạng thái đơn hàng</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-center">
+                        <i class="bi bi-graph-up fs-1 text-primary mb-3"></i>
+                        <h5>Biểu Đồ Sẽ Hiển Thị Tại Đây</h5>
+                        <p class="text-muted">Tích hợp Chart.js để hiển thị biểu đồ tròn</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Options -->
+        <div class="admin-card">
+            <h4 class="mb-3">
+                <i class="bi bi-download me-2 text-success"></i>
+                Xuất Báo Cáo
+            </h4>
+            <div class="row">
+                <div class="col-md-3">
+                    <button class="btn btn-success w-100 mb-2">
+                        <i class="bi bi-file-earmark-excel me-1"></i>Xuất Excel
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-danger w-100 mb-2">
+                        <i class="bi bi-file-earmark-pdf me-1"></i>Xuất PDF
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-info w-100 mb-2">
+                        <i class="bi bi-file-earmark-text me-1"></i>Xuất CSV
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-secondary w-100 mb-2">
+                        <i class="bi bi-printer me-1"></i>In Báo Cáo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

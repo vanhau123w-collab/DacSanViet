@@ -21,9 +21,6 @@ import java.time.LocalDateTime;
         @UniqueConstraint(name = "uk_cart_user_product", columnNames = {"user_id", "product_id"})
     }
 )
-@lombok.Data
-@lombok.NoArgsConstructor
-@lombok.AllArgsConstructor
 public class CartItem {
     
     @Id
@@ -32,12 +29,10 @@ public class CartItem {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @lombok.ToString.Exclude
     private User user;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    @lombok.ToString.Exclude
     private Product product;
     
     @Column(nullable = false)
@@ -55,6 +50,9 @@ public class CartItem {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
+    // Default constructor
+    public CartItem() {}
+    
     // Constructor with required fields
     public CartItem(User user, Product product, Integer quantity) {
         this.user = user;
@@ -62,6 +60,39 @@ public class CartItem {
         this.quantity = quantity;
         this.unitPrice = product.getPrice(); // Set current price
     }
+    
+    // All args constructor
+    public CartItem(Long id, User user, Product product, Integer quantity, BigDecimal unitPrice,
+                    LocalDateTime addedDate, LocalDateTime updatedAt) {
+        this.id = id;
+        this.user = user;
+        this.product = product;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+        this.addedDate = addedDate;
+        this.updatedAt = updatedAt;
+    }
+    
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+    
+    public Product getProduct() { return product; }
+    
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    
+    public BigDecimal getUnitPrice() { return unitPrice; }
+    public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
+    
+    public LocalDateTime getAddedDate() { return addedDate; }
+    public void setAddedDate(LocalDateTime addedDate) { this.addedDate = addedDate; }
+    
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     
     // Custom setter for product to update unit price
     public void setProduct(Product product) {

@@ -18,9 +18,6 @@ import java.util.List;
     @Index(name = "idx_address_user", columnList = "user_id"),
     @Index(name = "idx_address_default", columnList = "is_default")
 })
-@lombok.Data
-@lombok.NoArgsConstructor
-@lombok.AllArgsConstructor
 public class Address {
     
     @Id
@@ -70,11 +67,9 @@ public class Address {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @lombok.ToString.Exclude
     private User user;
     
     @OneToMany(mappedBy = "shippingAddress", fetch = FetchType.LAZY)
-    @lombok.ToString.Exclude
     private List<Order> orders = new ArrayList<>();
     
     @CreationTimestamp
@@ -85,6 +80,9 @@ public class Address {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
+    // Default constructor
+    public Address() {}
+    
     // Constructor with required fields
     public Address(String fullName, String addressLine1, String city, String province, String postalCode, User user) {
         this.fullName = fullName;
@@ -94,6 +92,69 @@ public class Address {
         this.postalCode = postalCode;
         this.user = user;
     }
+    
+    // All args constructor
+    public Address(Long id, String fullName, String phoneNumber, String addressLine1, String addressLine2,
+                   String city, String province, String postalCode, String country, Boolean isDefault,
+                   User user, List<Order> orders, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.fullName = fullName;
+        this.phoneNumber = phoneNumber;
+        this.addressLine1 = addressLine1;
+        this.addressLine2 = addressLine2;
+        this.city = city;
+        this.province = province;
+        this.postalCode = postalCode;
+        this.country = country;
+        this.isDefault = isDefault;
+        this.user = user;
+        this.orders = orders;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+    
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+    
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    
+    public String getAddressLine1() { return addressLine1; }
+    public void setAddressLine1(String addressLine1) { this.addressLine1 = addressLine1; }
+    
+    public String getAddressLine2() { return addressLine2; }
+    public void setAddressLine2(String addressLine2) { this.addressLine2 = addressLine2; }
+    
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+    
+    public String getProvince() { return province; }
+    public void setProvince(String province) { this.province = province; }
+    
+    public String getPostalCode() { return postalCode; }
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
+    
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
+    
+    public Boolean getIsDefault() { return isDefault; }
+    public void setIsDefault(Boolean isDefault) { this.isDefault = isDefault; }
+    
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+    
+    public List<Order> getOrders() { return orders; }
+    public void setOrders(List<Order> orders) { this.orders = orders; }
+    
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     
     // Helper methods
     public String getFullAddress() {

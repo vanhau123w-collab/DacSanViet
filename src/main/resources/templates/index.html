@@ -6,80 +6,274 @@
     <title>Trang Chủ - Đặc Sản Quê Hương</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/modern-ecommerce.css(v=1)}">
     
     <style>
+        :root {
+            --primary-color: #e74c3c;
+            --primary-dark: #c0392b;
+            --secondary-color: #34495e;
+            --accent-color: #f39c12;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+        
+        /* Hero Section - Modern E-commerce Style */
         .hero-section {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: white;
-            padding: 80px 0;
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
         }
         
         .hero-title {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
         .hero-subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+        
+        .hero-stats {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Modern Cards */
+        .modern-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: none;
+            overflow: hidden;
+        }
+        
+        .modern-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
         
         .category-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            height: 300px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.2);
+            transition: opacity 0.3s ease;
+        }
+        
+        .category-card:hover::before {
+            opacity: 0;
         }
         
         .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            color: white;
+            text-decoration: none;
         }
         
+        .category-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        
+        .category-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .category-desc {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        /* Product Cards */
         .product-card {
-            transition: transform 0.3s ease;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: 100%;
+            transition: all 0.3s ease;
         }
         
         .product-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
         }
         
         .product-img {
-            height: 200px;
+            height: 250px;
             object-fit: cover;
+            border-radius: 15px 15px 0 0;
         }
         
-        .navbar-brand {
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 3;
+        }
+        
+        .price-tag {
+            font-size: 1.4rem;
             font-weight: 700;
+            color: var(--primary-color);
         }
         
-        .nav-link {
-            font-weight: 500;
+        /* Features Section */
+        .features-section {
+            background: var(--light-bg);
+            padding: 80px 0;
         }
         
-        .btn-danger {
-            background: #dc3545;
+        .feature-item {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        /* Newsletter */
+        .newsletter-section {
+            background: var(--dark-bg);
+            color: white;
+            padding: 60px 0;
+        }
+        
+        .newsletter-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-input {
+            border-radius: 50px;
             border: none;
+            padding: 15px 25px;
+            font-size: 1rem;
         }
         
-        .btn-danger:hover {
-            background: #c82333;
+        .newsletter-btn {
+            border-radius: 50px;
+            padding: 15px 30px;
+            background: var(--accent-color);
+            border: none;
+            font-weight: 600;
         }
         
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 1rem;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .category-card {
+                height: 200px;
+            }
+            
+            .category-icon {
+                font-size: 3rem;
+            }
         }
         
-        .section-subtitle {
-            color: #6c757d;
-            margin-bottom: 3rem;
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        .animate-delay-4 { animation-delay: 0.4s; }
     </style>
 </head>
 <body>
@@ -195,22 +389,46 @@
     </nav>
     
     <!-- Hero Section -->
-    <section class="hero-section text-center">
+    <section class="hero-section">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-8 mx-auto">
-                    <h1 class="hero-title">Đặc Sản Quê Hương</h1>
-                    <p class="hero-subtitle">
+                <div class="col-lg-8 mx-auto text-center hero-content">
+                    <h1 class="hero-title animate-fade-in-up">Đặc Sản Quê Hương</h1>
+                    <p class="hero-subtitle animate-fade-in-up animate-delay-1">
                         Khám phá hương vị đặc trưng từ khắp các vùng miền Việt Nam.<br>
                         Sản phẩm chất lượng cao, đậm đà bản sắc văn hóa ẩm thực dân tộc.
                     </p>
-                    <div class="d-flex gap-3 justify-content-center flex-wrap">
-                        <a th:href="@{/products}" class="btn btn-light btn-lg">
-                            <i class="bi bi-grid me-2"></i>Xem Sản Phẩm
+                    <div class="d-flex gap-3 justify-content-center flex-wrap animate-fade-in-up animate-delay-2">
+                        <a th:href="@{/products}" class="btn btn-light btn-lg px-4 py-3">
+                            <i class="bi bi-grid me-2"></i>Khám Phá Ngay
                         </a>
-                        <a th:href="@{/categories}" class="btn btn-outline-light btn-lg">
+                        <a th:href="@{/categories}" class="btn btn-outline-light btn-lg px-4 py-3">
                             <i class="bi bi-tags me-2"></i>Danh Mục
                         </a>
+                    </div>
+                    
+                    <!-- Hero Stats -->
+                    <div class="hero-stats animate-fade-in-up animate-delay-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <span class="stat-number">500+</span>
+                                    <span class="stat-label">Sản Phẩm Đặc Sản</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <span class="stat-number">10K+</span>
+                                    <span class="stat-label">Khách Hàng Hài Lòng</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <span class="stat-number">63</span>
+                                    <span class="stat-label">Tỉnh Thành Phủ</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -218,7 +436,7 @@
     </section>
     
     <!-- Categories Section -->
-    <section class="py-5 bg-light">
+    <section class="py-5">
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="section-title">Danh Mục Sản Phẩm</h2>
@@ -227,47 +445,40 @@
             
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="card category-card text-center h-100">
-                        <div class="card-body p-4">
-                            <i class="bi bi-geo-alt-fill text-primary display-4 mb-3"></i>
-                            <h5 class="fw-bold mb-3">Miền Bắc</h5>
-                            <p class="text-muted mb-3">Bánh chưng, nem chua, chả cá Lã Vọng, bánh cuốn</p>
-                            <a th:href="@{/products?category=1}" class="btn btn-outline-primary">
-                                <i class="bi bi-arrow-right me-1"></i>Xem Sản Phẩm
-                            </a>
+                    <a th:href="@{/products?category=1}" class="category-card modern-card text-decoration-none animate-fade-in-up">
+                        <div class="category-content">
+                            <i class="bi bi-geo-alt-fill category-icon"></i>
+                            <h3 class="category-title">Miền Bắc</h3>
+                            <p class="category-desc">Bánh chưng, nem chua, chả cá Lã Vọng, bánh cuốn</p>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 <div class="col-md-4">
-                    <div class="card category-card text-center h-100">
-                        <div class="card-body p-4">
-                            <i class="bi bi-sun-fill text-warning display-4 mb-3"></i>
-                            <h5 class="fw-bold mb-3">Miền Trung</h5>
-                            <p class="text-muted mb-3">Bún bò Huế, bánh khoái, mắm ruốc, bánh bèo</p>
-                            <a th:href="@{/products?category=2}" class="btn btn-outline-warning">
-                                <i class="bi bi-arrow-right me-1"></i>Xem Sản Phẩm
-                            </a>
+                    <a th:href="@{/products?category=2}" class="category-card modern-card text-decoration-none animate-fade-in-up animate-delay-1" 
+                       style="background: linear-gradient(45deg, #f39c12, #e67e22);">
+                        <div class="category-content">
+                            <i class="bi bi-sun-fill category-icon"></i>
+                            <h3 class="category-title">Miền Trung</h3>
+                            <p class="category-desc">Bún bò Huế, bánh khoái, mắm ruốc, bánh bèo</p>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 <div class="col-md-4">
-                    <div class="card category-card text-center h-100">
-                        <div class="card-body p-4">
-                            <i class="bi bi-water text-success display-4 mb-3"></i>
-                            <h5 class="fw-bold mb-3">Miền Nam</h5>
-                            <p class="text-muted mb-3">Bánh tráng, hủ tiếu, bánh xèo, cơm tấm</p>
-                            <a th:href="@{/products?category=3}" class="btn btn-outline-success">
-                                <i class="bi bi-arrow-right me-1"></i>Xem Sản Phẩm
-                            </a>
+                    <a th:href="@{/products?category=3}" class="category-card modern-card text-decoration-none animate-fade-in-up animate-delay-2"
+                       style="background: linear-gradient(45deg, #27ae60, #2ecc71);">
+                        <div class="category-content">
+                            <i class="bi bi-water category-icon"></i>
+                            <h3 class="category-title">Miền Nam</h3>
+                            <p class="category-desc">Bánh tráng, hủ tiếu, bánh xèo, cơm tấm</p>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
     
     <!-- Featured Products Section -->
-    <section class="py-5">
+    <section class="py-5 bg-light"></section>
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="section-title">Sản Phẩm Nổi Bật</h2>
@@ -276,26 +487,31 @@
             
             <!-- Dynamic Products from Database -->
             <div class="row g-4" th:if="${featuredProducts != null and !featuredProducts.empty}">
-                <div class="col-lg-3 col-md-6" th:each="product : ${featuredProducts}">
-                    <div class="card product-card h-100">
+                <div class="col-lg-3 col-md-6" th:each="product, iterStat : ${featuredProducts}">
+                    <div class="card modern-card product-card h-100 animate-fade-in-up" th:attr="style='animation-delay: ' + ${iterStat.index * 0.1} + 's'">
                         <div class="position-relative">
                             <img th:src="${product.imageUrl}" 
                                  th:alt="${product.name}"
                                  class="card-img-top product-img" 
                                  onerror="this.src='https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&q=80'">
-                            <span class="badge bg-success position-absolute top-0 start-0 m-2" 
-                                  th:if="${product.isFeatured}">Nổi bật</span>
-                            <span class="badge bg-warning position-absolute top-0 end-0 m-2" 
-                                  th:if="${product.stockQuantity <= 10 and product.stockQuantity > 0}">Sắp hết</span>
+                            <div class="product-badge">
+                                <span class="badge bg-success mb-1" th:if="${product.isFeatured}">
+                                    <i class="bi bi-star-fill me-1"></i>Nổi bật
+                                </span>
+                                <span class="badge bg-warning" th:if="${product.stockQuantity <= 10 and product.stockQuantity > 0}">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>Sắp hết
+                                </span>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <h6 class="card-title fw-bold" th:text="${product.name}">Tên sản phẩm</h6>
-                            <p class="card-text text-muted small" th:text="${product.description}">Mô tả sản phẩm</p>
+                        <div class="card-body p-4">
+                            <h5 class="card-title fw-bold mb-2" th:text="${product.name}">Tên sản phẩm</h5>
+                            <p class="card-text text-muted mb-3" th:text="${product.description}">Mô tả sản phẩm</p>
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold text-danger" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
-                                <button class="btn btn-danger btn-sm" 
-                                        th:disabled="${product.stockQuantity == 0}">
-                                    <i class="bi bi-cart-plus"></i>
+                                <span class="price-tag" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                                <button class="btn btn-primary btn-sm px-3" 
+                                        th:disabled="${product.stockQuantity == 0}"
+                                        th:attr="data-product-id=${product.id}">
+                                    <i class="bi bi-cart-plus me-1"></i>Thêm
                                 </button>
                             </div>
                         </div>
@@ -371,29 +587,74 @@
                 </div>
             </div>
             
-            <div class="text-center mt-4">
-                <a th:href="@{/products}" class="btn btn-danger btn-lg">
+            <div class="text-center mt-5">
+                <a th:href="@{/products}" class="btn btn-primary btn-lg px-5 py-3"></a>
                     Xem Tất Cả Sản Phẩm <i class="bi bi-arrow-right ms-2"></i>
                 </a>
             </div>
         </div>
     </section>
     
-    <!-- Newsletter Section -->
-    <section class="hero-section text-center">
+    <!-- Features Section -->
+    <section class="features-section">
         <div class="container">
-            <h3 class="fw-bold mb-3">Đăng Ký Nhận Tin Khuyến Mãi</h3>
-            <p class="mb-4 opacity-75">Nhận thông tin sản phẩm mới và ưu đãi hấp dẫn</p>
-            <form class="row g-3 justify-content-center">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Tại Sao Chọn Chúng Tôi?</h2>
+                <p class="section-subtitle">Cam kết mang đến trải nghiệm mua sắm tốt nhất</p>
+            </div>
+            
+            <div class="row g-4">
                 <div class="col-md-4">
-                    <input type="email" class="form-control form-control-lg" placeholder="Nhập email của bạn">
+                    <div class="feature-item animate-fade-in-up">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Chất Lượng Đảm Bảo</h4>
+                        <p class="text-muted">Tất cả sản phẩm đều được kiểm tra chất lượng nghiêm ngặt, đảm bảo an toàn thực phẩm.</p>
+                    </div>
                 </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-light btn-lg">
-                        <i class="bi bi-envelope me-2"></i>Đăng Ký
-                    </button>
+                <div class="col-md-4">
+                    <div class="feature-item animate-fade-in-up animate-delay-1">
+                        <div class="feature-icon">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Giao Hàng Nhanh</h4>
+                        <p class="text-muted">Giao hàng toàn quốc trong 24-48h, đóng gói cẩn thận, bảo quản tươi ngon.</p>
+                    </div>
                 </div>
-            </form>
+                <div class="col-md-4">
+                    <div class="feature-item animate-fade-in-up animate-delay-2">
+                        <div class="feature-icon">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Hỗ Trợ 24/7</h4>
+                        <p class="text-muted">Đội ngũ chăm sóc khách hàng chuyên nghiệp, sẵn sàng hỗ trợ mọi lúc mọi nơi.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Newsletter Section -->
+    <section class="newsletter-section text-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h3 class="fw-bold mb-3">Đăng Ký Nhận Tin Khuyến Mãi</h3>
+                    <p class="mb-4 opacity-90">Nhận thông tin sản phẩm mới và ưu đãi hấp dẫn trước tiên</p>
+                    <form class="newsletter-form">
+                        <div class="input-group">
+                            <input type="email" class="form-control newsletter-input" placeholder="Nhập email của bạn..." required>
+                            <button type="submit" class="btn newsletter-btn">
+                                <i class="bi bi-envelope me-2"></i>Đăng Ký Ngay
+                            </button>
+                        </div>
+                    </form>
+                    <p class="small mt-3 opacity-75">
+                        <i class="bi bi-lock me-1"></i>Chúng tôi cam kết bảo mật thông tin của bạn
+                    </p>
+                </div>
+            </div>
         </div>
     </section>
     
@@ -401,54 +662,74 @@
     <footer class="bg-dark text-light py-5">
         <div class="container">
             <div class="row">
-                <div class="col-md-4 mb-4">
+                <div class="col-lg-4 col-md-6 mb-4">
                     <h5 class="fw-bold mb-3">
-                        <i class="bi bi-shop me-2"></i>Đặc Sản Quê Hương
+                        <i class="bi bi-shop me-2 text-warning"></i>Đặc Sản Quê Hương
                     </h5>
-                    <p class="text-muted">
+                    <p class="text-muted mb-4"></p>
                         Chuyên cung cấp các sản phẩm đặc sản chất lượng cao từ khắp các vùng miền Việt Nam.
                         Mang hương vị quê hương đến mọi gia đình.
                     </p>
                     <div class="d-flex gap-3">
-                        <a href="#" class="text-light"><i class="bi bi-facebook fs-5"></i></a>
-                        <a href="#" class="text-light"><i class="bi bi-instagram fs-5"></i></a>
-                        <a href="#" class="text-light"><i class="bi bi-youtube fs-5"></i></a>
-                        <a href="#" class="text-light"><i class="bi bi-envelope fs-5"></i></a>
+                        <a href="#" class="text-light fs-4 hover-effect">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="#" class="text-light fs-4 hover-effect">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="#" class="text-light fs-4 hover-effect">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                        <a href="#" class="text-light fs-4 hover-effect">
+                            <i class="bi bi-tiktok"></i>
+                        </a>
                     </div>
                 </div>
                 
-                <div class="col-md-2 mb-4">
-                    <h6 class="fw-bold mb-3">Liên Kết</h6>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3 text-warning">Liên Kết</h6>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-muted text-decoration-none">Về Chúng Tôi</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Liên Hệ</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Chính Sách</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Điều Khoản</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none hover-effect">Về Chúng Tôi</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none hover-effect">Tin Tức</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none hover-effect">Liên Hệ</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none hover-effect">Tuyển Dụng</a></li>
                     </ul>
                 </div>
                 
-                <div class="col-md-3 mb-4">
-                    <h6 class="fw-bold mb-3">Danh Mục</h6>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3 text-warning">Danh Mục</h6>
                     <ul class="list-unstyled">
-                        <li><a th:href="@{/products?category=1}" class="text-muted text-decoration-none">Đặc Sản Miền Bắc</a></li>
-                        <li><a th:href="@{/products?category=2}" class="text-muted text-decoration-none">Đặc Sản Miền Trung</a></li>
-                        <li><a th:href="@{/products?category=3}" class="text-muted text-decoration-none">Đặc Sản Miền Nam</a></li>
-                        <li><a th:href="@{/categories}" class="text-muted text-decoration-none">Tất Cả Danh Mục</a></li>
+                        <li class="mb-2"><a th:href="@{/products?category=1}" class="text-muted text-decoration-none hover-effect">Đặc Sản Miền Bắc</a></li>
+                        <li class="mb-2"><a th:href="@{/products?category=2}" class="text-muted text-decoration-none hover-effect">Đặc Sản Miền Trung</a></li>
+                        <li class="mb-2"><a th:href="@{/products?category=3}" class="text-muted text-decoration-none hover-effect">Đặc Sản Miền Nam</a></li>
+                        <li class="mb-2"><a th:href="@{/categories}" class="text-muted text-decoration-none hover-effect">Tất Cả Danh Mục</a></li>
                     </ul>
                 </div>
                 
-                <div class="col-md-3 mb-4">
-                    <h6 class="fw-bold mb-3">Liên Hệ</h6>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3 text-warning">Liên Hệ</h6>
                     <div class="text-muted">
-                        <div class="mb-2"><i class="bi bi-geo-alt me-2"></i>123 Đường ABC, Quận XYZ, TP.HCM</div>
-                        <div class="mb-2"><i class="bi bi-telephone me-2"></i><a href="tel:0123456789" class="text-muted text-decoration-none">0123 456 789</a></div>
-                        <div class="mb-2"><i class="bi bi-envelope me-2"></i><a href="mailto:info@dacsanquenhuong.vn" class="text-muted text-decoration-none">info@dacsanquenhuong.vn</a></div>
-                        <div><i class="bi bi-clock me-2"></i>8:00 - 22:00 (Thứ 2 - CN)</div>
+                        <div class="mb-3 d-flex align-items-start">
+                            <i class="bi bi-geo-alt me-2 mt-1 text-warning"></i>
+                            <span>123 Đường Nguyễn Huệ, Quận 1, TP.HCM</span>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-telephone me-2 text-warning"></i>
+                            <a href="tel:0123456789" class="text-muted text-decoration-none hover-effect">0123 456 789</a>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-envelope me-2 text-warning"></i>
+                            <a href="mailto:info@dacsanquenhuong.vn" class="text-muted text-decoration-none hover-effect">info@dacsanquenhuong.vn</a>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock me-2 text-warning"></i>
+                            <span>8:00 - 22:00 (Thứ 2 - CN)</span>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <hr class="my-4">
+            <hr class="my-4 border-secondary">
             
             <div class="row align-items-center">
                 <div class="col-md-6">
@@ -457,15 +738,32 @@
                     </p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <img src="https://via.placeholder.com/40x25/007bff/ffffff?text=VISA" alt="Visa" class="me-2">
-                    <img src="https://via.placeholder.com/40x25/ff5722/ffffff?text=MC" alt="Mastercard" class="me-2">
-                    <img src="https://via.placeholder.com/40x25/4caf50/ffffff?text=ATM" alt="ATM" class="me-2">
+                    <span class="text-muted me-3">Phương thức thanh toán:</span>
+                    <img src="https://img.icons8.com/color/40/000000/visa.png" alt="Visa" class="me-2">
+                    <img src="https://img.icons8.com/color/40/000000/mastercard.png" alt="Mastercard" class="me-2">
+                    <img src="https://img.icons8.com/color/40/000000/momo.png" alt="MoMo" class="me-2">
                 </div>
             </div>
         </div>
     </footer>
     
+    <style>
+        .hover-effect {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-effect:hover {
+            color: var(--accent-color) !important;
+            transform: translateX(5px);
+        }
+        
+        footer a.hover-effect:hover {
+            text-decoration: none !important;
+        }
+    </style>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/js/app.js(v=1)}"></script>
+    <script th:src="@{/js/ecommerce-enhanced.js(v=1)}"></script>
 </body>
 </html>
