@@ -3,16 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sản Phẩm - Đặc Sản Quê Hương</title>
+    <title>Sản Phẩm - Đặc Sản Việt</title>
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/header.css(v=1)}">
     
     <style>
         :root {
-            --primary-color: #D2691E;
-            --primary-dark: #8B4513;
-            --primary-light: #F4A460;
+            --primary-color: #4ec2b6;
+            --primary-dark: #2e857c;
+            --primary-light: #7dd3c7;
             --secondary-color: #34495e;
             --accent-color: #6B8E23;
             --light-bg: #f8f9fa;
@@ -29,7 +39,8 @@
         .nav-link { font-weight: 500; }
         
         .page-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                        url('/images/products/banner-category.webp') center/cover no-repeat;
             color: white;
             padding: 80px 0;
             position: relative;
@@ -43,8 +54,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            opacity: 0.3;
+            background: rgba(78, 194, 182, 0.1);
         }
         
         .page-header .container {
@@ -52,13 +62,16 @@
             z-index: 2;
         }
         
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: white !important;
+        }
+        
         .filter-sidebar {
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             padding: 2rem;
-            position: sticky;
-            top: 100px;
+            height: fit-content;
         }
         
         .filter-title {
@@ -143,6 +156,11 @@
             color: var(--secondary-color);
             margin-bottom: 0.5rem;
             font-size: 1.1rem;
+            min-height: 2.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         
         .product-description {
@@ -150,27 +168,82 @@
             font-size: 0.9rem;
             margin-bottom: 1rem;
             line-height: 1.5;
+            min-height: 3rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         
         .product-price {
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 800;
             color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .product-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
         }
         
         .add-to-cart-btn {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             border: none;
-            border-radius: 10px;
-            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            padding: 0.75rem 1.25rem;
             color: white;
             font-weight: 600;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 194, 182, 0.3);
+            width: 100%;
         }
         
-        .add-to-cart-btn:hover {
-            background: linear-gradient(135deg, var(--primary-dark), #a93226);
-            transform: scale(1.05);
+        .add-to-cart-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 194, 182, 0.4);
+        }
+        
+        .add-to-cart-btn:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .view-details-btn {
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 0.65rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .view-details-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .stock-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.75rem;
+            background: var(--light-bg);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .stock-info i {
+            color: var(--primary-color);
         }
         
         .results-header {
@@ -236,89 +309,118 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+        
+        /* Custom button styles */
+        .btn-teal {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 194, 182, 0.3);
+        }
+        
+        .btn-teal:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 194, 182, 0.4);
+        }
+        
+        .btn-teal-outline {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-teal-outline:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Review slider styles */
+        .review-slide {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        
+        .slider-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .indicator.active {
+            background: var(--primary-color);
+            width: 30px;
+            border-radius: 6px;
+        }
+        
+        .indicator:hover {
+            background: var(--primary-light);
+        }
+        
+        /* Price Range Slider Styles */
+        .price-slider-container input[type="range"] {
+            pointer-events: all !important;
+        }
+        
+        .price-slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            pointer-events: all;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .price-slider-container input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            pointer-events: all;
+        }
+        
+        .price-slider-container input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+        
+        .price-slider-container input[type="range"]::-moz-range-thumb:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
-    <!-- Navigation Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-danger sticky-top">
-        <div class="container">
-            <a class="navbar-brand" th:href="@{/}">
-                <i class="bi bi-shop me-2"></i>Đặc Sản Quê Hương
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/}">
-                            <i class="bi bi-house me-1"></i>Trang Chủ
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/products}">
-                            <i class="bi bi-grid me-1"></i>Sản Phẩm
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/categories}">
-                            <i class="bi bi-tags me-1"></i>Danh Mục
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/orders}">
-                            <i class="bi bi-bag me-1"></i>Đơn Hàng
-                        </a>
-                    </li>
-                </ul>
-                
-                <!-- Search Form -->
-                <form class="d-flex me-3" th:action="@{/products/search}" method="get">
-                    <div class="input-group">
-                        <input class="form-control" type="search" name="keyword" placeholder="Tìm kiếm sản phẩm..." th:value="${searchKeyword}">
-                        <button class="btn btn-outline-light" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
-                </form>
-                
-                <!-- User Menu -->
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" th:href="@{/cart}">
-                            <i class="bi bi-cart3 fs-5"></i>
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle me-1"></i>
-                            <span sec:authentication="name">User</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" th:href="@{/profile}">
-                                <i class="bi bi-person me-2"></i>Thông Tin Cá Nhân
-                            </a></li>
-                            <li sec:authorize="hasRole('ADMIN')">
-                                <a class="dropdown-item" th:href="@{/admin/dashboard}">
-                                    <i class="bi bi-speedometer2 me-2"></i>Quản Trị
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form th:action="@{/logout}" method="post" class="d-inline">
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="bi bi-box-arrow-right me-2"></i>Đăng Xuất
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
+    
+    <!-- Mobile Menu -->
+    <div th:replace="fragments/header :: mobile-menu"></div>
     
     <!-- Page Header -->
     <section class="page-header text-center">
@@ -328,7 +430,7 @@
             <div class="mt-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb justify-content-center">
-                        <li class="breadcrumb-item"><a href="/" class="text-white">Trang Chủ</a></li>
+                        <li class="breadcrumb-item"><a href="/" class="text-white text-decoration-none">Trang Chủ</a></li>
                         <li class="breadcrumb-item active text-white" aria-current="page">Sản Phẩm</li>
                     </ol>
                 </nav>
@@ -349,20 +451,16 @@
                     <!-- Category Filter -->
                     <div class="filter-section">
                         <h6><i class="bi bi-tags me-2"></i>Danh Mục</h6>
-                        <a th:href="@{/products}" class="category-filter-item" 
-                           th:classappend="${selectedCategory == null ? 'active' : ''}">
+                        <a href="#" class="category-filter-item filter-category active" data-category="all">
                             <i class="bi bi-grid me-2"></i>Tất Cả Sản Phẩm
                         </a>
-                        <a th:href="@{/products?category=1}" class="category-filter-item"
-                           th:classappend="${selectedCategory == '1' ? 'active' : ''}">
+                        <a href="#" class="category-filter-item filter-category" data-category="1">
                             <i class="bi bi-geo-alt me-2"></i>Đặc Sản Miền Bắc
                         </a>
-                        <a th:href="@{/products?category=2}" class="category-filter-item"
-                           th:classappend="${selectedCategory == '2' ? 'active' : ''}">
+                        <a href="#" class="category-filter-item filter-category" data-category="2">
                             <i class="bi bi-sun me-2"></i>Đặc Sản Miền Trung
                         </a>
-                        <a th:href="@{/products?category=3}" class="category-filter-item"
-                           th:classappend="${selectedCategory == '3' ? 'active' : ''}">
+                        <a href="#" class="category-filter-item filter-category" data-category="3">
                             <i class="bi bi-water me-2"></i>Đặc Sản Miền Nam
                         </a>
                     </div>
@@ -371,18 +469,53 @@
                     <div class="filter-section">
                         <h6><i class="bi bi-currency-dollar me-2"></i>Khoảng Giá</h6>
                         <div class="d-grid gap-2">
-                            <a href="#" class="category-filter-item">
+                            <a href="#" class="category-filter-item filter-price active" data-min="0" data-max="999999999">
+                                <i class="bi bi-tag me-2"></i>Tất cả
+                            </a>
+                            <a href="#" class="category-filter-item filter-price" data-min="0" data-max="50000">
                                 <i class="bi bi-tag me-2"></i>Dưới 50.000₫
                             </a>
-                            <a href="#" class="category-filter-item">
+                            <a href="#" class="category-filter-item filter-price" data-min="50000" data-max="100000">
                                 <i class="bi bi-tag me-2"></i>50.000₫ - 100.000₫
                             </a>
-                            <a href="#" class="category-filter-item">
+                            <a href="#" class="category-filter-item filter-price" data-min="100000" data-max="200000">
                                 <i class="bi bi-tag me-2"></i>100.000₫ - 200.000₫
                             </a>
-                            <a href="#" class="category-filter-item">
+                            <a href="#" class="category-filter-item filter-price" data-min="200000" data-max="999999999">
                                 <i class="bi bi-tag me-2"></i>Trên 200.000₫
                             </a>
+                            <a href="#" id="customPriceToggle" class="category-filter-item">
+                                <i class="bi bi-sliders me-2"></i>Giá Tùy Chỉnh
+                            </a>
+                        </div>
+                        
+                        <!-- Custom Price Range (Hidden by default) -->
+                        <div id="customPricePanel" class="mt-2 p-3 bg-light rounded-3" style="display: none;">
+                            <!-- Price Range Slider -->
+                            <div class="mb-3">
+                                <div class="price-slider-container position-relative" style="height: 5px; background: #dee2e6; border-radius: 5px; margin: 25px 0;">
+                                    <div id="priceSliderTrack" style="position: absolute; height: 100%; background: var(--primary-color); border-radius: 5px;"></div>
+                                    <input type="range" id="minPriceSlider" min="0" max="5000000" value="0" step="50000" 
+                                           style="position: absolute; width: 100%; top: -7px; pointer-events: none; -webkit-appearance: none; background: transparent;">
+                                    <input type="range" id="maxPriceSlider" min="0" max="5000000" value="5000000" step="50000"
+                                           style="position: absolute; width: 100%; top: -7px; pointer-events: none; -webkit-appearance: none; background: transparent;">
+                                </div>
+                            </div>
+                            
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Từ:</label>
+                                    <input type="text" id="customMinPrice" class="form-control form-control-sm" placeholder="0₫" value="0₫">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Đến:</label>
+                                    <input type="text" id="customMaxPrice" class="form-control form-control-sm" placeholder="5.000.000₫" value="5.000.000₫">
+                                </div>
+                            </div>
+                            
+                            <button id="applyCustomPrice" class="btn btn-sm btn-teal w-100">
+                                <i class="bi bi-check-circle me-2"></i>Áp Dụng
+                            </button>
                         </div>
                     </div>
                     
@@ -390,12 +523,47 @@
                     <div class="filter-section">
                         <h6><i class="bi bi-lightning me-2"></i>Thao Tác Nhanh</h6>
                         <div class="d-grid gap-2">
-                            <a th:href="@{/categories}" class="btn btn-outline-primary">
-                                <i class="bi bi-tags me-1"></i>Xem Danh Mục
+                            <a th:href="@{/categories}" class="btn btn-teal-outline rounded-pill">
+                                <i class="bi bi-tags me-2"></i>Xem Danh Mục
                             </a>
-                            <a th:href="@{/cart}" class="btn btn-primary">
-                                <i class="bi bi-cart me-1"></i>Giỏ Hàng
+                            <a th:href="@{/cart}" class="btn btn-teal rounded-pill">
+                                <i class="bi bi-cart me-2"></i>Giỏ Hàng
                             </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Promotional Banner -->
+                    <div class="promo-banner mt-4">
+                        <div class="position-relative overflow-hidden rounded-4" style="cursor: pointer; height: 400px;">
+                            <img src="/images/products/banner-sidebar.webp" alt="Khuyến mãi đặc biệt" class="w-100 h-100" 
+                                 style="border-radius: 15px; transition: transform 0.3s ease; object-fit: cover;" 
+                                 onerror="this.src='https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&q=80'"
+                                 onmouseover="this.style.transform='scale(1.05)'" 
+                                 onmouseout="this.style.transform='scale(1)'">
+                            <div class="promo-overlay position-absolute top-0 start-0 w-100 h-100" 
+                                 style="background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%); border-radius: 15px;">
+                                <div class="position-absolute bottom-0 start-0 p-4 text-white w-100">
+                                    <div class="badge bg-danger mb-2">
+                                        <i class="bi bi-fire me-1"></i>HOT DEAL
+                                    </div>
+                                    <h5 class="fw-bold mb-2">Tết Tây tưng bừng, vui mừng quà tặng</h5>
+                                    <p class="mb-3 small">Giảm giá lên đến 30% áp dụng cho hoá đơn trên 100k!</p>
+                                    <div class="coupon-code-box py-3 px-4 rounded-4 text-center mb-2" 
+                                         style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); 
+                                                box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+                                                cursor: pointer; 
+                                                transition: all 0.3s ease;
+                                                border: none;"
+                                         onclick="copyCouponCode()"
+                                         onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(78, 194, 182, 0.4)'"
+                                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.2)'">
+                                        <strong class="d-block fs-4 fw-bold" style="letter-spacing: 3px; color: #4ec2b6; font-family: 'Courier New', monospace;">DSVTET30</strong>
+                                    </div>
+                                    <small class="d-block text-center" style="font-size: 0.5rem; opacity: 0.95; font-style: italic;">
+                                        <i class="bi bi-calendar-check me-1"></i>Áp dụng từ 15/12/2025 - 03/01/2025
+                                    </small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -438,14 +606,21 @@
                                 <option value="price-high">Giá cao đến thấp</option>
                                 <option value="popular">Phổ biến nhất</option>
                             </select>
+                            <button id="clearFiltersBtn" class="btn btn-outline-danger border-radius:16px">
+                                <i class="bi bi-x-circle me-2"></i>Xóa Bộ Lọc
+                            </button>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Products Grid -->
-                <div class="row g-4" th:if="${products != null and !products.empty}">
-                    <div class="col-lg-4 col-md-6" th:each="product, iterStat : ${products}">
-                        <div class="product-card" th:attr="style='animation-delay: ' + ${iterStat.index * 0.1} + 's'">
+                <div class="row g-4" id="productsGrid" th:if="${products != null and !products.empty}">
+                    <div class="col-lg-4 col-md-6 product-item" 
+                         th:each="product, iterStat : ${products}"
+                         th:data-category="${product.categoryId}"
+                         th:data-price="${product.price}"
+                         th:data-index="${iterStat.index}">
+                        <div class="product-card">
                             <div class="position-relative">
                                 <img th:src="${product.imageUrl}" 
                                      th:alt="${product.name}"
@@ -466,20 +641,31 @@
                             <div class="product-info">
                                 <h5 class="product-title" th:text="${product.name}">Tên sản phẩm</h5>
                                 <p class="product-description" th:text="${product.description}">Mô tả sản phẩm</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                                <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
+                                
+                                <div class="product-actions">
                                     <button class="add-to-cart-btn" 
                                             th:disabled="${product.stockQuantity == 0}"
                                             th:attr="data-product-id=${product.id}">
-                                        <i class="bi bi-cart-plus me-1"></i>
+                                        <i class="bi bi-cart-plus me-2"></i>
                                         <span th:text="${product.stockQuantity == 0 ? 'Hết hàng' : 'Thêm vào giỏ'}">Thêm vào giỏ</span>
                                     </button>
+                                    <button class="view-details-btn">
+                                        <i class="bi bi-eye me-2"></i>Xem chi tiết
+                                    </button>
                                 </div>
-                                <div class="mt-2">
-                                    <small class="text-muted">
-                                        <i class="bi bi-box me-1"></i>
-                                        Còn lại: <span th:text="${product.stockQuantity}">0</span> sản phẩm
-                                    </small>
+                                
+                                <div class="stock-info">
+                                    <span>
+                                        <i class="bi bi-box-seam me-1"></i>
+                                        <strong th:text="${product.stockQuantity}">0</strong> sản phẩm
+                                    </span>
+                                    <span class="badge" 
+                                          th:classappend="${product.stockQuantity > 10 ? 'bg-success' : (product.stockQuantity > 0 ? 'bg-warning' : 'bg-danger')}">
+                                        <span th:if="${product.stockQuantity > 10}">Còn hàng</span>
+                                        <span th:if="${product.stockQuantity <= 10 and product.stockQuantity > 0}">Sắp hết</span>
+                                        <span th:if="${product.stockQuantity == 0}">Hết hàng</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -505,41 +691,701 @@
                 </div>
                 
                 <!-- Pagination -->
-                <nav th:if="${totalPages > 1}" class="mt-5">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                            <a class="page-link" th:href="@{/products(page=${currentPage - 1}, category=${selectedCategory}, keyword=${searchKeyword})}">
-                                <i class="bi bi-chevron-left"></i>
-                            </a>
-                        </li>
-                        
-                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
-                            th:classappend="${i == currentPage ? 'active' : ''}">
-                            <a class="page-link" th:href="@{/products(page=${i}, category=${selectedCategory}, keyword=${searchKeyword})}" 
-                               th:text="${i + 1}">1</a>
-                        </li>
-                        
-                        <li class="page-item" th:classappend="${currentPage >= totalPages - 1 ? 'disabled' : ''}">
-                            <a class="page-link" th:href="@{/products(page=${currentPage + 1}, category=${selectedCategory}, keyword=${searchKeyword})}">
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                        </li>
+                <nav id="paginationContainer" class="mt-5" style="display: none;">
+                    <ul class="pagination justify-content-center" id="paginationList">
+                        <!-- Pagination will be generated by JavaScript -->
                     </ul>
                 </nav>
             </div>
         </div>
     </main>
     
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5">
-        <div class="container text-center">
-            <h5><i class="bi bi-shop me-2"></i>Đặc Sản Quê Hương</h5>
-            <p class="text-muted mb-0">&copy; 2024 Đặc Sản Quê Hương. Tất cả quyền được bảo lưu.</p>
+    <!-- Customer Reviews Section -->
+    <section class="customer-reviews py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <div class="reviews-header">
+                        <h2 class="display-5 fw-bold mb-3" style="color: #D2691E;">ĐÁNH GIÁ<br>CỦA<br>KHÁCH HÀNG</h2>
+                        <div class="rating-summary mb-3">
+                            <div class="stars mb-2">
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                            </div>
+                            <p class="text-muted mb-0">Hơn 1,000+ đánh giá 5 sao</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-8">
+                    <div class="reviews-slider-container position-relative overflow-hidden" style="width: 100%;">
+                        <div class="reviews-track d-flex" id="reviewsSlider" style="transition: transform 0.5s ease-in-out; width: 100%;">
+                            <!-- Review 1 -->
+                            <div class="review-slide" style="width: 50%; min-width: 50%; max-width: 50%; flex-shrink: 0; padding: 0 10px; box-sizing: border-box;">
+                                <div class="review-card p-4 bg-white rounded-4 shadow-sm h-100">
+                                    <div class="stars mb-3">
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    </div>
+                                    <p class="review-text mb-3" style="line-height: 1.8;">
+                                        Tôi đã mua khô và mắm ở đây nhiều lần, chất lượng luôn ổn định. Đặc biệt là khô bò bên shop rất thơm, không bị mặn gắt như nhiều chỗ khác. Hương vị rất chuẩn đặc sản miền Tây. Chắc chắn sẽ ủng hộ tiếp!
+                                    </p>
+                                    <div class="reviewer d-flex align-items-center">
+                                        <img src="/images/customer-avt.webp" alt="Avatar" class="me-3" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #4ec2b6;">
+                                        <div>
+                                            <p class="mb-0 fw-semibold">Nguyễn Ngọc Tuấn</p>
+                                            <small class="text-muted">Khách hàng thân thiết</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Review 2 -->
+                            <div class="review-slide" style="width: 50%; min-width: 50%; max-width: 50%; flex-shrink: 0; padding: 0 10px; box-sizing: border-box;">
+                                <div class="review-card p-4 bg-white rounded-4 shadow-sm h-100">
+                                    <div class="stars mb-3">
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    </div>
+                                    <p class="review-text mb-3" style="line-height: 1.8;">
+                                        Lần đầu mua hàng tại Đặc Sản Việt nhưng rất hài lòng. Sản phẩm được đóng gói cẩn thận và đẹp mắt, giao hàng nhanh chóng. Đặc biệt, mắm cá linh được đóng hũ sạch sẽ. Rất thích cách shop chăm sóc và tư vấn tận tình!
+                                    </p>
+                                    <div class="reviewer d-flex align-items-center">
+                                        <img src="/images/customer-avt.webp" alt="Avatar" class="me-3" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #D2691E;">
+                                        <div>
+                                            <p class="mb-0 fw-semibold">Lê Kim Nghĩa</p>
+                                            <small class="text-muted">Khách hàng mới</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Review 3 -->
+                            <div class="review-slide" style="width: 50%; min-width: 50%; max-width: 50%; flex-shrink: 0; padding: 0 10px; box-sizing: border-box;">
+                                <div class="review-card p-4 bg-white rounded-4 shadow-sm h-100">
+                                    <div class="stars mb-3">
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    </div>
+                                    <p class="review-text mb-3" style="line-height: 1.8;">
+                                        Shop giao hàng rất nhanh, đóng gói cẩn thận. Bánh tráng và nem chua đều tươi ngon, giá cả hợp lý. Đã giới thiệu cho nhiều người bạn và họ cũng rất hài lòng. Sẽ tiếp tục ủng hộ shop lâu dài!
+                                    </p>
+                                    <div class="reviewer d-flex align-items-center">
+                                        <img src="/images/customer-avt.webp" alt="Avatar" class="me-3" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #6B8E23;">
+                                        <div>
+                                            <p class="mb-0 fw-semibold">Lê Quốc Khánh</p>
+                                            <small class="text-muted">Khách hàng thân thiết</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Review 4 -->
+                            <div class="review-slide" style="width: 50%; min-width: 50%; max-width: 50%; flex-shrink: 0; padding: 0 10px; box-sizing: border-box;">
+                                <div class="review-card p-4 bg-white rounded-4 shadow-sm h-100">
+                                    <div class="stars mb-3">
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    </div>
+                                    <p class="review-text mb-3" style="line-height: 1.8;">
+                                        Mình đặt hàng từ Hà Nội, lo lắng về chất lượng nhưng khi nhận được thì rất bất ngờ. Sản phẩm vẫn còn tươi, đóng gói kỹ lưỡng. Đặc biệt là khô cá lóc rất thơm ngon. Cảm ơn shop đã mang hương vị miền Nam ra Bắc!
+                                    </p>
+                                    <div class="reviewer d-flex align-items-center">
+                                        <img src="/images/customer-avt.webp" alt="Avatar" class="me-3" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #FF6B6B;">
+                                        <div>
+                                            <p class="mb-0 fw-semibold">Trần Hoàng Văn</p>
+                                            <small class="text-muted">Khách hàng mới</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Duplicate Review 1 for seamless loop -->
+                            <div class="review-slide" style="width: 50%; min-width: 50%; max-width: 50%; flex-shrink: 0; padding: 0 10px; box-sizing: border-box;">
+                                <div class="review-card p-4 bg-white rounded-4 shadow-sm h-100">
+                                    <div class="stars mb-3">
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    </div>
+                                    <p class="review-text mb-3" style="line-height: 1.8;">
+                                        Tôi đã mua khô và mắm ở đây nhiều lần, chất lượng luôn ổn định. Đặc biệt là khô bò bên shop rất thơm, không bị mặn gắt như nhiều chỗ khác. Hương vị rất chuẩn đặc sản miền Tây. Chắc chắn sẽ ủng hộ tiếp!
+                                    </p>
+                                    <div class="reviewer d-flex align-items-center">
+                                        <img src="/images/customer-avt.webp" alt="Avatar" class="me-3" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #4ec2b6;">
+                                        <div>
+                                            <p class="mb-0 fw-semibold">Nguyễn Ngọc Tuấn</p>
+                                            <small class="text-muted">Khách hàng thân thiết</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Slider indicators -->
+                        <div class="slider-indicators text-center mt-4">
+                            <span class="indicator active" data-slide="0"></span>
+                            <span class="indicator" data-slide="1"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </footer>
+    </section>
+    
+    <!-- Service Features Section -->
+    <section class="service-features py-5" style="background: white;">
+        <div class="container">
+            <div class="row g-4 mt-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card text-center p-4 bg-white rounded-4 shadow-sm h-100">
+                        <div class="icon mb-3">
+                            <i class="bi bi-truck fs-1" style="color: #4ec2b6;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2" style="color: #4ec2b6;">Giao hàng miễn phí</h5>
+                        <p class="text-muted mb-0 small">Miễn phí giao hàng nội thành cho đơn hàng từ 300.000đ</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card text-center p-4 bg-white rounded-4 shadow-sm h-100">
+                        <div class="icon mb-3">
+                            <i class="bi bi-headset fs-1" style="color: #4ec2b6;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2" style="color: #4ec2b6;">Hỗ trợ 24/7</h5>
+                        <p class="text-muted mb-0 small">Hotline hỗ trợ 24/7 tất cả ngày trong tuần</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card text-center p-4 bg-white rounded-4 shadow-sm h-100">
+                        <div class="icon mb-3">
+                            <i class="bi bi-arrow-repeat fs-1" style="color: #4ec2b6;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2" style="color: #4ec2b6;">7 ngày đổi trả</h5>
+                        <p class="text-muted mb-0 small">Cam kết chất lượng bao đổi trả trong vòng 7 ngày</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="feature-card text-center p-4 bg-white rounded-4 shadow-sm h-100">
+                        <div class="icon mb-3">
+                            <i class="bi bi-wallet2 fs-1" style="color: #4ec2b6;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2" style="color: #4ec2b6;">Thanh toán an toàn</h5>
+                        <p class="text-muted mb-0 small">Đảm bảo thanh toán an toàn với MoMo, VNPay, ZaloPay...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/js/cursor-trail.js(v=1)}"></script>
-    <script th:src="@{/js/card-3d-effect.js(v=1)}"></script>
+    
+    <!-- Header scroll effect -->
+    <script>
+        // Header hide/show on scroll
+        let lastScrollTop = 0;
+        const header = document.querySelector('.modern-header');
+        const scrollThreshold = 100;
+        
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > scrollThreshold) {
+                if (scrollTop > lastScrollTop) {
+                    // Scrolling down - hide header
+                    header.style.transform = 'translateY(-100%)';
+                } else {
+                    // Scrolling up - show header
+                    header.style.transform = 'translateY(0)';
+                }
+            } else {
+                // At top - always show
+                header.style.transform = 'translateY(0)';
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+    </script>
+    
+    <!-- Reviews Slider -->
+    <script>
+        let currentSlide = 0;
+        const reviewsTrack = document.getElementById('reviewsSlider');
+        const indicators = document.querySelectorAll('.indicator');
+        const totalReviews = 4; // 4 unique reviews
+        
+        function showSlide(slideIndex, instant = false) {
+            if (instant) {
+                reviewsTrack.style.transition = 'none';
+            } else {
+                reviewsTrack.style.transition = 'transform 0.5s ease-in-out';
+            }
+            
+            // Each slide shows 2 reviews, sliding by 50% (one review width)
+            const translateX = -(slideIndex * 50);
+            reviewsTrack.style.transform = `translateX(${translateX}%)`;
+            
+            // Update indicators - show which pair is most visible
+            const indicatorIndex = Math.floor(slideIndex / 2);
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === indicatorIndex);
+            });
+        }
+        
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+            
+            // When we reach the duplicate (slide 4), reset to slide 0 instantly
+            if (currentSlide === totalReviews) {
+                setTimeout(() => {
+                    currentSlide = 0;
+                    showSlide(currentSlide, true);
+                }, 500); // Wait for transition to complete
+            }
+        }
+        
+        // Auto slide every 5 seconds
+        setInterval(nextSlide, 5000);
+        
+        // Manual slide control - clicking indicator goes to that pair
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                currentSlide = index * 2;
+                showSlide(currentSlide);
+            });
+        });
+        
+        // Initialize
+        showSlide(0);
+    </script>
+    
+    <!-- Copy Coupon Code -->
+    <script>
+        function copyCouponCode() {
+            const code = 'DSVTET30';
+            const box = event.currentTarget;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                // Show success feedback
+                const originalBg = box.style.background;
+                const codeText = box.querySelector('strong');
+                const originalText = codeText.textContent;
+                
+                codeText.textContent = '✓ Đã sao chép!';
+                box.style.background = 'rgba(40, 167, 69, 0.5)';
+                
+                setTimeout(() => {
+                    codeText.textContent = originalText;
+                    box.style.background = originalBg;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+    </script>
+    
+    <!-- Products Filter & Pagination -->
+    <script>
+        const ITEMS_PER_PAGE = 12;
+        let currentPage = 1;
+        let currentCategory = 'all';
+        let currentSort = 'newest';
+        let currentPriceMin = 0;
+        let currentPriceMax = 999999999;
+        let allProducts = [];
+        
+        // Format number to VND (global scope)
+        function formatVND(number) {
+            return new Intl.NumberFormat('vi-VN').format(number) + '₫';
+        }
+        
+        // Parse VND string to number (global scope)
+        function parseVND(str) {
+            return parseInt(str.replace(/[^\d]/g, '')) || 0;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            allProducts = Array.from(document.querySelectorAll('.product-item'));
+            
+            // Category filters
+            document.querySelectorAll('.filter-category').forEach(filter => {
+                filter.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.filter-category').forEach(f => f.classList.remove('active'));
+                    this.classList.add('active');
+                    currentCategory = this.dataset.category;
+                    currentPage = 1;
+                    filterAndDisplay();
+                });
+            });
+            
+            // Price filters
+            document.querySelectorAll('.filter-price').forEach(filter => {
+                filter.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.filter-price').forEach(f => f.classList.remove('active'));
+                    this.classList.add('active');
+                    currentPriceMin = parseFloat(this.dataset.min);
+                    currentPriceMax = parseFloat(this.dataset.max);
+                    currentPage = 1;
+                    
+                    // Hide custom price panel when selecting preset
+                    document.getElementById('customPricePanel').style.display = 'none';
+                    document.getElementById('customPriceToggle').classList.remove('active');
+                    
+                    filterAndDisplay();
+                });
+            });
+            
+            // Sort dropdown
+            document.getElementById('sortSelect').addEventListener('change', function() {
+                currentSort = this.value;
+                currentPage = 1;
+                filterAndDisplay();
+            });
+            
+            // Toggle Custom Price Panel
+            document.getElementById('customPriceToggle').addEventListener('click', function(e) {
+                e.preventDefault();
+                const panel = document.getElementById('customPricePanel');
+                const isVisible = panel.style.display !== 'none';
+                
+                if (isVisible) {
+                    panel.style.display = 'none';
+                    this.classList.remove('active');
+                } else {
+                    panel.style.display = 'block';
+                    this.classList.add('active');
+                    // Remove active from other price filters
+                    document.querySelectorAll('.filter-price').forEach(f => f.classList.remove('active'));
+                }
+            });
+            
+            // Price Range Slider
+            const minSlider = document.getElementById('minPriceSlider');
+            const maxSlider = document.getElementById('maxPriceSlider');
+            const minInput = document.getElementById('customMinPrice');
+            const maxInput = document.getElementById('customMaxPrice');
+            const sliderTrack = document.getElementById('priceSliderTrack');
+            
+            function updateSliderTrack() {
+                const min = parseInt(minSlider.value);
+                const max = parseInt(maxSlider.value);
+                const rangeMin = parseInt(minSlider.min);
+                const rangeMax = parseInt(minSlider.max);
+                
+                const percentMin = ((min - rangeMin) / (rangeMax - rangeMin)) * 100;
+                const percentMax = ((max - rangeMin) / (rangeMax - rangeMin)) * 100;
+                
+                sliderTrack.style.left = percentMin + '%';
+                sliderTrack.style.width = (percentMax - percentMin) + '%';
+            }
+            
+            minSlider.addEventListener('input', function() {
+                let minVal = parseInt(this.value);
+                let maxVal = parseInt(maxSlider.value);
+                
+                if (minVal > maxVal - 50000) {
+                    minVal = maxVal - 50000;
+                    this.value = minVal;
+                }
+                
+                minInput.value = formatVND(minVal);
+                updateSliderTrack();
+            });
+            
+            maxSlider.addEventListener('input', function() {
+                let maxVal = parseInt(this.value);
+                let minVal = parseInt(minSlider.value);
+                
+                if (maxVal < minVal + 50000) {
+                    maxVal = minVal + 50000;
+                    this.value = maxVal;
+                }
+                
+                maxInput.value = formatVND(maxVal);
+                updateSliderTrack();
+            });
+            
+            // Format on blur (when leaving input)
+            minInput.addEventListener('blur', function() {
+                let val = parseVND(this.value);
+                if (val < 0) val = 0;
+                if (val > 5000000) val = 5000000;
+                this.value = formatVND(val);
+                minSlider.value = val;
+                updateSliderTrack();
+            });
+            
+            maxInput.addEventListener('blur', function() {
+                let val = parseVND(this.value);
+                if (val < 0) val = 0;
+                if (val > 5000000) val = 5000000;
+                this.value = formatVND(val);
+                maxSlider.value = val;
+                updateSliderTrack();
+            });
+            
+            // Initialize slider track
+            updateSliderTrack();
+            
+            // Custom price range
+            document.getElementById('applyCustomPrice').addEventListener('click', function() {
+                const minValue = parseVND(minInput.value);
+                const maxValue = parseVND(maxInput.value);
+                
+                if (minValue > maxValue) {
+                    alert('Giá tối thiểu không thể lớn hơn giá tối đa!');
+                    return;
+                }
+                
+                // Update filter values
+                currentPriceMin = minValue;
+                currentPriceMax = maxValue;
+                currentPage = 1;
+                
+                // Remove active from preset filters
+                document.querySelectorAll('.filter-price').forEach(f => f.classList.remove('active'));
+                
+                // Apply filter
+                filterAndDisplay();
+                scrollToProducts();
+            });
+            
+            // Clear filters button
+            document.getElementById('clearFiltersBtn').addEventListener('click', function() {
+                // Reset all filters to default
+                currentCategory = 'all';
+                currentPriceMin = 0;
+                currentPriceMax = 999999999;
+                currentSort = 'newest';
+                currentPage = 1;
+                
+                // Reset UI
+                document.querySelectorAll('.filter-category').forEach(f => f.classList.remove('active'));
+                document.querySelector('.filter-category[data-category="all"]').classList.add('active');
+                
+                document.querySelectorAll('.filter-price').forEach(f => f.classList.remove('active'));
+                document.querySelector('.filter-price[data-min="0"][data-max="999999999"]').classList.add('active');
+                
+                document.getElementById('sortSelect').value = 'newest';
+                document.getElementById('customMinPrice').value = formatVND(0);
+                document.getElementById('customMaxPrice').value = formatVND(5000000);
+                document.getElementById('minPriceSlider').value = '0';
+                document.getElementById('maxPriceSlider').value = '5000000';
+                document.getElementById('customPricePanel').style.display = 'none';
+                document.getElementById('customPriceToggle').classList.remove('active');
+                updateSliderTrack();
+                
+                // Refresh display
+                filterAndDisplay();
+                
+                // Scroll to products
+                scrollToProducts();
+            });
+            
+            // Initial display
+            filterAndDisplay();
+        });
+        
+        function filterAndDisplay() {
+            // Filter products
+            let filtered = allProducts.filter(product => {
+                // Category filter
+                if (currentCategory !== 'all' && product.dataset.category !== currentCategory) {
+                    return false;
+                }
+                
+                // Price filter
+                const price = getPrice(product);
+                if (price < currentPriceMin || price > currentPriceMax) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Sort products
+            filtered = sortProducts(filtered);
+            
+            // Get the products grid container
+            const productsGrid = document.getElementById('productsGrid');
+            
+            // Hide all products first
+            allProducts.forEach(p => p.style.display = 'none');
+            
+            // Re-append filtered products in sorted order to DOM
+            filtered.forEach(product => {
+                productsGrid.appendChild(product);
+            });
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+            
+            // Show only current page products
+            filtered.forEach((product, index) => {
+                if (index >= startIndex && index < endIndex) {
+                    product.style.display = 'block';
+                } else {
+                    product.style.display = 'none';
+                }
+            });
+            
+            // Update pagination
+            updatePagination(totalPages, filtered.length);
+            
+            // Update results count
+            updateResultsCount(filtered.length);
+        }
+        
+        function getPrice(element) {
+            // Get the raw price value from data attribute
+            const priceValue = element.dataset.price;
+            if (!priceValue) return 0;
+            
+            // Convert to number - data-price should be a plain number from backend
+            const price = parseFloat(priceValue);
+            return isNaN(price) ? 0 : price;
+        }
+        
+        function sortProducts(products) {
+            const sorted = [...products];
+            
+            switch(currentSort) {
+                case 'price-low':
+                    sorted.sort((a, b) => {
+                        const priceA = getPrice(a);
+                        const priceB = getPrice(b);
+                        return priceA - priceB;
+                    });
+                    break;
+                case 'price-high':
+                    sorted.sort((a, b) => {
+                        const priceA = getPrice(a);
+                        const priceB = getPrice(b);
+                        return priceB - priceA;
+                    });
+                    break;
+                case 'popular':
+                    // Sort by featured first, then by index
+                    sorted.sort((a, b) => {
+                        const aFeatured = a.querySelector('.badge.bg-success') ? 1 : 0;
+                        const bFeatured = b.querySelector('.badge.bg-success') ? 1 : 0;
+                        if (aFeatured !== bFeatured) return bFeatured - aFeatured;
+                        return parseInt(a.dataset.index) - parseInt(b.dataset.index);
+                    });
+                    break;
+                case 'newest':
+                default:
+                    sorted.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
+                    break;
+            }
+            
+            return sorted;
+        }
+        
+        function updatePagination(totalPages, totalItems) {
+            const container = document.getElementById('paginationContainer');
+            const list = document.getElementById('paginationList');
+            
+            if (totalPages <= 1) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            list.innerHTML = '';
+            
+            // Previous button
+            const prevLi = document.createElement('li');
+            prevLi.className = 'page-item' + (currentPage === 1 ? ' disabled' : '');
+            prevLi.innerHTML = `<a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a>`;
+            if (currentPage > 1) {
+                prevLi.querySelector('a').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage--;
+                    filterAndDisplay();
+                    scrollToProducts();
+                });
+            }
+            list.appendChild(prevLi);
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement('li');
+                li.className = 'page-item' + (i === currentPage ? ' active' : '');
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.querySelector('a').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = i;
+                    filterAndDisplay();
+                    scrollToProducts();
+                });
+                list.appendChild(li);
+            }
+            
+            // Next button
+            const nextLi = document.createElement('li');
+            nextLi.className = 'page-item' + (currentPage === totalPages ? ' disabled' : '');
+            nextLi.innerHTML = `<a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a>`;
+            if (currentPage < totalPages) {
+                nextLi.querySelector('a').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage++;
+                    filterAndDisplay();
+                    scrollToProducts();
+                });
+            }
+            list.appendChild(nextLi);
+        }
+        
+        function updateResultsCount(count) {
+            const countElement = document.querySelector('.results-header strong');
+            if (countElement) {
+                countElement.textContent = count;
+            }
+        }
+        
+        function scrollToProducts() {
+            const productsSection = document.getElementById('productsGrid');
+            if (productsSection) {
+                const offset = 100;
+                const elementPosition = productsSection.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    </script>
 </body>
 </html>

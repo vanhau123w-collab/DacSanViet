@@ -223,6 +223,23 @@
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer;
             transform-style: preserve-3d;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        
+        .product-card .card-body {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 !important;
+        }
+        
+        .product-card .card-body .card-text {
+            flex: 1 !important;
+            min-height: 3rem;
+        }
+        
+        .product-card .position-relative {
+            flex-shrink: 0;
         }
         
         .product-card:hover {

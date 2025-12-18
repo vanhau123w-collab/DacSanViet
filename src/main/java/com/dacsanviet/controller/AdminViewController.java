@@ -159,13 +159,13 @@ public class AdminViewController {
             }
             
             System.out.println("Dashboard method completed successfully");
-            return "admin/dashboard-simple-fixed";
+            return "admin/dashboard-simple";
             
         } catch (Exception e) {
             System.err.println("Dashboard method error: " + e.getMessage());
             e.printStackTrace();
             model.addAttribute("error", "Không thể tải dữ liệu dashboard: " + e.getMessage());
-            return "admin/dashboard-simple-fixed";
+            return "admin/dashboard-simple";
         }
     }
     

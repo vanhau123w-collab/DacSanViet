@@ -33,7 +33,7 @@ public class ProductController {
     @GetMapping
     public String listProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "100") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir,
             @RequestParam(required = false) String search,
@@ -55,15 +55,18 @@ public class ProductController {
             products = productService.getAllProducts(pageable);
         }
         
-        model.addAttribute("products", products);
+        model.addAttribute("products", products.getContent());
         model.addAttribute("categories", categoryService.getAllActiveCategories());
-        model.addAttribute("search", search);
-        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("searchKeyword", search);
+        model.addAttribute("selectedCategory", categoryId != null ? categoryId.toString() : null);
+        model.addAttribute("totalElements", products.getTotalElements());
+        model.addAttribute("totalPages", products.getTotalPages());
+        model.addAttribute("currentPage", page);
         model.addAttribute("sortBy", sortBy);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("pageTitle", "Sản Phẩm Đặc Sản");
         
-        return "products/simple-list";
+        return "products/index";
     }
     
     /**
