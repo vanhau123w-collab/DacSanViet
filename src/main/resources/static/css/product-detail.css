@@ -618,7 +618,13 @@ body {
 
 /* Reviews Section - New Layout */
 .reviews-section {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
     scroll-margin-top: 100px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .review-layout {
@@ -1020,7 +1026,12 @@ body {
 
 /* Q&A Section */
 .qa-section {
-    /* Styling handled by .section-card */
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 100%;
 }
 
 .qa-container {
@@ -1170,7 +1181,12 @@ body {
 
 /* FAQ Section */
 .faq-section {
-    /* Styling handled by .section-card */
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 100%;
 }
 
 .faq-section .row {
@@ -1251,7 +1267,12 @@ body {
 
 /* Related Products */
 .related-products {
-    /* Styling handled by .section-card */
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 100%;
 }
 
 .section-title {
