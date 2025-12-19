@@ -76,9 +76,86 @@
                             <a th:href="@{/cart}" class="cart-icon text-decoration-none d-block position-relative">
                                 <i class="bi bi-bag fs-4 text-dark"></i>
                             </a>
-                            <span class="cart-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-flex align-items-center justify-content-center" 
-                                  style="font-size: 0.65rem; padding: 0; min-width: 20px; height: 20px; line-height: 1; display: none;">0</span>
+                            <span class="cart-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                                  style="font-size: 0.65rem; padding: 0; min-width: 20px; height: 20px; line-height: 1; display: none; align-items: center; justify-content: center;">0</span>
                         </div>
+                        
+                        <!-- Inline script to immediately update cart badge -->
+                        <script>
+                            (function() {
+                                function updateCartBadgeNow() {
+                                    try {
+                                        const cart = localStorage.getItem('shopping_cart');
+                                        const cartData = cart ? JSON.parse(cart) : { items: [] };
+                                        const count = cartData.items.reduce((total, item) => total + (item.quantity || 0), 0);
+                                        
+                                        console.log('Updating cart badge - count:', count, 'cart items:', cartData.items.length);
+                                        
+                                        const badges = document.querySelectorAll('.cart-badge');
+                                        badges.forEach(badge => {
+                                            if (count > 0) {
+                                                badge.textContent = count;
+                                                badge.style.display = 'flex';
+                                                badge.style.visibility = 'visible';
+                                                badge.style.opacity = '1';
+                                            } else {
+                                                badge.textContent = '0';
+                                                badge.style.display = 'none';
+                                                badge.style.visibility = 'hidden';
+                                                badge.style.opacity = '0';
+                                            }
+                                        });
+                                    } catch (e) {
+                                        console.error('Error updating cart badge:', e);
+                                    }
+                                }
+                                
+                                // Run immediately
+                                updateCartBadgeNow();
+                                
+                                // Run when DOM is ready
+                                if (document.readyState === 'loading') {
+                                    document.addEventListener('DOMContentLoaded', updateCartBadgeNow);
+                                } else {
+                                    updateCartBadgeNow();
+                                }
+                                
+                                // CRITICAL: Run on pageshow (back button) - this must work!
+                                window.addEventListener('pageshow', function(event) {
+                                    console.log('pageshow event - persisted:', event.persisted);
+                                    updateCartBadgeNow();
+                                });
+                                
+                                // Run on storage change
+                                window.addEventListener('storage', function(e) {
+                                    if (e.key === 'shopping_cart') {
+                                        console.log('storage event - cart changed');
+                                        updateCartBadgeNow();
+                                    }
+                                });
+                                
+                                // Run on focus
+                                window.addEventListener('focus', function() {
+                                    console.log('window focus - updating cart');
+                                    updateCartBadgeNow();
+                                });
+                                
+                                // Run on visibilitychange
+                                document.addEventListener('visibilitychange', function() {
+                                    if (!document.hidden) {
+                                        console.log('page visible - updating cart');
+                                        updateCartBadgeNow();
+                                    }
+                                });
+                                
+                                // Polling as last resort - check every 2 seconds when page is visible
+                                setInterval(function() {
+                                    if (!document.hidden) {
+                                        updateCartBadgeNow();
+                                    }
+                                }, 2000);
+                            })();
+                        </script>
                         
                         <!-- User Avatar/Login -->
                         <div class="user-section">

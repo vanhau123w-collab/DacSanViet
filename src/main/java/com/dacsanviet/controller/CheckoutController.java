@@ -30,27 +30,32 @@ public class CheckoutController {
     private OrderService orderService;
     
     /**
-     * Show checkout page
+     * Show checkout page - supports both authenticated users and guests
      */
     @GetMapping
     public String showCheckout(Model model, Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/login";
-        }
-        
         try {
-            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-            CartDao cart = cartService.getCart(userPrincipal.getId());
+            CartDao cart;
             
-            if (cart.getItems().isEmpty()) {
-                model.addAttribute("error", "Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi thanh toán.");
-                return "redirect:/cart";
+            // Check if user is authenticated
+            if (authentication != null && authentication.isAuthenticated()) {
+                UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+                cart = cartService.getCart(userPrincipal.getId());
+                
+                // Validate cart before checkout
+                if (!cartService.validateCart(userPrincipal.getId())) {
+                    cartService.removeUnavailableItems(userPrincipal.getId());
+                    model.addAttribute("error", "Một số sản phẩm trong giỏ hàng không còn khả dụng và đã được xóa.");
+                    return "redirect:/cart";
+                }
+            } else {
+                // Guest checkout - cart will be loaded from localStorage on client side
+                cart = new CartDao();
+                model.addAttribute("isGuest", true);
             }
             
-            // Validate cart before checkout
-            if (!cartService.validateCart(userPrincipal.getId())) {
-                cartService.removeUnavailableItems(userPrincipal.getId());
-                model.addAttribute("error", "Một số sản phẩm trong giỏ hàng không còn khả dụng và đã được xóa.");
+            if (cart.getItems() != null && cart.getItems().isEmpty() && authentication != null) {
+                model.addAttribute("error", "Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi thanh toán.");
                 return "redirect:/cart";
             }
             

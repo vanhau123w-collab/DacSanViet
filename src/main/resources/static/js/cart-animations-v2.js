@@ -426,6 +426,28 @@
     };
     
     /**
+     * Update cart dropdown content (refresh without showing)
+     */
+    window.updateCartDropdown = function() {
+        const wrapper = document.querySelector('.cart-icon-wrapper');
+        if (!wrapper) return;
+        
+        const dropdown = wrapper.querySelector('.cart-dropdown');
+        if (!dropdown) return;
+        
+        const cart = window.CartManager ? window.CartManager.getCart() : { items: [], total: 0 };
+        
+        // If cart is empty, remove dropdown
+        if (cart.items.length === 0) {
+            dropdown.remove();
+            return;
+        }
+        
+        // Update existing dropdown content
+        updateDropdownContent(dropdown, cart);
+    };
+    
+    /**
      * Update dropdown content
      */
     function updateDropdownContent(dropdown, cart) {

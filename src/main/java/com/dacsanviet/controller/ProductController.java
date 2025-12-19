@@ -1,6 +1,7 @@
 package com.dacsanviet.controller;
 
 import com.dacsanviet.dao.ProductDao;
+import com.dacsanviet.model.ProductImage;
 import com.dacsanviet.service.ProductService;
 import com.dacsanviet.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * Product controller for public product browsing
@@ -47,11 +51,12 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ProductDao> products;
         
+        // Always load all products for client-side filtering
+        // Only apply search filter on server-side
         if (search != null && !search.trim().isEmpty()) {
             products = productService.searchProducts(search, categoryId, pageable);
-        } else if (categoryId != null) {
-            products = productService.getProductsByCategory(categoryId, pageable);
         } else {
+            // Load all products regardless of categoryId - let client-side handle category filtering
             products = productService.getAllProducts(pageable);
         }
         
@@ -73,10 +78,29 @@ public class ProductController {
      * Show product details
      */
     @GetMapping("/{id}")
-    public String viewProduct(@RequestParam Long id, Model model) {
+    public String viewProduct(@PathVariable Long id, Model model) {
         try {
             ProductDao product = productService.getProductById(id);
+            List<ProductImage> productImages = productService.getProductImages(id);
+            
+            // Get related products (same category, limit 8)
+            Pageable pageable = PageRequest.of(0, 8);
+            Page<ProductDao> relatedProducts;
+            if (product.getCategoryId() != null) {
+                relatedProducts = productService.getProductsByCategory(product.getCategoryId(), pageable);
+                // Remove current product from related products
+                List<ProductDao> filteredRelated = relatedProducts.getContent().stream()
+                    .filter(p -> !p.getId().equals(id))
+                    .limit(8)
+                    .collect(java.util.stream.Collectors.toList());
+                model.addAttribute("relatedProducts", filteredRelated);
+            } else {
+                relatedProducts = productService.getAllProducts(pageable);
+                model.addAttribute("relatedProducts", relatedProducts.getContent());
+            }
+            
             model.addAttribute("product", product);
+            model.addAttribute("productImages", productImages);
             model.addAttribute("pageTitle", product.getName());
             return "products/detail";
         } catch (RuntimeException e) {

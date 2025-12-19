@@ -86,6 +86,11 @@ function initializeProductInteractions() {
     document.body.addEventListener('click', function(e) {
         const button = e.target.closest('.add-to-cart-btn, [data-product-id]');
         if (button) {
+            // Skip if this button is already handled by product-detail.js
+            if (button.getAttribute('data-detail-page-handler') === 'true') {
+                return;
+            }
+            
             e.preventDefault();
             
             const productId = button.getAttribute('data-product-id');
@@ -856,7 +861,7 @@ function showQuickViewModal(productCard) {
     const productId = addToCartBtn ? addToCartBtn.getAttribute('data-product-id') : null;
     
     // Get product link for "View Details" button
-    const productLink = productCard.querySelector('a[href*="/products/"]')?.href || '#';
+    const productLink = productId ? `/products/${productId}` : (productCard.querySelector('a[href*="/products/"]')?.href || '#');
     
     // Create modal HTML
     const modalHTML = `

@@ -757,3 +757,45 @@ textarea:focus {
         border-width: 3px;
     }
 }
+
+
+/* Fix View Details Button Clickability */
+.card .btn-outline-primary,
+.card .btn-primary,
+.product-card .btn-outline-primary,
+.product-card .btn-primary {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.card-body {
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure buttons are always clickable */
+.d-grid .btn {
+    position: relative;
+    z-index: 10;
+}
+
+
+/* Fix Modal Buttons Clickability */
+.modal .btn,
+.modal .btn-outline-secondary,
+.modal .btn-primary {
+    position: relative;
+    z-index: 1060;
+    pointer-events: auto;
+}
+
+.modal-body .d-grid {
+    position: relative;
+    z-index: 1060;
+}
+
+.modal-content {
+    position: relative;
+    z-index: 1055;
+}

@@ -97,6 +97,9 @@ public class SecurityConfig {
                 // Cart endpoints (allow guests)
                 .requestMatchers("/cart/**", "/api/cart/**").permitAll()
                 
+                // Checkout endpoints (allow guests for guest checkout)
+                .requestMatchers("/checkout", "/checkout/**").permitAll()
+                
                 // User-specific endpoints
                 .requestMatchers("/profile/**", "/orders/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/profile/**", "/api/orders/**").hasAnyRole("USER", "ADMIN")

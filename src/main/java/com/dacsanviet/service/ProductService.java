@@ -5,8 +5,12 @@ import com.dacsanviet.dto.CreateProductRequest;
 import com.dacsanviet.dto.UpdateProductRequest;
 import com.dacsanviet.model.Category;
 import com.dacsanviet.model.Product;
+import com.dacsanviet.model.ProductImage;
 import com.dacsanviet.repository.CategoryRepository;
 import com.dacsanviet.repository.ProductRepository;
+import com.dacsanviet.repository.ProductImageRepository;
+
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,6 +43,9 @@ public class ProductService {
     
     @Autowired
     private CategoryRepository categoryRepository;
+    
+    @Autowired
+    private ProductImageRepository productImageRepository;
     
     private static final String UPLOAD_DIR = "uploads/products/";
     
@@ -413,5 +420,21 @@ public class ProductService {
     })
     public Product saveProduct(Product product) {
         return productRepository.save(product);
+    }
+    
+    /**
+     * Get product images
+     */
+    @Transactional(readOnly = true)
+    public List<ProductImage> getProductImages(Long productId) {
+        return productImageRepository.findByProductIdOrderByDisplayOrderAsc(productId);
+    }
+    
+    /**
+     * Get primary product image
+     */
+    @Transactional(readOnly = true)
+    public ProductImage getPrimaryProductImage(Long productId) {
+        return productImageRepository.findByProductIdAndIsPrimaryTrue(productId);
     }
 }

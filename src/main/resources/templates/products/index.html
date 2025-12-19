@@ -224,6 +224,15 @@
             font-weight: 600;
             transition: all 0.3s ease;
             width: 100%;
+            position: relative;
+            z-index: 100;
+            pointer-events: auto;
+            cursor: pointer;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
         }
         
         .view-details-btn:hover {
@@ -650,9 +659,9 @@
                                         <i class="bi bi-cart-plus me-2"></i>
                                         <span th:text="${product.stockQuantity == 0 ? 'Hết hàng' : 'Thêm vào giỏ'}">Thêm vào giỏ</span>
                                     </button>
-                                    <button class="view-details-btn">
+                                    <a th:href="@{/products/{id}(id=${product.id})}" class="view-details-btn" style="text-decoration: none; display: inline-block;">
                                         <i class="bi bi-eye me-2"></i>Xem chi tiết
-                                    </button>
+                                    </a>
                                 </div>
                                 
                                 <div class="stock-info">
@@ -1050,7 +1059,7 @@
                 }
             }
             
-            // Category filters
+            // Category filters - client-side filtering without page reload
             document.querySelectorAll('.filter-category').forEach(filter => {
                 filter.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -1059,7 +1068,7 @@
                     currentCategory = this.dataset.category;
                     currentPage = 1;
                     
-                    // Update URL with category parameter
+                    // Update URL without reload
                     const newUrl = new URL(window.location);
                     if (currentCategory === 'all') {
                         newUrl.searchParams.delete('categoryId');
@@ -1069,6 +1078,7 @@
                     window.history.pushState({}, '', newUrl);
                     
                     filterAndDisplay();
+                    scrollToProducts();
                 });
             });
             
