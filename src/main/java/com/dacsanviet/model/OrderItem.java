@@ -6,6 +6,10 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -17,6 +21,9 @@ import java.time.LocalDateTime;
     @Index(name = "idx_order_item_order", columnList = "order_id"),
     @Index(name = "idx_order_item_product", columnList = "product_id")
 })
+@Getter
+@Setter
+@NoArgsConstructor
 public class OrderItem {
     
     @Id
@@ -59,9 +66,6 @@ public class OrderItem {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
     
-    // Default constructor
-    public OrderItem() {}
-    
     // Constructor with required fields
     public OrderItem(Order order, Product product, Integer quantity, BigDecimal unitPrice) {
         this.order = order;
@@ -84,50 +88,6 @@ public class OrderItem {
     public OrderItem(Order order, CartItem cartItem) {
         this(order, cartItem.getProduct(), cartItem.getQuantity(), cartItem.getUnitPrice());
     }
-    
-    // All args constructor
-    public OrderItem(Long id, Order order, Product product, Integer quantity, BigDecimal unitPrice,
-                     String productName, String productDescription, String categoryName, LocalDateTime createdAt) {
-        this.id = id;
-        this.order = order;
-        this.product = product;
-        this.quantity = quantity;
-        this.unitPrice = unitPrice;
-        this.productName = productName;
-        this.productDescription = productDescription;
-        this.categoryName = categoryName;
-        this.createdAt = createdAt;
-    }
-    
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public Order getOrder() { return order; }
-    public void setOrder(Order order) { this.order = order; }
-    
-    public Product getProduct() { return product; }
-    
-    public Integer getQuantity() { return quantity; }
-    public void setQuantity(Integer quantity) { this.quantity = quantity; }
-    
-    public BigDecimal getUnitPrice() { return unitPrice; }
-    public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
-    
-    public String getProductName() { return productName; }
-    public void setProductName(String productName) { this.productName = productName; }
-    
-    public String getProductDescription() { return productDescription; }
-    public void setProductDescription(String productDescription) { this.productDescription = productDescription; }
-    
-    public String getCategoryName() { return categoryName; }
-    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
-    
-    public String getProductImageUrl() { return productImageUrl; }
-    public void setProductImageUrl(String productImageUrl) { this.productImageUrl = productImageUrl; }
-    
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     
     // Custom setter for product to update snapshots
     public void setProduct(Product product) {

@@ -684,12 +684,12 @@
                         </h5>
                         
                         <div class="payment-methods">
-                            <!-- Momo -->
-                            <div class="payment-method" onclick="selectPaymentMethod('MOMO')">
+                            <!-- COD - Default selected -->
+                            <div class="payment-method selected" onclick="selectPaymentMethod('COD')">
                                 <div class="payment-radio"></div>
                                 <div class="payment-content">
-                                    <img src="https://files.catbox.moe/o6fnfm.webp" alt="Momo" class="payment-logo">
-                                    <span class="payment-text">Thanh toán qua ví điện tử Momo</span>
+                                    <i class="fas fa-money-bill-wave text-success" style="font-size: 1.75rem;"></i>
+                                    <span class="payment-text">Thanh toán khi nhận hàng (COD)</span>
                                 </div>
                             </div>
                             
@@ -698,7 +698,10 @@
                                 <div class="payment-radio"></div>
                                 <div class="payment-content">
                                     <img src="https://vnpay.vn/s1/statics.vnpay.vn/2023/9/06ncktiwd6dc1694418196384.png" alt="VNPAY" class="payment-logo">
-                                    <span class="payment-text">Thanh toán VNPAY (tự động)</span>
+                                    <div>
+                                        <div class="payment-text">Thanh toán VNPAY</div>
+                                        <small class="text-muted d-block">Tự động xác nhận thanh toán</small>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -707,25 +710,22 @@
                                 <div class="payment-radio"></div>
                                 <div class="payment-content">
                                     <img src="https://vietqr.io/img/logo.png" alt="VietQR" class="payment-logo">
-                                    <span class="payment-text">Thanh toán với VietQR</span>
+                                    <div>
+                                        <div class="payment-text">Chuyển khoản VietQR</div>
+                                        <small class="text-muted d-block">Quét mã QR để thanh toán</small>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <!-- Bank Transfer -->
-                            <div class="payment-method" onclick="selectPaymentMethod('BANK_TRANSFER')">
+                            <!-- Momo -->
+                            <div class="payment-method" onclick="selectPaymentMethod('MOMO')">
                                 <div class="payment-radio"></div>
                                 <div class="payment-content">
-                                    <i class="fas fa-university text-primary" style="font-size: 1.75rem;"></i>
-                                    <span class="payment-text">Chuyển khoản ngân hàng</span>
-                                </div>
-                            </div>
-                            
-                            <!-- COD -->
-                            <div class="payment-method selected" onclick="selectPaymentMethod('COD')">
-                                <div class="payment-radio"></div>
-                                <div class="payment-content">
-                                    <i class="fas fa-money-bill-wave text-success" style="font-size: 1.75rem;"></i>
-                                    <span class="payment-text">Thanh toán khi nhận hàng (COD)</span>
+                                    <img src="https://files.catbox.moe/o6fnfm.webp" alt="Momo" class="payment-logo">
+                                    <div>
+                                        <div class="payment-text">Ví điện tử Momo</div>
+                                        <small class="text-muted d-block">Quét mã QR bằng app Momo</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1472,45 +1472,8 @@
             // Update hidden input
             document.getElementById('paymentMethodInput').value = method;
             console.log('Payment method set to:', method);
-            
-            // Show VietQR info if selected
-            if (method === 'VIETQR') {
-                showVietQRInfo();
-            }
         }
         
-        function showVietQRInfo() {
-            // Get cart total
-            const cart = CartManager.getCart();
-            const appliedPromotion = sessionStorage.getItem('appliedPromotion');
-            let discount = 0;
-            
-            if (appliedPromotion) {
-                try {
-                    const promo = JSON.parse(appliedPromotion);
-                    discount = promo.discountAmount || 0;
-                } catch (e) {
-                    console.error('Error parsing promotion:', e);
-                }
-            }
-            
-            const total = cart.total - discount;
-            
-            // VietQR parameters - you can configure these
-            const bankId = '970422'; // MB Bank code (change to your bank)
-            const accountNo = '0123456789'; // Your account number
-            const accountName = 'DAC SAN VIET'; // Your account name
-            const amount = total;
-            const description = 'Thanh toan don hang';
-            
-            // Generate VietQR URL
-            const vietQRUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.jpg?amount=${amount}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(accountName)}`;
-            
-            console.log('VietQR URL:', vietQRUrl);
-            
-            // You can show a modal or alert with QR code here
-            // For now, just log it
-        }
     </script>
 </body>
 </html>

@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import com.dacsanviet.dao.OrderDao;
 import com.dacsanviet.dto.ConsultationRequest;
 
 import jakarta.mail.MessagingException;
@@ -580,7 +581,7 @@ public class EmailService {
 				logger.warn("Failed to set personal name, using email only", e);
 				helper.setFrom(fromEmail);
 			}
-			
+
 			helper.setTo(order.getCustomerEmail());
 			helper.setSubject("Xác Nhận Đơn Hàng #" + order.getOrderNumber() + " - Đặc Sản Việt");
 
@@ -912,4 +913,75 @@ public class EmailService {
 		case CANCELLED -> "Đã hủy";
 		};
 	}
+
+	/**
+	 * Send payment confirmation email
+	 */
+	public void sendPaymentConfirmationEmail(OrderDao order) {
+		try {
+			MimeMessage message = mailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+			helper.setFrom(fromEmail);
+			helper.setTo(order.getCustomerEmail());
+			helper.setSubject("Xác Nhận Thanh Toán - Đơn Hàng " + order.getOrderNumber());
+
+			String htmlContent = buildPaymentConfirmationEmail(order);
+			helper.setText(htmlContent, true);
+
+			mailSender.send(message);
+			System.out.println("Payment confirmation email sent to: " + order.getCustomerEmail());
+		} catch (Exception e) {
+			System.err.println("Failed to send payment confirmation email: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private String buildPaymentConfirmationEmail(OrderDao order) {
+		StringBuilder html = new StringBuilder();
+		html.append("<!DOCTYPE html>");
+		html.append("<html><head><meta charset='UTF-8'></head><body style='font-family: Arial, sans-serif;'>");
+		html.append("<div style='max-width: 600px; margin: 0 auto; padding: 20px;'>");
+
+		// Header
+		html.append(
+				"<div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;'>");
+		html.append("<h1 style='margin: 0;'>✅ Thanh Toán Thành Công!</h1>");
+		html.append("</div>");
+
+		// Content
+		html.append("<div style='background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;'>");
+		html.append("<p style='font-size: 16px;'>Xin chào <strong>").append(order.getCustomerName())
+				.append("</strong>,</p>");
+		html.append("<p>Chúng tôi đã nhận được thanh toán của bạn cho đơn hàng <strong>").append(order.getOrderNumber())
+				.append("</strong>.</p>");
+
+		// Payment info
+		html.append("<div style='background: white; padding: 20px; border-radius: 8px; margin: 20px 0;'>");
+		html.append("<h3 style='color: #28a745; margin-top: 0;'>Thông Tin Thanh Toán</h3>");
+		html.append("<table style='width: 100%; border-collapse: collapse;'>");
+		html.append("<tr><td style='padding: 8px 0; border-bottom: 1px solid #dee2e6;'><strong>Số tiền:</strong></td>");
+		html.append(
+				"<td style='padding: 8px 0; border-bottom: 1px solid #dee2e6; text-align: right; color: #28a745; font-size: 18px;'><strong>")
+				.append(formatPrice(order.getTotalAmount())).append("</strong></td></tr>");
+		html.append(
+				"<tr><td style='padding: 8px 0; border-bottom: 1px solid #dee2e6;'><strong>Phương thức:</strong></td>");
+		html.append("<td style='padding: 8px 0; border-bottom: 1px solid #dee2e6; text-align: right;'>")
+				.append(getPaymentMethodText(order.getPaymentMethod())).append("</td></tr>");
+		html.append("<tr><td style='padding: 8px 0;'><strong>Trạng thái:</strong></td>");
+		html.append(
+				"<td style='padding: 8px 0; text-align: right; color: #28a745;'><strong>Đã thanh toán</strong></td></tr>");
+		html.append("</table>");
+		html.append("</div>");
+
+		html.append("<p>Đơn hàng của bạn đang được xử lý và sẽ được giao sớm nhất có thể.</p>");
+		html.append("<p>Cảm ơn bạn đã mua hàng tại <strong>Đặc Sản Việt</strong>!</p>");
+
+		html.append("</div>");
+		html.append("</div>");
+		html.append("</body></html>");
+
+		return html.toString();
+	}
+
 }

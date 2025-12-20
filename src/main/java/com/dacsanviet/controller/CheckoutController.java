@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Checkout controller for order processing
@@ -70,7 +71,8 @@ public class CheckoutController {
             BindingResult bindingResult,
             Authentication authentication,
             Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            HttpServletRequest request) {
         
         try {
             // Validate form
@@ -98,24 +100,41 @@ public class CheckoutController {
                 cartService.clearCart(userId);
             }
             
-            // Set appropriate success message based on payment method
-            String successMessage;
-            if ("COD".equals(orderRequest.getPaymentMethod())) {
-                successMessage = "Đặt hàng COD thành công! Mã đơn hàng: " + order.getOrderNumber() + 
-                               ". Đơn hàng đang được xử lý và sẽ được giao đến bạn sớm nhất.";
-            } else {
-                successMessage = "Đặt hàng thành công! Mã đơn hàng: " + order.getOrderNumber();
+            // Handle payment method
+            String paymentMethod = orderRequest.getPaymentMethod();
+            
+            if ("VNPAY".equals(paymentMethod)) {
+                // Redirect to VNPAY payment
+                return "redirect:/payment/vnpay/create?orderId=" + order.getId() + 
+                       "&amount=" + order.getTotalAmount() + 
+                       "&orderInfo=" + java.net.URLEncoder.encode("Thanh toan don hang " + order.getOrderNumber(), "UTF-8");
+            } else if ("VIETQR".equals(paymentMethod)) {
+                // Redirect to VietQR payment page
+                return "redirect:/payment/vietqr?orderId=" + order.getId() + 
+                       "&amount=" + order.getTotalAmount() + 
+                       "&orderInfo=" + java.net.URLEncoder.encode("Don hang " + order.getOrderNumber(), "UTF-8");
+            } else if ("MOMO".equals(paymentMethod)) {
+                // Redirect to Momo payment page
+                return "redirect:/payment/momo?orderId=" + order.getId() + 
+                       "&amount=" + order.getTotalAmount() + 
+                       "&orderInfo=" + java.net.URLEncoder.encode("Don hang " + order.getOrderNumber(), "UTF-8");
+            } else if ("COD".equals(paymentMethod)) {
+                // COD - direct success
+                String successMessage = "Đặt hàng COD thành công! Mã đơn hàng: " + order.getOrderNumber() + 
+                                      ". Đơn hàng đang được xử lý và sẽ được giao đến bạn sớm nhất.";
+                redirectAttributes.addFlashAttribute("message", successMessage);
+                
+                // For guest orders, redirect to a guest-friendly success page
+                if (userId == null) {
+                    redirectAttributes.addFlashAttribute("orderNumber", order.getOrderNumber());
+                    return "redirect:/checkout/success?orderNumber=" + order.getOrderNumber();
+                }
+                
+                return "redirect:/orders/" + order.getId();
             }
             
-            redirectAttributes.addFlashAttribute("message", successMessage);
-            
-            // For guest orders, redirect to a guest-friendly success page
-            if (userId == null) {
-                redirectAttributes.addFlashAttribute("orderNumber", order.getOrderNumber());
-                return "redirect:/checkout/success?orderNumber=" + order.getOrderNumber();
-            }
-            
-            return "redirect:/orders/" + order.getId();
+            // Default fallback
+            return "redirect:/checkout/success?orderNumber=" + order.getOrderNumber();
             
         } catch (Exception e) {
             model.addAttribute("error", "Lỗi đặt hàng: " + e.getMessage());
@@ -128,8 +147,10 @@ public class CheckoutController {
      * Checkout success page
      */
     @GetMapping("/success")
-    public String checkoutSuccess(@RequestParam(required = false) Long orderId, Model model) {
-        model.addAttribute("orderId", orderId);
+    public String checkoutSuccess(
+            @RequestParam(required = false) String orderNumber,
+            Model model) {
+        model.addAttribute("orderNumber", orderNumber);
         model.addAttribute("pageTitle", "Đặt Hàng Thành Công");
         return "checkout/success";
     }

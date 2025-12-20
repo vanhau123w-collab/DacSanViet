@@ -100,6 +100,10 @@ public class SecurityConfig {
                 // Checkout endpoints (allow guests for guest checkout)
                 .requestMatchers("/checkout", "/checkout/**").permitAll()
                 
+                // Payment endpoints (allow all for payment processing)
+                .requestMatchers("/payment/**").permitAll()
+                .requestMatchers("/api/payment/**").permitAll()
+                
                 // User-specific endpoints
                 .requestMatchers("/profile/**", "/orders/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/profile/**", "/api/orders/**").hasAnyRole("USER", "ADMIN")
