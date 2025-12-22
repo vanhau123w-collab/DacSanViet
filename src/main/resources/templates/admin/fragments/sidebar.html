@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="sidebar" class="admin-sidebar">
+        <div class="admin-logo">
+            <img src="https://files.catbox.moe/4ka4id.webp" alt="DacSanViet Logo" style="width: 100%; max-width: 180px; height: auto; margin-bottom: 0.5rem;">
+            <p>Trang Quản Trị</p>
+        </div>
+        
+        <nav class="admin-menu">
+            <a href="/admin/dashboard" class="menu-item" th:classappend="${activePage == 'dashboard'} ? 'active' : ''">
+                <i class="bi bi-grid"></i>
+                <span>Tổng Quan</span>
+            </a>
+            
+            <a href="/admin/orders" class="menu-item" th:classappend="${activePage == 'orders'} ? 'active' : ''">
+                <i class="bi bi-bag"></i>
+                <span>Đơn Hàng</span>
+            </a>
+            
+            <a href="/admin/products" class="menu-item" th:classappend="${activePage == 'products'} ? 'active' : ''">
+                <i class="bi bi-box"></i>
+                <span>Sản Phẩm</span>
+            </a>
+            
+            <a href="/admin/customers" class="menu-item" th:classappend="${activePage == 'customers'} ? 'active' : ''">
+                <i class="bi bi-people"></i>
+                <span>Khách Hàng</span>
+            </a>
+            
+            <a href="/admin/analytics" class="menu-item" th:classappend="${activePage == 'analytics'} ? 'active' : ''">
+                <i class="bi bi-bar-chart"></i>
+                <span>Thống Kê</span>
+            </a>
+            
+            <a href="/admin/settings" class="menu-item" th:classappend="${activePage == 'settings'} ? 'active' : ''">
+                <i class="bi bi-gear"></i>
+                <span>Cài Đặt</span>
+            </a>
+            
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                <a href="/" class="menu-item">
+                    <i class="bi bi-house"></i>
+                    <span>Về Cửa Hàng</span>
+                </a>
+                
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="menu-item" style="width: 100%; background: none; border: none; text-align: left; color: var(--danger-color);">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Đăng Xuất</span>
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </div>
+</body>
+</html>

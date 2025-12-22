@@ -214,8 +214,36 @@ h1, h2, h3, h4, h5, h6 {
 .card-3d,
 .product-card {
     transform-style: preserve-3d;
-    transition: transform 0.1s ease-out;
+    transition: all 0.3s ease;
     will-change: transform;
+}
+
+/* Product Card Hover Effect */
+.product-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Product Description Styling */
+.product-card .card-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    min-height: 3em;
+    margin-bottom: 1rem !important;
+}
+
+/* Remove default paragraph margins from CKEditor HTML */
+.product-card .card-text p {
+    margin: 0;
+    display: inline;
+}
+
+.product-card .card-text p:not(:last-child)::after {
+    content: " ";
 }
 
 /* Forms */

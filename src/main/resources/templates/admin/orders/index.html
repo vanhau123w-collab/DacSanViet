@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders Management - Đặc Sản Việt Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/admin-dashboard.css}">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+    
+    <!-- Main Content -->
+    <div class="admin-main">
+        <!-- Header -->
+        <div class="admin-header">
+            <div class="header-title">
+                <h1>Quản Lý Đơn Hàng</h1>
+                <p>Theo dõi và quản lý đơn hàng và vận chuyển</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="exportOrders()">
+                    <i class="bi bi-download"></i> Xuất CSV
+                </button>
+                <button class="btn btn-primary" onclick="createOrder()">
+                    <i class="bi bi-plus-lg"></i> Tạo Đơn Hàng
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="data-table-container">
+            <div class="table-filters">
+                <div class="filter-group">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchInput" class="filter-input" 
+                           placeholder="Tìm theo Mã Đơn, Tên Khách Hàng..." 
+                           onkeyup="searchOrders()">
+                </div>
+                
+                <div class="filter-group">
+                    <i class="bi bi-funnel"></i>
+                    <select id="statusFilter" class="filter-input" onchange="filterOrders()">
+                        <option value="">Tất Cả Trạng Thái</option>
+                        <option value="PENDING">Chờ Xử Lý</option>
+                        <option value="CONFIRMED">Đã Xác Nhận</option>
+                        <option value="PROCESSING">Đang Xử Lý</option>
+                        <option value="SHIPPED">Đang Giao</option>
+                        <option value="DELIVERED">Đã Giao</option>
+                        <option value="CANCELLED">Đã Hủy</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <i class="bi bi-calendar"></i>
+                    <input type="date" id="startDate" class="filter-input" onchange="filterOrders()">
+                    <span style="color: var(--text-secondary);">đến</span>
+                    <input type="date" id="endDate" class="filter-input" onchange="filterOrders()">
+                </div>
+                
+                <button class="btn btn-secondary btn-sm" onclick="applyFilters()">
+                    Áp Dụng
+                </button>
+            </div>
+
+            <!-- Orders Table -->
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mã Đơn</th>
+                        <th>Khách Hàng</th>
+                        <th>Ngày</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th>Thanh Toán</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <!-- Dynamic content -->
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <div class="pagination-info">
+                    Hiển thị <span id="showingStart">1</span> đến <span id="showingEnd">10</span> trong tổng số <span id="totalOrders">0</span> kết quả
+                </div>
+                <div class="pagination-buttons" id="paginationButtons">
+                    <!-- Dynamic pagination -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="orderModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3>Chi Tiết Đơn Hàng</h3>
+                <button class="close-btn" onclick="closeOrderModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/admin-orders.js}"></script>
+    
+    <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        
+        .order-section {
+            margin-bottom: 2rem;
+        }
+        
+        .order-section h4 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .info-item {
+            padding: 1rem;
+            background: var(--dark-bg);
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            font-weight: 600;
+        }
+    </style>
+</body>
+</html>

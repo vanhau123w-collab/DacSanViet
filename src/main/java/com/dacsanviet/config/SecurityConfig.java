@@ -86,7 +86,7 @@ public class SecurityConfig {
 
                 
                 // Static resources
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/**", "/favicon.ico").permitAll()
                 
                 // Product browsing (require login)
                 // Product browsing (public)

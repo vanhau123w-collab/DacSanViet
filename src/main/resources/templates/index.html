@@ -67,6 +67,79 @@
     <style>
         /* Page-specific styles for index.html */
         
+        /* Product Card Hover & Description Styles */
+        .product-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transform-style: preserve-3d !important;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.03) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        /* 3D Effect for Featured Products Section */
+        section.featured-products-section .product-card {
+            perspective: 1000px !important;
+            transform-style: preserve-3d !important;
+            transition: transform 0.1s ease-out !important;
+        }
+        
+        section.featured-products-section .product-card .card-body {
+            transform-style: preserve-3d !important;
+        }
+        
+        section.featured-products-section .card.product-card {
+            perspective: 1000px !important;
+            transform-style: preserve-3d !important;
+            transition: transform 0.1s ease-out !important;
+        }
+        
+        /* Product Image Hover Effect - Show Second Image */
+        .product-img-container {
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        
+        .product-img {
+            transition: opacity 0.4s ease-in-out !important;
+        }
+        
+        .product-img-hover {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            opacity: 0 !important;
+            transition: opacity 0.4s ease-in-out !important;
+        }
+        
+        .product-card:hover .product-img-hover {
+            opacity: 1 !important;
+        }
+        
+        .product-card .card-text {
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            line-height: 1.5 !important;
+            min-height: 3em !important;
+            margin-bottom: 1rem !important;
+        }
+        
+        .product-card .card-text p {
+            margin: 0 !important;
+            display: inline !important;
+        }
+        
+        .product-card .card-text p:not(:last-child)::after {
+            content: " " !important;
+        }
+        
         /* Category Card Hover Effects */
         .category-card-hover {
             transition: all 0.3s ease;
@@ -394,7 +467,7 @@
                                 <div class="col-lg-8 mx-auto text-center">
                                     <h1 class="display-4 fw-bold mb-4 animate-fade-in-up text-white">Món ngon trứ danh ngày Tết Việt</h1>
                                     <p class="lead mb-4 animate-fade-in-up animate-delay-1 text-white">
-                                        Hương vị béo ngậy, thơm lừng của lạp xướng mang đậm dấu ấn ẩm thực truyền thống, thường xuất hiện trong mâm cơ sưng vây ngày Tết.
+                                        Hương vị béo ngậy, thơm lừng của lạp xưởng mang đậm dấu ấn ẩm thực truyền thống, thường xuất hiện trong mâm cơm sum vầy ngày Tết.
                                     </p>
                                     <a th:href="@{/products}" class="btn btn-warning btn-lg px-5 py-3 animate-fade-in-up animate-delay-2">
                                         <i class="bi bi-cart-plus me-2"></i>Tìm hiểu ngay
@@ -585,7 +658,7 @@
                         </div>
                         <div class="card-body p-4">
                             <h5 class="card-title fw-bold mb-2" th:text="${product.name}">Tên sản phẩm</h5>
-                            <p class="card-text text-muted mb-3" th:text="${product.description}">Mô tả sản phẩm</p>
+                            <p class="card-text text-muted mb-3" th:utext="${product.description}">Mô tả sản phẩm</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="price-tag" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
                                 <button class="btn btn-primary btn-sm px-3" 
@@ -748,7 +821,7 @@
     </section>
     
     <!-- Featured Products Section -->
-    <section class="py-5 bg-light">
+    <section class="py-5 bg-light featured-products-section">
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="section-title text-warning">
@@ -777,7 +850,7 @@
                         </div>
                         <div class="card-body p-4">
                             <h5 class="card-title fw-bold mb-2" th:text="${product.name}">Tên sản phẩm</h5>
-                            <p class="card-text text-muted mb-3" th:text="${product.description}">Mô tả sản phẩm</p>
+                            <p class="card-text text-muted mb-3" th:utext="${product.description}">Mô tả sản phẩm</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="price-tag" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
                                 <button class="btn btn-primary btn-sm px-3" 
@@ -1451,6 +1524,132 @@
             
             // Initialize first page (without scrolling)
             showPage(1, false);
+        });
+    </script>
+    
+    <!-- Product Image Hover Effect Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 3D Tilt Effect for Featured Products
+            const featuredSection = document.querySelector('.featured-products-section');
+            
+            if (featuredSection) {
+                const featuredCards = featuredSection.querySelectorAll('.product-card');
+                
+                featuredCards.forEach((card) => {
+                    let currentRotateX = 0;
+                    let currentRotateY = 0;
+                    let targetRotateX = 0;
+                    let targetRotateY = 0;
+                    let animationFrame = null;
+                    
+                    // Smooth animation function with easing
+                    function animate() {
+                        // Lerp (linear interpolation) with higher factor for ultra-smooth transition
+                        currentRotateX += (targetRotateX - currentRotateX) * 0.15;
+                        currentRotateY += (targetRotateY - currentRotateY) * 0.15;
+                        
+                        const transformValue = `translateY(-12px) rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg) scale(1.05)`;
+                        card.style.setProperty('transform', transformValue, 'important');
+                        
+                        // Continue animation if not close enough to target
+                        if (Math.abs(targetRotateX - currentRotateX) > 0.05 || Math.abs(targetRotateY - currentRotateY) > 0.05) {
+                            animationFrame = requestAnimationFrame(animate);
+                        }
+                    }
+                    
+                    card.addEventListener('mousemove', function(e) {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        
+                        const centerX = rect.width / 2;
+                        const centerY = rect.height / 2;
+                        
+                        // Reversed and very subtle sensitivity (divided by 20 for smoother effect)
+                        targetRotateX = -(y - centerY) / 20;  // Negative to reverse
+                        targetRotateY = (x - centerX) / 20;   // Positive to reverse
+                        
+                        card.style.setProperty('box-shadow', '0 25px 50px rgba(0, 0, 0, 0.2)', 'important');
+                        
+                        // Start animation if not already running
+                        if (!animationFrame) {
+                            animationFrame = requestAnimationFrame(animate);
+                        }
+                    });
+                    
+                    card.addEventListener('mouseleave', function() {
+                        targetRotateX = 0;
+                        targetRotateY = 0;
+                        
+                        // Smooth return to original position with easing
+                        function returnToOriginal() {
+                            currentRotateX += (0 - currentRotateX) * 0.2;
+                            currentRotateY += (0 - currentRotateY) * 0.2;
+                            
+                            const transformValue = `translateY(0) rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg) scale(1)`;
+                            card.style.setProperty('transform', transformValue, 'important');
+                            
+                            if (Math.abs(currentRotateX) > 0.05 || Math.abs(currentRotateY) > 0.05) {
+                                requestAnimationFrame(returnToOriginal);
+                            } else {
+                                card.style.setProperty('transform', 'translateY(0) rotateX(0) rotateY(0) scale(1)', 'important');
+                                currentRotateX = 0;
+                                currentRotateY = 0;
+                            }
+                        }
+                        
+                        card.style.setProperty('box-shadow', '', 'important');
+                        if (animationFrame) {
+                            cancelAnimationFrame(animationFrame);
+                            animationFrame = null;
+                        }
+                        requestAnimationFrame(returnToOriginal);
+                    });
+                });
+            }
+            
+            // Get all product cards for image hover
+            const productCards = document.querySelectorAll('.product-card');
+            
+            productCards.forEach(card => {
+                const imgElement = card.querySelector('.product-img');
+                if (!imgElement) return;
+                
+                const productId = card.querySelector('[data-product-id]')?.getAttribute('data-product-id');
+                if (!productId) return;
+                
+                // Fetch additional images for this product
+                fetch(`/api/products/${productId}/images`)
+                    .then(response => response.json())
+                    .then(images => {
+                        if (images && images.length > 0) {
+                            const secondImage = images[0];
+                            
+                            const hoverImg = document.createElement('img');
+                            hoverImg.src = secondImage.imageUrl;
+                            hoverImg.alt = 'Product hover image';
+                            hoverImg.className = 'card-img-top product-img product-img-hover';
+                            hoverImg.onerror = function() {
+                                this.style.display = 'none';
+                            };
+                            
+                            const imgContainer = imgElement.parentElement;
+                            if (!imgContainer.classList.contains('product-img-container')) {
+                                const container = document.createElement('div');
+                                container.className = 'product-img-container';
+                                imgElement.parentNode.insertBefore(container, imgElement);
+                                container.appendChild(imgElement);
+                                container.appendChild(hoverImg);
+                            } else {
+                                imgContainer.appendChild(hoverImg);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.log('No additional images for product', productId);
+                    });
+            });
         });
     </script>
 </body>

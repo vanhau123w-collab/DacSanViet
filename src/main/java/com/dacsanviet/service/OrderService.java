@@ -973,4 +973,12 @@ public class OrderService {
 			return false;
 		}
 	}
+	
+	/**
+	 * Convert Order to OrderDao (alias for convertToOrderDto)
+	 * Used by admin controllers
+	 */
+	public OrderDao convertToDao(Order order) {
+		return convertToOrderDto(order);
+	}
 }

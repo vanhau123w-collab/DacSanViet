@@ -381,4 +381,29 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "WHERE o.status != 'CANCELLED' AND o.orderDate BETWEEN :startDate AND :endDate")
     BigDecimal calculateAverageOrderValueInPeriod(@Param("startDate") LocalDateTime startDate,
                                                  @Param("endDate") LocalDateTime endDate);
+    
+    /**
+     * Find orders by status with pagination
+     */
+    Page<Order> findByStatus(OrderStatus status, Pageable pageable);
+    
+    /**
+     * Find orders by order date between
+     */
+    List<Order> findByOrderDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+    
+    /**
+     * Find orders by order date between with pagination
+     */
+    Page<Order> findByOrderDateBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    
+    /**
+     * Find top 10 orders by order date descending
+     */
+    List<Order> findTop10ByOrderByOrderDateDesc();
+    
+    /**
+     * Count orders by order date between
+     */
+    Long countByOrderDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

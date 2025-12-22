@@ -132,4 +132,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
                                       @Param("registeredAfter") LocalDateTime registeredAfter,
                                       @Param("registeredBefore") LocalDateTime registeredBefore,
                                       Pageable pageable);
+    
+    /**
+     * Count users by created at between
+     */
+    Long countByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

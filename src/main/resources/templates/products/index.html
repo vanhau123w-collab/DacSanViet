@@ -649,7 +649,7 @@
                             </div>
                             <div class="product-info">
                                 <h5 class="product-title" th:text="${product.name}">Tên sản phẩm</h5>
-                                <p class="product-description" th:text="${product.description}">Mô tả sản phẩm</p>
+                                <p class="product-description" th:utext="${product.description}">Mô tả sản phẩm</p>
                                 <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
                                 
                                 <div class="product-actions">

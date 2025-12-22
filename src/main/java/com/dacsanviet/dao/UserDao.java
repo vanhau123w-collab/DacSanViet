@@ -27,6 +27,7 @@ public class UserDao {
     
     // Analytics fields
     private Long orderCount;
+    private Long totalOrders;
     private BigDecimal totalSpent;
     
     // Constructor for basic user info

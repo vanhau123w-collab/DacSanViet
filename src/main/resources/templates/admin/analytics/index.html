@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Reports - Đặc Sản Việt Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/admin-dashboard.css}">
+</head>
+<body>
+    <div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+    
+    <div class="admin-main">
+        <div class="admin-header">
+            <div class="header-title">
+                <h1>Thống Kê & Báo Cáo</h1>
+                <p>Tổng quan hiệu suất cửa hàng và các chỉ số quan trọng</p>
+            </div>
+            <div class="header-actions">
+                <select id="dateRange" class="filter-input">
+                    <option value="7days">7 Ngày Qua</option>
+                    <option value="30days" selected>30 Ngày Qua</option>
+                    <option value="90days">90 Ngày Qua</option>
+                    <option value="year">Năm Nay</option>
+                </select>
+                <button class="btn btn-primary" onclick="exportReport()">
+                    <i class="bi bi-download"></i> Xuất Báo Cáo
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Tổng Doanh Thu</span>
+                    <div class="stat-icon" style="background: rgba(76, 175, 80, 0.2); color: #4caf50;">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="totalRevenue">0₫</div>
+                <div class="stat-change positive">
+                    <i class="bi bi-arrow-up"></i> <span>12%</span> so với tháng trước
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Tổng Đơn Hàng</span>
+                    <div class="stat-icon" style="background: rgba(33, 150, 243, 0.2); color: #2196f3;">
+                        <i class="bi bi-bag-check"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="totalOrders">0</div>
+                <div class="stat-change positive">
+                    <i class="bi bi-arrow-up"></i> <span>5%</span> so với tháng trước
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Giá Trị Đơn TB</span>
+                    <div class="stat-icon" style="background: rgba(255, 152, 0, 0.2); color: #ff9800;">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="avgOrderValue">0₫</div>
+                <div class="stat-change negative">
+                    <i class="bi bi-arrow-down"></i> <span>2%</span> so với tháng trước
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Khách Hàng Mới</span>
+                    <div class="stat-icon" style="background: rgba(156, 39, 176, 0.2); color: #9c27b0;">
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="newCustomers">0</div>
+                <div class="stat-change positive">
+                    <i class="bi bi-arrow-up"></i> <span>8%</span> so với tháng trước
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h3>Xu Hướng Doanh Thu</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">Hiệu suất doanh thu theo ngày</p>
+                </div>
+                <div style="padding: 2rem;">
+                    <canvas id="salesTrendChart" height="80"></canvas>
+                </div>
+            </div>
+
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h3>Nguồn Truy Cập</h3>
+                </div>
+                <div style="padding: 2rem;">
+                    <canvas id="trafficChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Performance & Demographics -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h3>Hiệu Suất Sản Phẩm</h3>
+                </div>
+                <div id="productPerformance" style="padding: 1rem;">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h3>Thống Kê Khách Hàng</h3>
+                </div>
+                <div style="padding: 2rem;">
+                    <canvas id="demographicsChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script th:src="@{/js/admin-analytics.js}"></script>
+</body>
+</html>
