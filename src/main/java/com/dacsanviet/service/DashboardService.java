@@ -130,6 +130,7 @@ public class DashboardService {
     /**
      * Get Top Selling Products
      */
+    @Transactional(readOnly = true)
     public List<Map<String, Object>> getTopSellingProducts(int limit) {
         try {
             // Use PageRequest to limit results
@@ -145,6 +146,12 @@ public class DashboardService {
                     Long totalSold = ((Number) row[1]).longValue();
                     Long orderCount = ((Number) row[2]).longValue();
                     
+                    // Force load category to avoid lazy loading issue
+                    String categoryName = "N/A";
+                    if (product.getCategory() != null) {
+                        categoryName = product.getCategory().getName();
+                    }
+                    
                     Map<String, Object> productData = new HashMap<>();
                     productData.put("id", product.getId());
                     productData.put("name", product.getName());
@@ -153,15 +160,6 @@ public class DashboardService {
                     productData.put("stock", product.getStockQuantity());
                     productData.put("totalSold", totalSold);
                     productData.put("orderCount", orderCount);
-                    
-                    String categoryName = "N/A";
-                    try {
-                        if (product.getCategory() != null) {
-                            categoryName = product.getCategory().getName();
-                        }
-                    } catch (Exception e) {
-                        // Category might be lazy-loaded, ignore error
-                    }
                     productData.put("category", categoryName);
                     
                     return productData;

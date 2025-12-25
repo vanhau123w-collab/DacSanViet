@@ -1,5 +1,7 @@
 // Admin Dashboard JavaScript
 let salesChart = null;
+let orderStatusChart = null;
+let topCategoriesChart = null;
 let currentPeriod = '30days';
 let recentOrdersPage = 0;
 let recentOrdersSize = 5;
@@ -11,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSalesChart();
     loadTopProducts();
     loadRecentOrders();
+    loadOrderStatusChart();
+    loadTopCategoriesChart();
     
     // Period selector
     document.getElementById('periodSelect').addEventListener('change', function() {
@@ -339,4 +343,133 @@ function viewOrder(orderId) {
 
 function exportReport() {
     window.location.href = `/admin/dashboard/export?period=${currentPeriod}`;
+}
+
+// Load Order Status Distribution Chart
+async function loadOrderStatusChart() {
+    try {
+        const response = await fetch('/admin/dashboard/order-status-chart');
+        const data = await response.json();
+        
+        const ctx = document.getElementById('orderStatusChart').getContext('2d');
+        
+        if (orderStatusChart) {
+            orderStatusChart.destroy();
+        }
+        
+        orderStatusChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    data: data.data,
+                    backgroundColor: data.colors,
+                    borderWidth: 2,
+                    borderColor: '#1a1a1a'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#e0e0e0',
+                            padding: 15,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: ${value} đơn (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error loading order status chart:', error);
+    }
+}
+
+// Load Top Categories Chart
+async function loadTopCategoriesChart() {
+    try {
+        const response = await fetch('/admin/dashboard/top-categories-chart');
+        const data = await response.json();
+        
+        const ctx = document.getElementById('topCategoriesChart').getContext('2d');
+        
+        if (topCategoriesChart) {
+            topCategoriesChart.destroy();
+        }
+        
+        topCategoriesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Doanh Thu',
+                    data: data.revenue,
+                    backgroundColor: 'rgba(210, 105, 30, 0.8)',
+                    borderColor: '#D2691E',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const revenue = formatCurrency(context.parsed.y);
+                                const orders = data.orders[context.dataIndex];
+                                return [
+                                    `Doanh thu: ${revenue}`,
+                                    `Số đơn: ${orders}`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return formatCurrency(value);
+                            },
+                            color: '#e0e0e0'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#e0e0e0'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error loading top categories chart:', error);
+    }
 }

@@ -39,6 +39,9 @@ public class AdminProductController {
     
     @Autowired
     private CategoryRepository categoryRepository;
+    
+    @Autowired
+    private com.dacsanviet.repository.SupplierRepository supplierRepository;
 
     @Autowired
     private ProductImageRepository productImageRepository;
@@ -92,6 +95,7 @@ public class AdminProductController {
             @RequestParam("price") Double price,
             @RequestParam("stockQuantity") Integer stockQuantity,
             @RequestParam("categoryId") Long categoryId,
+            @RequestParam(value = "supplierId", required = false) Long supplierId,
             @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
             @RequestParam(value = "additionalImages", required = false) MultipartFile[] additionalImages,
             Model model) {
@@ -110,6 +114,12 @@ public class AdminProductController {
             product.setStockQuantity(stockQuantity);
             product.setCategory(category);
             product.setIsActive(true);
+            
+            // Set supplier if provided
+            if (supplierId != null) {
+                com.dacsanviet.model.Supplier supplier = supplierRepository.findById(supplierId).orElse(null);
+                product.setSupplier(supplier);
+            }
             
             // Handle main image upload
             if (mainImage != null && !mainImage.isEmpty()) {
@@ -154,6 +164,7 @@ public class AdminProductController {
             @RequestParam("price") Double price,
             @RequestParam("stockQuantity") Integer stockQuantity,
             @RequestParam("categoryId") Long categoryId,
+            @RequestParam(value = "supplierId", required = false) Long supplierId,
             @RequestParam(value = "active", required = false) Boolean active,
             @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
             @RequestParam(value = "additionalImages", required = false) MultipartFile[] additionalImages,
@@ -168,6 +179,20 @@ public class AdminProductController {
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             
             product.setName(name);
+            product.setDescription(description);
+            product.setStory(story);
+            product.setPrice(BigDecimal.valueOf(price));
+            product.setStockQuantity(stockQuantity);
+            product.setCategory(category);
+            product.setIsActive(active != null && active);
+            
+            // Set supplier if provided
+            if (supplierId != null) {
+                com.dacsanviet.model.Supplier supplier = supplierRepository.findById(supplierId).orElse(null);
+                product.setSupplier(supplier);
+            } else {
+                product.setSupplier(null);
+            }
             product.setDescription(description);
             product.setStory(story);
             product.setPrice(BigDecimal.valueOf(price));

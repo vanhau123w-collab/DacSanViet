@@ -23,9 +23,19 @@
                 <span>Sản Phẩm</span>
             </a>
             
+            <a href="/admin/categories" class="menu-item" th:classappend="${activePage == 'categories'} ? 'active' : ''">
+                <i class="bi bi-folder"></i>
+                <span>Danh Mục</span>
+            </a>
+            
             <a href="/admin/customers" class="menu-item" th:classappend="${activePage == 'customers'} ? 'active' : ''">
                 <i class="bi bi-people"></i>
                 <span>Khách Hàng</span>
+            </a>
+            
+            <a href="/admin/promotions" class="menu-item" th:classappend="${activePage == 'promotions'} ? 'active' : ''">
+                <i class="bi bi-tag"></i>
+                <span>Khuyến Mãi</span>
             </a>
             
             <a href="/admin/analytics" class="menu-item" th:classappend="${activePage == 'analytics'} ? 'active' : ''">

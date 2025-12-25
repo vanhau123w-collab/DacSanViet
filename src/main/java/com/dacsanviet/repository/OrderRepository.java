@@ -101,6 +101,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Long countByStatus(@Param("status") OrderStatus status);
     
     /**
+     * Get order status distribution for charts
+     */
+    @Query("SELECT o.status, COUNT(o) FROM Order o GROUP BY o.status")
+    List<Object[]> getOrderStatusDistribution();
+    
+    /**
      * Count orders for user
      */
     @Query("SELECT COUNT(o) FROM Order o WHERE o.user.id = :userId")

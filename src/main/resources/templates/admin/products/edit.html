@@ -128,6 +128,25 @@
             border: 1px solid var(--border-color) !important;
             border-radius: 8px !important;
         }
+        
+        .custom-select-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .custom-select-option:hover {
+            background: rgba(255, 107, 53, 0.1);
+        }
+        
+        .custom-select-option.selected {
+            background: rgba(255, 107, 53, 0.05);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -192,6 +211,29 @@
                                         <input type="number" class="form-control" id="price" name="price" 
                                                th:value="${product.price}" step="1000" min="0" required>
                                     </div>
+                                </div>
+                                
+                                <!-- Supplier -->
+                                <div class="mb-3">
+                                    <label for="supplierId" class="form-label">Nhà phân phối</label>
+                                    <div class="custom-select-wrapper">
+                                        <button type="button" class="custom-select-button" id="supplierBtn">
+                                            <span class="select-placeholder">Chọn nhà phân phối</span>
+                                            <i class="bi bi-chevron-down"></i>
+                                        </button>
+                                        <div class="custom-select-dropdown" id="supplierDropdown">
+                                            <div class="custom-select-search">
+                                                <input type="text" placeholder="Tìm kiếm..." id="supplierSearch">
+                                            </div>
+                                            <div class="custom-select-options" id="supplierOptions"></div>
+                                            <div class="custom-select-footer">
+                                                <button type="button" class="btn-add-new" onclick="openSupplierModal(); return false;">
+                                                    <i class="bi bi-plus-circle"></i> Thêm nhà phân phối mới
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="supplierId" name="supplierId">
                                 </div>
                                 
                                 <!-- Stock -->
@@ -306,6 +348,119 @@
         </div>
     </div>
 
+    <!-- Supplier Modal -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content" style="max-width: 700px; position: relative; z-index: 100000;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border-radius: 12px 12px 0 0; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" style="flex-shrink: 0;">
+                        <path d="M2.97 1.35A1 1 0 0 1 3.73 1h8.54a1 1 0 0 1 .76.35l2.609 3.044A1.5 1.5 0 0 1 16 5.37v.255a2.375 2.375 0 0 1-4.25 1.458A2.371 2.371 0 0 1 9.875 8 2.37 2.37 0 0 1 8 7.083 2.37 2.37 0 0 1 6.125 8a2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.625V5.37a1.5 1.5 0 0 1 .361-.976l2.61-3.045zm1.78 4.275a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 1 0 2.75 0V5.37a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.255a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0zM1.5 8.5A.5.5 0 0 1 2 9v6h1v-5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v5h6V9a.5.5 0 0 1 1 0v6h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1V9a.5.5 0 0 1 .5-.5zM4 15h3v-5H4v5zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3zm3 0h-2v3h2v-3z"/>
+                    </svg>
+                    <span>Thêm Nhà Phân Phối Mới</span>
+                </h2>
+                <button class="modal-close" onclick="closeSupplierModal()" style="color: white; background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.5rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 2rem;">
+                <form id="supplierForm" onsubmit="saveSupplier(event)">
+                    <div class="mb-3">
+                        <label for="supplierName" class="form-label">
+                            Tên nhà phân phối <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="supplierName" required 
+                               placeholder="VD: Công ty TNHH ABC">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="supplierContactPerson" class="form-label">Người liên hệ</label>
+                            <input type="text" class="form-control" id="supplierContactPerson" 
+                                   placeholder="VD: Nguyễn Văn A">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="supplierPhone" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="supplierPhone" 
+                                   placeholder="VD: 0901234567">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="supplierEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="supplierEmail" 
+                               placeholder="VD: contact@company.com">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="supplierAddress" class="form-label">Địa chỉ cụ thể</label>
+                        <textarea class="form-control" id="supplierAddress" rows="2" 
+                                  placeholder="Số nhà, tên đường..."></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tỉnh/Thành phố</label>
+                            <div class="custom-select-wrapper">
+                                <button type="button" class="custom-select-button" id="supplierProvinceBtn">
+                                    <span class="select-placeholder">Chọn Tỉnh/TP</span>
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                                <div class="custom-select-dropdown" id="supplierProvinceDropdown">
+                                    <div class="custom-select-search">
+                                        <input type="text" placeholder="Tìm kiếm..." id="supplierProvinceSearch">
+                                    </div>
+                                    <div class="custom-select-options" id="supplierProvinceOptions"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="supplierProvince">
+                            <input type="hidden" id="supplierProvinceCode">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Quận/Huyện</label>
+                            <div class="custom-select-wrapper">
+                                <button type="button" class="custom-select-button" id="supplierDistrictBtn" disabled>
+                                    <span class="select-placeholder">Chọn Quận/Huyện</span>
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                                <div class="custom-select-dropdown" id="supplierDistrictDropdown">
+                                    <div class="custom-select-search">
+                                        <input type="text" placeholder="Tìm kiếm..." id="supplierDistrictSearch">
+                                    </div>
+                                    <div class="custom-select-options" id="supplierDistrictOptions"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="supplierDistrict">
+                            <input type="hidden" id="supplierDistrictCode">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Phường/Xã</label>
+                            <div class="custom-select-wrapper">
+                                <button type="button" class="custom-select-button" id="supplierWardBtn" disabled>
+                                    <span class="select-placeholder">Chọn Phường/Xã</span>
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                                <div class="custom-select-dropdown" id="supplierWardDropdown">
+                                    <div class="custom-select-search">
+                                        <input type="text" placeholder="Tìm kiếm..." id="supplierWardSearch">
+                                    </div>
+                                    <div class="custom-select-options" id="supplierWardOptions"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="supplierWard">
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions" style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                        <button type="button" class="btn btn-outline-secondary" onclick="closeSupplierModal()">
+                            <i class="bi bi-x-circle"></i> Hủy
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Lưu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
@@ -313,6 +468,307 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
     
     <script>
+        // Custom Select Class
+        class CustomSelect {
+            constructor(buttonId, dropdownId, searchId, optionsId) {
+                this.button = document.getElementById(buttonId);
+                this.dropdown = document.getElementById(dropdownId);
+                this.searchInput = document.getElementById(searchId);
+                this.optionsContainer = document.getElementById(optionsId);
+                this.options = [];
+                this.selectedValue = null;
+                this.onSelect = null;
+                this.init();
+            }
+            
+            init() {
+                this.button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggle();
+                });
+                
+                this.searchInput.addEventListener('input', () => {
+                    this.filterOptions(this.searchInput.value);
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (!this.button.contains(e.target) && !this.dropdown.contains(e.target)) {
+                        this.close();
+                    }
+                });
+            }
+            
+            toggle() {
+                if (this.dropdown.classList.contains('show')) {
+                    this.close();
+                } else {
+                    this.open();
+                }
+            }
+            
+            open() {
+                this.dropdown.classList.add('show');
+                this.button.classList.add('active');
+                this.searchInput.value = '';
+                this.searchInput.focus();
+                this.filterOptions('');
+            }
+            
+            close() {
+                this.dropdown.classList.remove('show');
+                this.button.classList.remove('active');
+            }
+            
+            setOptions(options) {
+                this.options = options;
+                this.renderOptions(options);
+            }
+            
+            renderOptions(options) {
+                this.optionsContainer.innerHTML = options.map(opt => {
+                    const isSelected = this.selectedValue && this.selectedValue.value == (opt.id || opt.code);
+                    return `
+                        <div class="custom-select-option ${isSelected ? 'selected' : ''}" data-value="${opt.id || opt.code}" data-name="${opt.name}">
+                            <span>${opt.name}</span>
+                            ${isSelected ? '<i class="bi bi-check-circle-fill" style="color: var(--primary-color); margin-left: auto;"></i>' : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                this.optionsContainer.querySelectorAll('.custom-select-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        this.select(option.dataset.value, option.dataset.name);
+                    });
+                });
+            }
+            
+            filterOptions(searchTerm) {
+                const filtered = this.options.filter(opt => 
+                    opt.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                this.renderOptions(filtered);
+            }
+            
+            select(value, name) {
+                this.selectedValue = { value, name };
+                this.button.innerHTML = `<span class="select-value">${name}</span><i class="bi bi-chevron-down"></i>`;
+                this.close();
+                if (this.onSelect) this.onSelect(value, name);
+            }
+            
+            reset() {
+                this.selectedValue = null;
+                this.button.innerHTML = '<span class="select-placeholder">Chọn...</span><i class="bi bi-chevron-down"></i>';
+            }
+        }
+        
+        let supplierSelect, supplierProvinceSelect, supplierDistrictSelect, supplierWardSelect;
+        let provinces = [], districts = [], wards = [];
+        const currentSupplierId = /*[[${product.supplier != null ? product.supplier.id : null}]]*/ null;
+        const currentSupplierName = /*[[${product.supplier != null ? product.supplier.name : null}]]*/ null;
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            supplierSelect = new CustomSelect('supplierBtn', 'supplierDropdown', 'supplierSearch', 'supplierOptions');
+            supplierSelect.onSelect = (value, name) => {
+                document.getElementById('supplierId').value = value;
+            };
+            loadSuppliers();
+        });
+        
+        async function loadSuppliers() {
+            try {
+                console.log('Loading suppliers...');
+                const response = await fetch('/admin/suppliers/active');
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const suppliers = await response.json();
+                console.log('Suppliers loaded:', suppliers);
+                
+                if (!suppliers || suppliers.length === 0) {
+                    console.warn('No suppliers found in database');
+                    showNotification('Chưa có nhà phân phối nào. Vui lòng thêm mới.', 'warning');
+                } else {
+                    supplierSelect.setOptions(suppliers);
+                    console.log('Suppliers set to dropdown');
+                }
+                
+                // Pre-select current supplier if exists
+                if (currentSupplierId && currentSupplierName) {
+                    supplierSelect.select(currentSupplierId, currentSupplierName);
+                    document.getElementById('supplierId').value = currentSupplierId;
+                }
+            } catch (error) {
+                console.error('Error loading suppliers:', error);
+                showNotification('Lỗi khi tải danh sách nhà phân phối: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadProvinces() {
+            try {
+                const response = await fetch('https://provinces.open-api.vn/api/p/');
+                provinces = await response.json();
+                if (supplierProvinceSelect) {
+                    supplierProvinceSelect.setOptions(provinces);
+                }
+            } catch (error) {
+                console.error('Error loading provinces:', error);
+            }
+        }
+        
+        async function loadDistricts(provinceCode) {
+            try {
+                const response = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
+                const data = await response.json();
+                districts = data.districts || [];
+                if (supplierDistrictSelect) {
+                    supplierDistrictSelect.setOptions(districts);
+                    document.getElementById('supplierDistrictBtn').disabled = false;
+                }
+            } catch (error) {
+                console.error('Error loading districts:', error);
+            }
+        }
+        
+        async function loadWards(districtCode) {
+            try {
+                const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
+                const data = await response.json();
+                wards = data.wards || [];
+                if (supplierWardSelect) {
+                    supplierWardSelect.setOptions(wards);
+                    document.getElementById('supplierWardBtn').disabled = false;
+                }
+            } catch (error) {
+                console.error('Error loading wards:', error);
+            }
+        }
+        
+        function openSupplierModal() {
+            const modal = document.getElementById('supplierModal');
+            document.getElementById('supplierForm').reset();
+            
+            // Close supplier dropdown if open
+            if (supplierSelect) {
+                supplierSelect.close();
+            }
+            
+            modal.classList.add('show');
+            
+            // Reset address dropdowns
+            document.getElementById('supplierDistrictBtn').disabled = true;
+            document.getElementById('supplierWardBtn').disabled = true;
+            
+            if (!supplierProvinceSelect) {
+                supplierProvinceSelect = new CustomSelect('supplierProvinceBtn', 'supplierProvinceDropdown', 'supplierProvinceSearch', 'supplierProvinceOptions');
+                supplierProvinceSelect.onSelect = (code, name) => {
+                    document.getElementById('supplierProvince').value = name;
+                    document.getElementById('supplierProvinceCode').value = code;
+                    // Reset district and ward
+                    if (supplierDistrictSelect) supplierDistrictSelect.reset();
+                    if (supplierWardSelect) supplierWardSelect.reset();
+                    document.getElementById('supplierDistrict').value = '';
+                    document.getElementById('supplierWard').value = '';
+                    document.getElementById('supplierWardBtn').disabled = true;
+                    loadDistricts(code);
+                };
+                loadProvinces();
+            }
+            
+            if (!supplierDistrictSelect) {
+                supplierDistrictSelect = new CustomSelect('supplierDistrictBtn', 'supplierDistrictDropdown', 'supplierDistrictSearch', 'supplierDistrictOptions');
+                supplierDistrictSelect.onSelect = (code, name) => {
+                    document.getElementById('supplierDistrict').value = name;
+                    document.getElementById('supplierDistrictCode').value = code;
+                    // Reset ward
+                    if (supplierWardSelect) supplierWardSelect.reset();
+                    document.getElementById('supplierWard').value = '';
+                    loadWards(code);
+                };
+            }
+            
+            if (!supplierWardSelect) {
+                supplierWardSelect = new CustomSelect('supplierWardBtn', 'supplierWardDropdown', 'supplierWardSearch', 'supplierWardOptions');
+                supplierWardSelect.onSelect = (code, name) => {
+                    document.getElementById('supplierWard').value = name;
+                };
+            }
+        }
+        
+        function closeSupplierModal() {
+            document.getElementById('supplierModal').classList.remove('show');
+        }
+        
+        async function saveSupplier(event) {
+            event.preventDefault();
+            
+            // Build full address from components
+            const streetAddress = document.getElementById('supplierAddress').value.trim();
+            const ward = document.getElementById('supplierWard').value.trim();
+            const district = document.getElementById('supplierDistrict').value.trim();
+            const province = document.getElementById('supplierProvince').value.trim();
+            
+            // Combine address parts (only non-empty parts)
+            const addressParts = [streetAddress, ward, district, province].filter(part => part);
+            const fullAddress = addressParts.join(', ');
+            
+            const supplierData = {
+                name: document.getElementById('supplierName').value.trim(),
+                contactPerson: document.getElementById('supplierContactPerson').value.trim(),
+                phone: document.getElementById('supplierPhone').value.trim(),
+                email: document.getElementById('supplierEmail').value.trim(),
+                address: fullAddress
+            };
+            
+            try {
+                const response = await fetch('/admin/suppliers/quick-add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(supplierData)
+                });
+                
+                if (response.ok) {
+                    const newSupplier = await response.json();
+                    await loadSuppliers();
+                    supplierSelect.select(newSupplier.id, newSupplier.name);
+                    document.getElementById('supplierId').value = newSupplier.id;
+                    showNotification('Thêm nhà phân phối thành công', 'success');
+                    closeSupplierModal();
+                } else {
+                    const error = await response.text();
+                    showNotification(error || 'Có lỗi xảy ra', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving supplier:', error);
+                showNotification('Lỗi khi lưu nhà phân phối', 'error');
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info-circle'}"></i><span>${message}</span>`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 10);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('supplierModal');
+            if (event.target === modal) closeSupplierModal();
+        });
+        
         // Get existing content
         const descriptionContent = document.querySelector('#description').value;
         const storyContent = document.querySelector('#story').value;

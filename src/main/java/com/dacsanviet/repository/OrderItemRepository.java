@@ -114,6 +114,16 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     List<Object[]> getCategorySalesStatistics();
     
     /**
+     * Find top categories by sales for charts (limit 5)
+     */
+    @Query("SELECT oi.categoryName, SUM(oi.unitPrice * oi.quantity) as totalRevenue, COUNT(DISTINCT oi.order) as orderCount " +
+           "FROM OrderItem oi " +
+           "WHERE oi.order.status != 'CANCELLED' AND oi.categoryName IS NOT NULL " +
+           "GROUP BY oi.categoryName " +
+           "ORDER BY SUM(oi.unitPrice * oi.quantity) DESC")
+    List<Object[]> findTopCategoriesBySales(Pageable pageable);
+    
+    /**
      * Find order items with quantity greater than threshold
      */
     @Query("SELECT oi FROM OrderItem oi WHERE oi.quantity > :threshold ORDER BY oi.quantity DESC")

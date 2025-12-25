@@ -897,7 +897,22 @@ public class OrderService {
 	}
 
 	private String generateOrderNumber() {
-		return "ORD" + System.currentTimeMillis();
+		// Generate order number: DSV{yy}{mm}{dd}{random_6_chars}
+		// Example: DSV2412250A3B5C
+		LocalDateTime now = LocalDateTime.now();
+		String year = String.format("%02d", now.getYear() % 100); // Last 2 digits of year
+		String month = String.format("%02d", now.getMonthValue());
+		String day = String.format("%02d", now.getDayOfMonth());
+		
+		// Generate 6 random alphanumeric characters (uppercase)
+		String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		StringBuilder random = new StringBuilder();
+		java.util.Random rnd = new java.util.Random();
+		for (int i = 0; i < 6; i++) {
+			random.append(chars.charAt(rnd.nextInt(chars.length())));
+		}
+		
+		return "DSV" + year + month + day + random.toString();
 	}
 
 	/**
