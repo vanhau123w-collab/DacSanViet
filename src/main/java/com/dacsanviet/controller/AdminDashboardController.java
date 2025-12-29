@@ -1,7 +1,13 @@
 package com.dacsanviet.controller;
 
 import com.dacsanviet.service.DashboardService;
+import com.dacsanviet.service.OrderService;
+import com.dacsanviet.dao.OrderDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -21,6 +27,9 @@ public class AdminDashboardController {
 
     @Autowired
     private DashboardService dashboardService;
+
+    @Autowired
+    private OrderService orderService;
 
     /**
      * Dashboard Overview Page
@@ -114,9 +123,19 @@ public class AdminDashboardController {
      */
     @GetMapping("/orders")
     public String ordersManagement(Model model) {
-        model.addAttribute("pageTitle", "Orders Management");
-        model.addAttribute("activePage", "orders");
-        return "admin/orders/index";
+        try {
+            // Get orders with pagination (first page, 20 items)
+            Pageable pageable = PageRequest.of(0, 20, Sort.by("orderDate").descending());
+            Page<OrderDao> orders = orderService.getAllOrders(pageable);
+            
+            model.addAttribute("orders", orders);
+            model.addAttribute("pageTitle", "Orders Management");
+            model.addAttribute("activePage", "orders");
+        } catch (Exception e) {
+            model.addAttribute("error", "Không thể tải danh sách đơn hàng: " + e.getMessage());
+        }
+        
+        return "admin/orders/list-debug";
     }
 
     /**

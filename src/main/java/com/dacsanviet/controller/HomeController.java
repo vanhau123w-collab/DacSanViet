@@ -148,6 +148,13 @@ public class HomeController {
 		return "terms-of-service";
 	}
 
+	@GetMapping("/about")
+	public String about(Model model) {
+		model.addAttribute("pageTitle", "Giới Thiệu - Đặc Sản Việt Nam");
+		model.addAttribute("categories", categoryService.getAllActiveCategories());
+		return "pages/about";
+	}
+
 	@PostMapping("/api/consultation")
 	@ResponseBody
 	public org.springframework.http.ResponseEntity<?> submitConsultation(

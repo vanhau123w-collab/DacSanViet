@@ -174,9 +174,62 @@ public class AdminApiController {
 		OrderStatus newStatus = OrderStatus.valueOf(statusStr);
 
 		order.setStatus(newStatus);
+		
+		// Update notes if provided
+		if (request.containsKey("notes")) {
+			order.setNotes(request.get("notes"));
+		}
+		
 		orderRepository.save(order);
 
-		return ResponseEntity.ok(Map.of("message", "Order status updated successfully"));
+		// Convert to DAO for response
+		OrderDao dao = orderService.convertToDao(order);
+		return ResponseEntity.ok(dao);
+	}
+
+	/**
+	 * Approve COD Order (AJAX) - Changes status from PROCESSING to SHIPPED
+	 */
+	@PostMapping("/orders/{id}/approve-cod")
+	public ResponseEntity<?> approveCODOrder(@PathVariable Long id, @RequestBody Map<String, String> request) {
+		try {
+			Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+
+			// Validate that this is a COD order
+			if (!"COD".equals(order.getPaymentMethod())) {
+				return ResponseEntity.status(400).body(Map.of("success", false, "message", "Đây không phải đơn hàng COD"));
+			}
+
+			// Validate current status
+			if (order.getStatus() != OrderStatus.PROCESSING && order.getStatus() != OrderStatus.PENDING) {
+				return ResponseEntity.status(400).body(Map.of("success", false, "message", "Đơn hàng không ở trạng thái có thể phê duyệt"));
+			}
+
+			// Get request data
+			String shippingCarrier = request.get("shippingCarrier");
+			String trackingNumber = request.get("trackingNumber");
+			String notes = request.get("notes");
+
+			if (shippingCarrier == null || shippingCarrier.trim().isEmpty()) {
+				return ResponseEntity.status(400).body(Map.of("success", false, "message", "Vui lòng chọn nhà vận chuyển"));
+			}
+
+			// Update order
+			order.setStatus(OrderStatus.SHIPPED);
+			order.setShippingCarrier(shippingCarrier);
+			if (trackingNumber != null && !trackingNumber.trim().isEmpty()) {
+				order.setTrackingNumber(trackingNumber);
+			}
+			if (notes != null && !notes.trim().isEmpty()) {
+				order.setNotes(notes);
+			}
+
+			orderRepository.save(order);
+
+			return ResponseEntity.ok(Map.of("success", true, "message", "Đơn hàng COD đã được phê duyệt thành công"));
+		} catch (Exception e) {
+			return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi hệ thống: " + e.getMessage()));
+		}
 	}
 
 	/**

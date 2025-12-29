@@ -32,17 +32,96 @@
                                 </a>
                             </li>
                             <li class="nav-item dropdown me-4">
-                                <a href="#" class="nav-link text-dark fw-semibold position-relative">
+                                <a href="#" class="nav-link text-dark fw-semibold position-relative dropdown-toggle" 
+                                   data-bs-toggle="dropdown" aria-expanded="false">
                                     Sản Phẩm
                                     <i class="fas fa-chevron-down ms-1" style="font-size: 0.75rem;"></i>
                                 </a>
-                                <ul class="dropdown-menu border-0 shadow-lg">
-                                    <li th:each="category : ${categories}">
-                                        <a class="dropdown-item py-2" th:href="@{/products(categoryId=${category.id})}">
-                                            <i class="fas fa-tag me-2" th:classappend="${category.id == 1 ? 'text-primary' : (category.id == 2 ? 'text-warning' : 'text-info')}"></i>
-                                            <span th:text="${category.name}">Tên danh mục</span>
+                                <ul class="dropdown-menu mega-menu border-0 shadow-lg">
+                                    <!-- Đặc Sản Miền Bắc -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item py-2 d-flex align-items-center justify-content-between" href="#">
+                                            <span>
+                                                <i class="fas fa-mountain text-primary me-2"></i>
+                                                Đặc Sản Miền Bắc
+                                            </span>
+                                            <i class="fas fa-chevron-right ms-2"></i>
                                         </a>
+                                        <ul class="dropdown-menu submenu-items">
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='bac',category='banh-chung')}">
+                                                <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Bánh Chưng Truyền Thống
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='bac',category='pho-bo')}">
+                                                <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Phở Bò Hà Nội
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='bac',category='cha-ca')}">
+                                                <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Chả Cá Lã Vọng
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='bac',category='com-lang')}">
+                                                <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Cốm Làng Vòng
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='bac',category='banh-cuon')}">
+                                                <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Bánh Cuốn Thanh Trì
+                                            </a></li>
+                                        </ul>
                                     </li>
+                                    
+                                    <!-- Đặc Sản Miền Trung -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item py-2 d-flex align-items-center justify-content-between" href="#">
+                                            <span>
+                                                <i class="fas fa-sun text-warning me-2"></i>
+                                                Đặc Sản Miền Trung
+                                            </span>
+                                            <i class="fas fa-chevron-right ms-2"></i>
+                                        </a>
+                                        <ul class="dropdown-menu submenu-items">
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='bun-bo-hue')}">
+                                                <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Bún Bò Huế
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='banh-khoai')}">
+                                                <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Bánh Khoái Huế
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='mi-quang')}">
+                                                <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Mì Quảng Đà Nẵng
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='cao-lau')}">
+                                                <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Cao Lầu Hội An
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='nem-lui')}"></a>
+                                                <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Nem Lụi Huế
+                                            </a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <!-- Đặc Sản Miền Nam -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item py-2 d-flex align-items-center justify-content-between" href="#">
+                                            <span>
+                                                <i class="fas fa-leaf text-info me-2"></i>
+                                                Đặc Sản Miền Nam
+                                            </span>
+                                            <i class="fas fa-chevron-right ms-2"></i>
+                                        </a>
+                                        <ul class="dropdown-menu submenu-items">
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='nam',category='banh-tet')}">
+                                                <i class="fas fa-circle text-info me-2" style="font-size: 0.5rem;"></i>Bánh Tét Trà Cuôn
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='nam',category='hu-tieu')}">
+                                                <i class="fas fa-circle text-info me-2" style="font-size: 0.5rem;"></i>Hủ Tiếu Nam Vang
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='nam',category='banh-xeo')}">
+                                                <i class="fas fa-circle text-info me-2" style="font-size: 0.5rem;"></i>Bánh Xèo Miền Tây
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='nam',category='mit-say')}">
+                                                <i class="fas fa-circle text-info me-2" style="font-size: 0.5rem;"></i>Mít Sấy Đồng Tháp
+                                            </a></li>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='nam',category='keo-dua')}">
+                                                <i class="fas fa-circle text-info me-2" style="font-size: 0.5rem;"></i>Kẹo Dừa Bến Tre
+                                            </a></li>
+                                        </ul>
+                                    </li>
+                                    
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item py-2" th:href="@{/products}">
                                         <i class="fas fa-th text-success me-2"></i>Tất Cả Sản Phẩm
@@ -50,17 +129,17 @@
                                 </ul>
                             </li>
                             <li class="nav-item me-4">
-                                <a href="#" class="nav-link text-dark fw-semibold position-relative">
+                                <a th:href="@{/about}" class="nav-link text-dark fw-semibold position-relative">
                                     Giới thiệu
                                 </a>
                             </li>
                             <li class="nav-item me-4">
-                                <a href="#" class="nav-link text-dark fw-semibold position-relative">
+                                <a th:href="@{/news}" class="nav-link text-dark fw-semibold position-relative">
                                     Tin tức
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link text-dark fw-semibold position-relative">
+                                <a th:href="@{/contact}" class="nav-link text-dark fw-semibold position-relative">
                                     Liên hệ
                                 </a>
                             </li>
@@ -250,25 +329,59 @@
                             <i class="fas fa-th me-2"></i>Sản phẩm
                         </a>
                         <ul class="list-unstyled ms-4 mt-2">
-                            <li th:each="category : ${categories}">
-                                <a th:href="@{/products(categoryId=${category.id})}" 
-                                   class="text-decoration-none text-muted d-block py-1"
-                                   th:text="${category.name}">Danh mục</a>
+                            <li class="mb-2">
+                                <strong class="text-primary">
+                                    <i class="fas fa-mountain me-2"></i>Miền Bắc
+                                </strong>
+                                <ul class="list-unstyled ms-3 mt-1">
+                                    <li><a th:href="@{/products(region='bac',category='banh-chung')}" 
+                                           class="text-decoration-none text-muted d-block py-1">Bánh Chưng</a></li>
+                                    <li><a th:href="@{/products(region='bac',category='pho-bo')}" 
+                                           class="text-decoration-none text-muted d-block py-1">Phở Bò Hà Nội</a></li>
+                                    <li><a th:href="@{/products(region='bac',category='com-lang')}" 
+                                           class="text-decoration-none text-muted d-block py-1">Cốm Làng Vòng</a></li>
+                                </ul>
+                            </li>
+                            <li class="mb-2">
+                                <strong class="text-warning">
+                                    <i class="fas fa-sun me-2"></i>Miền Trung
+                                </strong>
+                                <ul class="list-unstyled ms-3 mt-1">
+                                    <li><a th:href="@{/products(region='trung',category='bun-bo-hue')}" 
+                                           class="text-decoration-none text-muted d-block py-1">Bún Bò Huế</a></li>
+                                    <li><a th:href="@{/products(region='trung',category='mi-quang')}" 
+                                           class="text-decoration-none text-muted d-block py-1">Mì Quảng</a></li>
+                                    <li><a th:href="@{/products(region='trung',category='cao-lau')}" 
+                                           class="text-decoration-none text-muted d-block py-1">Cao Lầu</a></li>
+                                </ul>
+                            </li>
+                            <li class="mb-2">
+                                <strong class="text-info">
+                                    <i class="fas fa-leaf me-2"></i>Miền Nam
+                                </strong>
+                                <ul class="list-unstyled ms-3 mt-1">
+                                    <li><a th:href="@{/products(region='nam',category='banh-tet')}" 
+                                           class="text-decoration-none text-muted d-block py-1">Bánh Tét</a></li>
+                                    <li><a th:href="@{/products(region='nam',category='banh-xeo')}" 
+                                           class="text-decoration-none text-muted d-block py-1">Bánh Xèo</a></li>
+                                    <li><a th:href="@{/products(region='nam',category='mit-say')}" 
+                                           class="text-decoration-none text-muted d-block py-1">Mít Sấy</a></li>
+                                </ul>
                             </li>
                         </ul>
                     </li>
                     <li class="mb-3">
-                        <a href="#" class="text-decoration-none text-dark fw-semibold d-block py-2">
+                        <a th:href="@{/about}" class="text-decoration-none text-dark fw-semibold d-block py-2">
                             <i class="fas fa-info-circle me-2"></i>Giới thiệu
                         </a>
                     </li>
                     <li class="mb-3">
-                        <a href="#" class="text-decoration-none text-dark fw-semibold d-block py-2">
+                        <a th:href="@{/news}" class="text-decoration-none text-dark fw-semibold d-block py-2">
                             <i class="fas fa-newspaper me-2"></i>Tin tức
                         </a>
                     </li>
                     <li class="mb-3">
-                        <a href="#" class="text-decoration-none text-dark fw-semibold d-block py-2">
+                        <a th:href="@{/contact}" class="text-decoration-none text-dark fw-semibold d-block py-2">
                             <i class="fas fa-phone me-2"></i>Liên hệ
                         </a>
                     </li>
@@ -312,4 +425,107 @@
         </div>
     </div>
 </body>
+
+<!-- CSS cho Mega Menu và Submenu -->
+<style>
+/* Mega Menu Styles */
+.mega-menu {
+    min-width: 280px;
+    padding: 10px 0;
+}
+
+/* Dropdown Submenu Styles */
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -1px;
+    min-width: 250px;
+    display: none;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Show submenu on hover */
+.dropdown-submenu:hover > .dropdown-menu {
+    display: block;
+    animation: slideInRight 0.3s ease;
+}
+
+/* Hover effects */
+.dropdown-submenu > .dropdown-item:hover {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    color: #495057;
+}
+
+.submenu-items .dropdown-item:hover {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    transform: translateX(5px);
+    transition: all 0.3s ease;
+}
+
+/* Animation */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 991px) {
+    .dropdown-submenu > .dropdown-menu {
+        position: static;
+        float: none;
+        width: auto;
+        margin-top: 0;
+        background-color: #f8f9fa;
+        border: none;
+        box-shadow: none;
+        display: none;
+    }
+    
+    .dropdown-submenu:hover > .dropdown-menu {
+        display: block;
+    }
+    
+    .submenu-items .dropdown-item {
+        padding-left: 2rem;
+    }
+}
+
+/* Icon animations */
+.dropdown-submenu > .dropdown-item i.fa-chevron-right {
+    transition: transform 0.3s ease;
+}
+
+.dropdown-submenu:hover > .dropdown-item i.fa-chevron-right {
+    transform: rotate(90deg);
+}
+
+/* Color coding for regions */
+.dropdown-submenu:nth-child(1) > .dropdown-item:hover {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.dropdown-submenu:nth-child(2) > .dropdown-item:hover {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: white;
+}
+
+.dropdown-submenu:nth-child(3) > .dropdown-item:hover {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+}
+</style>
+
 </html>
