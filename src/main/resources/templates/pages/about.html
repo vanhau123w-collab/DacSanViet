@@ -1,515 +1,849 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Bản Đồ Đặc Sản Việt Nam</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giới Thiệu - Đặc Sản Việt</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/header.css(v=1)}">
+    <link rel="stylesheet" th:href="@{/css/modern-ecommerce.css(v=1)}">
+    
     <style>
-        /* --- General Styles --- */
+        :root {
+            --primary-color: #4ec2b6;
+            --secondary-color: #34495e;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Hero Section with background image */
         .about-hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/bg-about.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white;
+            padding: 100px 0 80px;
+            text-align: center;
+            margin-top: -80px;
+            padding-top: 180px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Floating particles */
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            animation: particleFloat 20s linear infinite;
+        }
+        
+        @keyframes particleFloat {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50px); }
+        }
+        
+        .about-hero h1 {
+            animation: fadeInUp 1s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .about-hero p {
+            animation: fadeInUp 1.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Story Section */
+        .story-section {
+            padding: 80px 0;
+            background: white;
+            position: relative;
+        }
+        
+        .story-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .story-card::before {
+            content: '🌾';
+            position: absolute;
+            font-size: 200px;
+            opacity: 0.05;
+            right: -50px;
+            top: -50px;
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .story-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        
+        /* Values Section with animated gradient */
+        .values-section {
+            background: #f8f9fa;
+            color: #2c3e50;
+            padding: 80px 0;
+            position: relative;
+        }
+        
+        .value-item {
+            text-align: center;
+            padding: 40px 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.4s ease;
+        }
+        
+        .value-item:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 15px 40px rgba(78, 194, 182, 0.2);
+        }
+        
+        .value-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            color: #4ec2b6;
+            animation: bounce 2s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .value-item:hover .value-icon {
+            animation: spin 0.6s ease;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg) scale(1); }
+            to { transform: rotate(360deg) scale(1.2); }
+        }
+        
+        /* Team Section */
+        .team-section {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .team-member {
+            text-align: center;
+            padding: 40px 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .team-member::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(78, 194, 182, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .team-member:hover::before {
+            left: 100%;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-15px) rotate(2deg);
+            box-shadow: 0 15px 40px rgba(78, 194, 182, 0.3);
+        }
+        
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #2e857c 0%, #4ec2b6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .team-member:hover .member-avatar {
+            transform: scale(1.1) rotate(360deg);
+            box-shadow: 0 10px 30px rgba(78, 194, 182, 0.4);
+        }
+        
+        /* Contact Section */
+        .contact-section {
+            background: linear-gradient(135deg, #2e857c 0%, #4ec2b6 100%);
             color: white;
             padding: 80px 0;
             text-align: center;
-        }
-        
-        /* --- Map Section Styles --- */
-        .vietnam-map-section {
-            padding: 80px 0;
-            background: #f8f9fa;
-        }
-        
-        .map-container {
             position: relative;
-            max-width: 100%;
-            margin: 0 auto;
-            background: #fff;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: center;
+            overflow: hidden;
         }
         
-        .vietnam-map {
-            width: 100%;
-            height: auto;
-            max-height: 800px; /* Giới hạn chiều cao để map không quá lớn */
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: backgroundScroll 30s linear infinite;
         }
         
-        /* Style cho các tỉnh */
+        @keyframes backgroundScroll {
+            from { transform: translate(0, 0); }
+            to { transform: translate(30px, 30px); }
+        }
+        
+        .contact-section .btn {
+            background: white;
+            color: #2e857c;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .contact-section .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(78, 194, 182, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        
+        .contact-section .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .contact-section .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .contact-section .btn i {
+            transition: transform 0.3s ease;
+        }
+        
+        .contact-section .btn:hover i {
+            transform: scale(1.2) rotate(15deg);
+        }
+        
+        /* Fade in animation on scroll */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- Mobile Menu -->
+    <div th:replace="~{fragments/header :: mobile-menu}"></div>
+    
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="container">
+            <h1 class="display-3 fw-bold mb-4" style="color: white;">Về Đặc Sản Việt</h1>
+            <p class="lead fs-4" style="color: white;">
+                <i class="fas fa-leaf me-2"></i>
+                Gìn giữ hồn quê, lan toả giá trị Việt
+                <i class="fas fa-leaf ms-2"></i>
+            </p>
+        </div>
+    </section>
+    
+    <!-- Story Section -->
+    <section class="story-section fade-in-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <div class="story-card">
+                        <h2 class="text-center mb-5 fw-bold" style="color: #2e857c;">
+                            <i class="fas fa-book-open me-3"></i>
+                            Câu Chuyện Của Chúng Tôi
+                        </h2>
+                        <p class="lead text-center mb-4" style="font-size: 1.2rem;">
+                            <i class="fas fa-quote-left me-2" style="color: #4ec2b6;"></i>
+                            Đặc Sản Việt ra đời từ tình yêu sâu sắc với ẩm thực truyền thống Việt Nam.
+                            <i class="fas fa-quote-right ms-2" style="color: #4ec2b6;"></i>
+                        </p>
+                        <p class="fs-5 text-muted text-center" style="line-height: 1.8;">
+                            Chúng tôi hiểu rằng mỗi vùng miền đều có những đặc sản riêng biệt, mang đậm dấu ấn văn hóa và tâm huyết của người làm ra chúng. 
+                            Sứ mệnh của chúng tôi là kết nối những người yêu ẩm thực với các nghệ nhân, làng nghề truyền thống 
+                            trên khắp cả nước, mang đến cho bạn những sản phẩm chất lượng nhất với giá cả hợp lý nhất.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Values Section -->
+    <section class="values-section fade-in-section">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold fs-1">
+                <i class="fas fa-gem me-3"></i>
+                Giá Trị Cốt Lõi
+            </h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="value-item">
+                        <div class="value-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Chất Lượng Tự Nhiên
+                        </h4>
+                        <p class="fs-5">Sản phẩm từ nguyên liệu tự nhiên, không chất bảo quản, đảm bảo an toàn cho sức khỏe.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="value-item">
+                        <div class="value-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Hỗ Trợ Cộng Đồng
+                        </h4>
+                        <p class="fs-5">Đồng hành cùng nghệ nhân và làng nghề truyền thống, giữ gìn bản sắc văn hóa Việt.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="value-item">
+                        <div class="value-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Giao Hàng Tận Tâm
+                        </h4>
+                        <p class="fs-5">Đóng gói cẩn thận, bảo quản tốt nhất để sản phẩm đến tay bạn trong tình trạng hoàn hảo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Vietnam Map Section -->
+    <section class="vietnam-map-section fade-in-section" style="padding: 80px 0; background: white;">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold" style="color: #4ec2b6;">Khám Phá Đặc Sản Từng Tỉnh Thành</h2>
+            <div class="row g-5">
+                <div class="col-lg-6">
+                    <div class="map-container" style="position: relative; background: #f8f9fa; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);">
+                        <!-- Bản đồ SVG sẽ được tải động -->
+                        <div style="text-align: center; padding: 50px; color: #6c757d;">
+                            <i class="fas fa-map-marked-alt" style="font-size: 4rem; color: #4ec2b6; margin-bottom: 20px;"></i>
+                            <p class="fs-5">🗺️ Đang khởi tạo bản đồ Việt Nam...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <h3 class="fw-bold mb-4" style="color: #2e857c;">Đặc Sản Các Vùng Miền</h3>
+                    <div class="region-info">
+                        <div class="mb-4 p-4 bg-light rounded-3">
+                            <h5 class="fw-bold mb-3" style="color: #007bff;">
+                                <i class="fas fa-map-marker-alt me-2"></i>Miền Bắc (26 tỉnh thành)
+                            </h5>
+                            <p class="mb-0">Hương vị tinh tế, thanh đạm. Nổi bật với các món như Phở, Bún chả, Cơm cháy, Bánh cuốn...</p>
+                        </div>
+                        <div class="mb-4 p-4 bg-light rounded-3">
+                            <h5 class="fw-bold mb-3" style="color: #ffc107;">
+                                <i class="fas fa-map-marker-alt me-2"></i>Miền Trung (18 tỉnh thành)
+                            </h5>
+                            <p class="mb-0">Đậm đà, cay nồng. Nổi tiếng với Mì Quảng, Bún bò Huế, Bánh khoái, Nem lụi...</p>
+                        </div>
+                        <div class="mb-4 p-4 bg-light rounded-3">
+                            <h5 class="fw-bold mb-3" style="color: #28a745;">
+                                <i class="fas fa-map-marker-alt me-2"></i>Miền Nam (19 tỉnh thành)
+                            </h5>
+                            <p class="mb-0">Ngọt ngào, dân dã. Phong phú với Cơm tấm, Hủ tiếu, Bánh xèo, Bánh khọt...</p>
+                        </div>
+                        <div class="mt-4 p-3 rounded-3" style="background: linear-gradient(135deg, #4ec2b6 0%, #2e857c 100%); color: white;">
+                            <p class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Hướng dẫn:</strong> Di chuột qua bản đồ bên trái để xem đặc sản chi tiết từng tỉnh. 
+                                Hiện tại đã cập nhật <strong>63 tỉnh thành</strong> trên toàn quốc.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Map Tooltip -->
+    <div class="map-tooltip" id="mapTooltip" style="position: fixed; background: rgba(0, 0, 0, 0.9); color: white; padding: 15px; border-radius: 8px; font-size: 14px; max-width: 300px; z-index: 9999; pointer-events: none; opacity: 0; display: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);">
+        <div class="tooltip-title" style="font-weight: bold; font-size: 16px; margin-bottom: 5px; color: #ffc107; border-bottom: 1px solid #555; padding-bottom: 5px;"></div>
+        <div class="tooltip-content" style="line-height: 1.4;"></div>
+    </div>
+    
+    <style>
+        /* Map Styles */
         .province {
-            fill: #e9ecef; /* Màu nền mặc định (màu xám nhạt) */
             stroke: #fff;
             stroke-width: 0.5;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        /* Màu theo vùng miền (được thêm class bằng JS) */
-        .province.north { fill: #007bff; } /* Miền Bắc: Xanh dương */
-        .province.central { fill: #ffc107; } /* Miền Trung: Vàng */
-        .province.south { fill: #28a745; } /* Miền Nam: Xanh lá */
-
-        /* Hiệu ứng khi Hover */
         .province:hover {
-            fill: #dc3545 !important; /* Đổi màu đỏ khi hover (ghi đè màu vùng) */
-            stroke: #333; /* Viền đậm hơn */
-            stroke-width: 1;
-            filter: brightness(1.1);
-            transform-origin: center; 
-            /* Lưu ý: Không dùng scale transform với SVG map phức tạp vì sẽ bị lệch vị trí */
+            stroke: #333;
+            stroke-width: 1.5;
+            filter: brightness(1.2);
         }
         
-        /* --- Tooltip Styles --- */
-        .map-tooltip {
-            position: fixed;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 14px;
-            max-width: 300px;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            display: none;
+        .province.dimmed {
+            opacity: 0.3;
+            filter: grayscale(80%);
+        }
+        
+        .province.highlighted {
+            stroke: #333;
+            stroke-width: 2;
+            filter: brightness(1.3) drop-shadow(0 0 10px rgba(0,0,0,0.5));
         }
         
         .map-tooltip.show {
-            display: block;
-            opacity: 1;
-        }
-        
-        .tooltip-title {
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 5px;
-            color: #ffc107;
-            border-bottom: 1px solid #555;
-            padding-bottom: 5px;
-        }
-        
-        .tooltip-content {
-            line-height: 1.4;
-        }
-
-        /* --- Story, Values, Team Styles (Giữ nguyên) --- */
-        .story-section { padding: 80px 0; }
-        .story-card {
-            background: white; border-radius: 15px; padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); margin-bottom: 30px;
-            transition: transform 0.3s ease;
-        }
-        .story-card:hover { transform: translateY(-5px); }
-        .values-section {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white; padding: 80px 0;
-        }
-        .value-item { text-align: center; padding: 30px; margin-bottom: 30px; }
-        .value-icon { font-size: 3rem; margin-bottom: 20px; color: #ffc107; }
-        .team-section { padding: 80px 0; background: #f8f9fa; }
-        .team-member {
-            text-align: center; padding: 30px; background: white;
-            border-radius: 15px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px; transition: transform 0.3s ease;
-        }
-        .team-member:hover { transform: translateY(-5px); }
-        .member-avatar {
-            width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; color: white;
+            display: block !important;
+            opacity: 1 !important;
         }
     </style>
-</head>
-
-<body>
-    <div layout:fragment="content">
-        <section class="about-hero">
-            <div class="container">
-                <h1 class="display-4 mb-4">Về Đặc Sản Việt</h1>
-                <p class="lead">Kết nối hương vị truyền thống từ khắp mọi miền đất nước</p>
-            </div>
-        </section>
-
-        <section class="story-section">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-8 mx-auto">
-                        <div class="story-card">
-                            <h2 class="text-center mb-4">Câu Chuyện Của Chúng Tôi</h2>
-                            <p class="lead text-center mb-4">
-                                Đặc Sản Việt ra đời từ tình yêu sâu sắc với ẩm thực truyền thống Việt Nam.
-                            </p>
-                            <p>
-                                Chúng tôi hiểu rằng mỗi vùng miền đều có những đặc sản riêng biệt. 
-                                Sứ mệnh của chúng tôi là kết nối những người yêu ẩm thực với các nghệ nhân 
-                                trên khắp cả nước.
-                            </p>
+    
+    <!-- Team Section -->
+    <section class="team-section fade-in-section">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold" style="color: #2e857c;">
+                <i class="fas fa-users me-3"></i>
+                Đội Ngũ Của Chúng Tôi
+            </h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="team-member">
+                        <div class="member-avatar">
+                            <i class="fas fa-user-tie"></i>
                         </div>
+                        <h5 class="fw-bold mb-2">
+                            <i class="fas fa-star me-2" style="color: #ffd700;"></i>
+                            Nguyễn Văn A
+                        </h5>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-crown me-1" style="color: #4ec2b6;"></i>
+                            Founder & CEO
+                        </p>
+                        <p class="small text-muted mt-2">
+                            <i class="fas fa-briefcase me-1"></i>
+                            15 năm kinh nghiệm trong ngành F&B
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="team-member">
+                        <div class="member-avatar">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">
+                            <i class="fas fa-star me-2" style="color: #ffd700;"></i>
+                            Trần Thị B
+                        </h5>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-award me-1" style="color: #4ec2b6;"></i>
+                            Head of Quality
+                        </p>
+                        <p class="small text-muted mt-2">
+                            <i class="fas fa-certificate me-1"></i>
+                            Chuyên gia kiểm định chất lượng thực phẩm
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="team-member">
+                        <div class="member-avatar">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">
+                            <i class="fas fa-star me-2" style="color: #ffd700;"></i>
+                            Lê Văn C
+                        </h5>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-code me-1" style="color: #4ec2b6;"></i>
+                            Tech Lead
+                        </p>
+                        <p class="small text-muted mt-2">
+                            <i class="fas fa-rocket me-1"></i>
+                            Chuyên gia công nghệ & phát triển sản phẩm
+                        </p>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <section class="values-section">
-            <div class="container">
-                <h2 class="text-center mb-5">Giá Trị Cốt Lõi</h2>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="value-item">
-                            <div class="value-icon">🌾</div>
-                            <h4>Chất Lượng Tự Nhiên</h4>
-                            <p>Nguyên liệu tự nhiên, không chất bảo quản.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="value-item">
-                            <div class="value-icon">🤝</div>
-                            <h4>Hỗ Trợ Cộng Đồng</h4>
-                            <p>Hỗ trợ nghệ nhân và làng nghề truyền thống.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="value-item">
-                            <div class="value-icon">🚚</div>
-                            <h4>Giao Hàng Tận Tâm</h4>
-                            <p>Bảo quản tốt nhất đến tay khách hàng.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="vietnam-map-section">
-            <div class="container">
-                <h2 class="text-center mb-5">Khám Phá Đặc Sản Từng Tỉnh Thành</h2>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="map-container">
-                            <!-- Bản đồ SVG sẽ được tải động -->
-                            <div style="text-align: center; padding: 50px; color: #6c757d;">
-                                🗺️ Đang khởi tạo bản đồ...
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <h3>Đặc Sản Các Vùng Miền</h3>
-                        <div class="region-info">
-                            <div class="mb-4">
-                                <h5 class="text-primary">🔵 Miền Bắc (26 tỉnh thành)</h5>
-                                <p>Hương vị tinh tế, thanh đạm. Nổi bật với các món như Phở, Bún chả, Cơm cháy, Bánh cuốn...</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="text-warning">🟡 Miền Trung (18 tỉnh thành)</h5>
-                                <p>Đậm đà, cay nồng. Nổi tiếng với Mì Quảng, Bún bò Huế, Bánh khoái, Nem lụi...</p>
-                            </div>
-                            <div class="mb-4">
-                                <h5 class="text-success">🟢 Miền Nam (19 tỉnh thành)</h5>
-                                <p>Ngọt ngào, dân dã. Phong phú với Cơm tấm, Hủ tiếu, Bánh xèo, Bánh khọt...</p>
-                            </div>
-                            <div class="mt-4 p-3 bg-light rounded border">
-                                <small class="text-muted">
-                                    <i class="bi bi-info-circle me-1"></i>
-                                    <strong>Hướng dẫn:</strong> Di chuột qua bản đồ bên trái để xem đặc sản chi tiết từng tỉnh. 
-                                    Hiện tại đã cập nhật <strong>63 tỉnh thành</strong> trên toàn quốc.
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Script đặt trực tiếp trong content -->
-        <script>
-            console.log('🚀 Script trong content đã chạy!');
-            
-            document.addEventListener('DOMContentLoaded', function() {
-                console.log('🚀 DOMContentLoaded - Script đã chạy!');
-                
-                // Test cơ bản trước
-                testBasicFunctionality();
-                
-                function testBasicFunctionality() {
-                    console.log('🔍 Kiểm tra container...');
-                    
-                    const mapContainer = document.querySelector('.map-container');
-                    if (!mapContainer) {
-                        console.error('❌ Không tìm thấy map container');
-                        return;
-                    }
-                    
-                    console.log('✅ Tìm thấy map container');
-                    
-                    // Test tải SVG đơn giản
-                    console.log('📡 Bắt đầu tải SVG...');
-                    
-                    fetch('/vn.svg')
-                        .then(response => {
-                            console.log('📡 Response status:', response.status);
-                            console.log('📡 Response ok:', response.ok);
-                            
-                            if (!response.ok) {
-                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                            }
-                            return response.text();
-                        })
-                        .then(svgContent => {
-                            console.log('✅ SVG tải thành công!');
-                            console.log('📏 Kích thước SVG:', svgContent.length, 'ký tự');
-                            
-                            // Hiển thị SVG đơn giản
-                            displaySimpleSVG(svgContent);
-                        })
-                        .catch(error => {
-                            console.error('❌ Lỗi tải SVG:', error);
-                            showErrorMessage();
-                        });
-                }
-                
-                function displaySimpleSVG(svgContent) {
-                    console.log('🎨 Hiển thị SVG...');
-                    
-                    const mapContainer = document.querySelector('.map-container');
-                    
-                    // Đơn giản chỉ hiển thị SVG
-                    mapContainer.innerHTML = `
-                        <div style="text-align: center;">
-                            <h5>Bản đồ Việt Nam</h5>
-                            <div style="max-width: 400px; margin: 0 auto; border: 2px solid #007bff; border-radius: 10px; padding: 10px;">
-                                ${svgContent}
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Tìm SVG và style cơ bản
-                    const svg = mapContainer.querySelector('svg');
-                    if (svg) {
-                        console.log('✅ SVG element found!');
-                        svg.style.width = '100%';
-                        svg.style.height = 'auto';
-                        svg.style.maxHeight = '400px';
-                        
-                        // Đếm provinces
-                        const provinces = svg.querySelectorAll('path[id^="VN"]');
-                        console.log(`🗺️ Tìm thấy ${provinces.length} tỉnh thành`);
-                        
-                        if (provinces.length > 0) {
-                            console.log('🎉 Bản đồ hiển thị thành công!');
-                            
-                            // Thêm màu đơn giản cho test
-                            provinces.forEach((province, index) => {
-                                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
-                                province.style.fill = colors[index % colors.length];
-                                province.style.stroke = '#fff';
-                                province.style.strokeWidth = '0.5';
-                                province.style.cursor = 'pointer';
-                                
-                                // Click event đơn giản
-                                province.addEventListener('click', function() {
-                                    const id = this.getAttribute('id');
-                                    const name = this.getAttribute('name') || id;
-                                    alert(`Clicked: ${name} (${id})`);
-                                });
-                            });
-                        } else {
-                            console.warn('⚠️ Không tìm thấy province nào');
-                        }
-                    } else {
-                        console.error('❌ Không tìm thấy SVG element');
-                    }
-                }
-                
-                function showErrorMessage() {
-                    const mapContainer = document.querySelector('.map-container');
-                    if (!mapContainer) return;
-                    
-                    mapContainer.innerHTML = `
-                        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 15px; border: 2px solid #dc3545;">
-                            <h4 style="color: #dc3545;">❌ Lỗi tải bản đồ</h4>
-                            <p>Không thể tải file SVG. Vui lòng kiểm tra:</p>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>File vn.svg có tồn tại không?</li>
-                                <li>Server có chạy không?</li>
-                                <li>Đường dẫn /vn.svg có đúng không?</li>
-                            </ul>
-                            <button onclick="location.reload()" style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-                                🔄 Thử lại
-                            </button>
-                        </div>
-                    `;
-                }
-            });
-        </script>
-
-        <section class="team-section">
-            <div class="container">
-                <h2 class="text-center mb-5">Đội Ngũ</h2>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="team-member">
-                            <div class="member-avatar">👨‍💼</div>
-                            <h5>Nguyễn Văn A</h5>
-                            <p class="text-muted">Founder & CEO</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="team-member">
-                            <div class="member-avatar">👩‍🍳</div>
-                            <h5>Trần Thị B</h5>
-                            <p class="text-muted">Head of Quality</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="team-member">
-                            <div class="member-avatar">👨‍💻</div>
-                            <h5>Lê Văn C</h5>
-                            <p class="text-muted">Tech Lead</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-5 bg-primary text-white text-center">
-            <div class="container">
-                <h3>Liên Hệ Với Chúng Tôi</h3>
-                <p class="lead mb-4">Chúng tôi luôn sẵn sàng lắng nghe!</p>
-                <a href="mailto:info@dacsanviet.com" class="btn btn-light btn-lg">
-                    📧 info@dacsanviet.com
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section class="contact-section fade-in-section">
+        <div class="container">
+            <h2 class="fw-bold mb-4 fs-1">
+                <i class="fas fa-phone-alt me-3"></i>
+                Liên Hệ Với Chúng Tôi
+            </h2>
+            <p class="lead mb-5 fs-4">
+                <i class="fas fa-headset me-2"></i>
+                Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn!
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="mailto:dacsanviethotro@gmail.com" class="btn">
+                    <i class="fas fa-envelope me-2"></i>dacsanviethotro@gmail.com
+                </a>
+                <a href="tel:0123456789" class="btn">
+                    <i class="fas fa-phone me-2"></i>0123 456 789
                 </a>
             </div>
-        </section>
-    </div>
-
-    <!-- Script sử dụng fragment đúng -->
-    <th:block th:fragment="scripts-extra">
-        <script>
-            console.log('🚀 Script trong scripts-extra đã chạy!');
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/header.js(v=1)}"></script>
+    
+    <!-- Vietnam Map Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🗺️ Loading Vietnam Map...');
             
-            document.addEventListener('DOMContentLoaded', function() {
-                console.log('🚀 DOMContentLoaded - Script đã chạy!');
-                
-                // Test cơ bản trước
-                testBasicFunctionality();
-                
-                function testBasicFunctionality() {
-                    console.log('🔍 Kiểm tra container...');
+            const mapContainer = document.querySelector('.map-container');
+            const tooltip = document.getElementById('mapTooltip');
+            
+            if (!mapContainer) {
+                console.error('Map container not found');
+                return;
+            }
+            
+            // Load SVG map
+            fetch('/vn.svg')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load map');
+                    return response.text();
+                })
+                .then(svgContent => {
+                    console.log('✅ Map loaded successfully');
                     
-                    const mapContainer = document.querySelector('.map-container');
-                    if (!mapContainer) {
-                        console.error('❌ Không tìm thấy map container');
-                        return;
-                    }
+                    // Display SVG
+                    mapContainer.innerHTML = svgContent;
                     
-                    console.log('✅ Tìm thấy map container');
-                    
-                    // Test tải SVG đơn giản
-                    console.log('📡 Bắt đầu tải SVG...');
-                    
-                    fetch('/vn.svg')
-                        .then(response => {
-                            console.log('📡 Response status:', response.status);
-                            console.log('📡 Response ok:', response.ok);
-                            
-                            if (!response.ok) {
-                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                            }
-                            return response.text();
-                        })
-                        .then(svgContent => {
-                            console.log('✅ SVG tải thành công!');
-                            console.log('📏 Kích thước SVG:', svgContent.length, 'ký tự');
-                            
-                            // Hiển thị SVG đơn giản
-                            displaySimpleSVG(svgContent);
-                        })
-                        .catch(error => {
-                            console.error('❌ Lỗi tải SVG:', error);
-                            showErrorMessage();
-                        });
-                }
-                
-                function displaySimpleSVG(svgContent) {
-                    console.log('🎨 Hiển thị SVG...');
-                    
-                    const mapContainer = document.querySelector('.map-container');
-                    
-                    // Đơn giản chỉ hiển thị SVG
-                    mapContainer.innerHTML = `
-                        <div style="text-align: center;">
-                            <h5>Bản đồ Việt Nam</h5>
-                            <div style="max-width: 400px; margin: 0 auto; border: 2px solid #007bff; border-radius: 10px; padding: 10px;">
-                                ${svgContent}
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Tìm SVG và style cơ bản
                     const svg = mapContainer.querySelector('svg');
                     if (svg) {
-                        console.log('✅ SVG element found!');
                         svg.style.width = '100%';
                         svg.style.height = 'auto';
-                        svg.style.maxHeight = '400px';
+                        svg.style.maxHeight = '600px';
                         
-                        // Đếm provinces
+                        // Get all provinces
                         const provinces = svg.querySelectorAll('path[id^="VN"]');
-                        console.log(`🗺️ Tìm thấy ${provinces.length} tỉnh thành`);
+                        console.log(`🗺️ Found ${provinces.length} provinces`);
                         
-                        if (provinces.length > 0) {
-                            console.log('🎉 Bản đồ hiển thị thành công!');
+                        // Generate random colors for each province
+                        const colors = [
+                            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+                            '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788',
+                            '#E63946', '#F77F00', '#06FFA5', '#118AB2', '#073B4C',
+                            '#FFB703', '#FB8500', '#8ECAE6', '#219EBC', '#023047',
+                            '#D62828', '#F77F00', '#FCBF49', '#EAE2B7', '#003049',
+                            '#D90429', '#EF233C', '#EDF2F4', '#8D99AE', '#2B2D42',
+                            '#06FFA5', '#FFFB46', '#B4FE98', '#77E4C8', '#36C9C6',
+                            '#FF6392', '#FFD23F', '#EE4266', '#540D6E', '#F3722C',
+                            '#F94144', '#F3722C', '#F8961E', '#F9844A', '#F9C74F',
+                            '#90BE6D', '#43AA8B', '#4D908E', '#577590', '#277DA1',
+                            '#7209B7', '#560BAD', '#480CA8', '#3A0CA3', '#3F37C9',
+                            '#4361EE', '#4895EF', '#4CC9F0', '#06FFA5', '#FFFB46'
+                        ];
+                        
+                        // Province data (all 63 provinces) - matching SVG IDs without dashes
+                        const provinceData = {
+                            'VNHN': { name: 'Hà Nội', specialty: 'Phở, Bún chả, Cơm cháy' },
+                            'VNHP': { name: 'Hải Phòng', specialty: 'Bánh đa cua, Nem cua bể' },
+                            'VNSG': { name: 'Hồ Chí Minh', specialty: 'Cơm tấm, Hủ tiếu, Bánh xèo' },
+                            'VNDN': { name: 'Đà Nẵng', specialty: 'Mì Quảng, Bánh tráng cuốn thịt heo' },
+                            'VNCT': { name: 'Cần Thơ', specialty: 'Bánh xèo, Lẩu mắm' },
+                            'VN01': { name: 'Lai Châu', specialty: 'Thịt trâu gác bếp' },
+                            'VN02': { name: 'Lào Cai', specialty: 'Thịt trâu gác bếp, Cá hồi Sa Pa' },
+                            'VN03': { name: 'Hà Giang', specialty: 'Thắng cố, Men men' },
+                            'VN04': { name: 'Cao Bằng', specialty: 'Pháp pỉnh top, Bánh trôi tàu' },
+                            'VN05': { name: 'Sơn La', specialty: 'Cá suối, Măng rừng' },
+                            'VN06': { name: 'Yên Bái', specialty: 'Cá hồi, Măng rừng' },
+                            'VN07': { name: 'Tuyên Quang', specialty: 'Bánh khảo, Cá suối' },
+                            'VN09': { name: 'Lạng Sơn', specialty: 'Bánh cuốn, Thịt trâu gác bếp' },
+                            'VN13': { name: 'Quảng Ninh', specialty: 'Hải sản, Bánh đa cua' },
+                            'VN14': { name: 'Hòa Bình', specialty: 'Cá suối, Măng rừng' },
+                            'VN18': { name: 'Ninh Bình', specialty: 'Cơm cháy, Dê núi' },
+                            'VN20': { name: 'Thái Bình', specialty: 'Bánh đậu xanh, Nem chua' },
+                            'VN21': { name: 'Thanh Hóa', specialty: 'Nem chua, Cá kho làng Vũ Đại' },
+                            'VN22': { name: 'Nghệ An', specialty: 'Nem chua, Cá kho' },
+                            'VN23': { name: 'Hà Tĩnh', specialty: 'Nem chua, Cá kho' },
+                            'VN24': { name: 'Quảng Bình', specialty: 'Bánh ướt, Nem chua' },
+                            'VN25': { name: 'Quảng Trị', specialty: 'Bánh bèo, Bánh nậm' },
+                            'VN26': { name: 'Thừa Thiên - Huế', specialty: 'Bún bò Huế, Bánh khoái' },
+                            'VN27': { name: 'Quảng Nam', specialty: 'Mì Quảng, Cao lầu' },
+                            'VN28': { name: 'Kon Tum', specialty: 'Cơm lam, Thịt trâu gác bếp' },
+                            'VN29': { name: 'Quảng Ngãi', specialty: 'Bánh xèo, Mì Quảng' },
+                            'VN30': { name: 'Gia Lai', specialty: 'Cơm lam, Thịt trâu gác bếp' },
+                            'VN31': { name: 'Bình Định', specialty: 'Bánh hỏi, Bánh xèo' },
+                            'VN32': { name: 'Phú Yên', specialty: 'Bánh hỏi, Bánh xèo' },
+                            'VN33': { name: 'Đắk Lắk', specialty: 'Cà phê, Cơm lam' },
+                            'VN34': { name: 'Khánh Hòa', specialty: 'Bánh căn, Nem nướng' },
+                            'VN35': { name: 'Lâm Đồng', specialty: 'Rau Đà Lạt, Dâu tây' },
+                            'VN36': { name: 'Ninh Thuận', specialty: 'Bánh căn, Nem nướng' },
+                            'VN37': { name: 'Tây Ninh', specialty: 'Bánh tráng, Bánh canh' },
+                            'VN39': { name: 'Đồng Nai', specialty: 'Bánh tráng, Bánh canh' },
+                            'VN40': { name: 'Bình Thuận', specialty: 'Bánh căn, Bánh xèo' },
+                            'VN41': { name: 'Long An', specialty: 'Bánh tét, Hủ tiếu' },
+                            'VN43': { name: 'Bà Rịa - Vũng Tàu', specialty: 'Hải sản, Bánh khọt' },
+                            'VN44': { name: 'An Giang', specialty: 'Bánh xèo, Lẩu mắm' },
+                            'VN45': { name: 'Đồng Tháp', specialty: 'Mít sấy, Bánh xèo' },
+                            'VN46': { name: 'Tiền Giang', specialty: 'Hủ tiếu, Bánh tráng' },
+                            'VN47': { name: 'Kiên Giang', specialty: 'Hải sản, Bánh xèo' },
+                            'VN49': { name: 'Vĩnh Long', specialty: 'Bánh xèo, Hủ tiếu' },
+                            'VN50': { name: 'Bến Tre', specialty: 'Kẹo dừa, Bánh tráng' },
+                            'VN51': { name: 'Trà Vinh', specialty: 'Bánh xèo, Hủ tiếu' },
+                            'VN52': { name: 'Sóc Trăng', specialty: 'Bánh xèo, Bánh tét' },
+                            'VN53': { name: 'Bắc Kạn', specialty: 'Cá suối, Măng rừng' },
+                            'VN54': { name: 'Bắc Giang', specialty: 'Bánh đa, Nem chua' },
+                            'VN55': { name: 'Bạc Liêu', specialty: 'Bánh xèo, Lẩu mắm' },
+                            'VN56': { name: 'Bắc Ninh', specialty: 'Bánh đa, Nem chua' },
+                            'VN57': { name: 'Bình Dương', specialty: 'Bánh tráng, Bánh canh' },
+                            'VN58': { name: 'Bình Phước', specialty: 'Bánh tráng, Điều' },
+                            'VN59': { name: 'Cà Mau', specialty: 'Hải sản, Bánh xèo' },
+                            'VN61': { name: 'Hải Dương', specialty: 'Bánh đa, Nem chua' },
+                            'VN63': { name: 'Hà Nam', specialty: 'Bánh cuốn, Nem chua' },
+                            'VN66': { name: 'Hưng Yên', specialty: 'Bánh đa, Nem chua' },
+                            'VN67': { name: 'Nam Định', specialty: 'Bánh đa, Nem chua' },
+                            'VN68': { name: 'Phú Thọ', specialty: 'Bánh đa, Nem chua' },
+                            'VN69': { name: 'Thái Nguyên', specialty: 'Chè Tân Cương, Nem chua' },
+                            'VN70': { name: 'Vĩnh Phúc', specialty: 'Bánh đa, Nem chua' },
+                            'VN71': { name: 'Điện Biên', specialty: 'Thịt trâu gác bếp, Cá suối' },
+                            'VN72': { name: 'Đắk Nông', specialty: 'Cà phê, Cơm lam' },
+                            'VN73': { name: 'Hậu Giang', specialty: 'Bánh xèo, Lẩu mắm' }
+                        };
+                        
+                        provinces.forEach((province, index) => {
+                            const id = province.getAttribute('id');
                             
-                            // Thêm màu đơn giản cho test
-                            provinces.forEach((province, index) => {
-                                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
-                                province.style.fill = colors[index % colors.length];
-                                province.style.stroke = '#fff';
-                                province.style.strokeWidth = '0.5';
-                                province.style.cursor = 'pointer';
+                            // Try to find province data, if not found use a default with proper name
+                            let data = provinceData[id];
+                            if (!data) {
+                                // If not found, try to create a readable name from the ID
+                                data = { 
+                                    name: id.replace('VN-', 'Tỉnh ').replace('VN', 'Tỉnh '), 
+                                    specialty: 'Đang cập nhật...' 
+                                };
+                            }
+                            
+                            // Assign unique color to each province
+                            const color = colors[index % colors.length];
+                            province.style.fill = color;
+                            province.classList.add('province');
+                            province.setAttribute('data-province-id', id);
+                            province.setAttribute('data-province-name', data.name);
+                            province.setAttribute('data-province-specialty', data.specialty);
+                            
+                            // Determine if this is part of an archipelago
+                            let groupId = id;
+                            if (id.startsWith('VNHS_') || id.startsWith('VN-HS')) {
+                                groupId = 'VNHS'; // Hoàng Sa
+                            } else if (id.startsWith('VNTS_') || id.startsWith('VN-TS')) {
+                                groupId = 'VNTS'; // Trường Sa
+                            }
+                            province.setAttribute('data-group-id', groupId);
+                            
+                            // Hover events
+                            province.addEventListener('mouseenter', function(e) {
+                                const currentGroupId = this.getAttribute('data-group-id');
+                                const provinceName = this.getAttribute('data-province-name');
+                                const provinceSpecialty = this.getAttribute('data-province-specialty');
                                 
-                                // Click event đơn giản
-                                province.addEventListener('click', function() {
-                                    const id = this.getAttribute('id');
-                                    const name = this.getAttribute('name') || id;
-                                    alert(`Clicked: ${name} (${id})`);
+                                // Dim all provinces
+                                provinces.forEach(p => {
+                                    p.classList.add('dimmed');
+                                    p.classList.remove('highlighted');
                                 });
+                                
+                                // Highlight current province and its group
+                                provinces.forEach(p => {
+                                    const pGroupId = p.getAttribute('data-group-id');
+                                    if (pGroupId === currentGroupId) {
+                                        p.classList.remove('dimmed');
+                                        p.classList.add('highlighted');
+                                    }
+                                });
+                                
+                                // Show tooltip
+                                if (tooltip) {
+                                    let displayName = provinceName;
+                                    if (currentGroupId === 'VNHS') {
+                                        displayName = 'Quần đảo Hoàng Sa';
+                                    } else if (currentGroupId === 'VNTS') {
+                                        displayName = 'Quần đảo Trường Sa';
+                                    }
+                                    tooltip.querySelector('.tooltip-title').textContent = displayName;
+                                    tooltip.querySelector('.tooltip-content').textContent = `Đặc sản: ${provinceSpecialty}`;
+                                    tooltip.classList.add('show');
+                                }
                             });
-                        } else {
-                            console.warn('⚠️ Không tìm thấy province nào');
-                        }
-                    } else {
-                        console.error('❌ Không tìm thấy SVG element');
+                            
+                            province.addEventListener('mousemove', function(e) {
+                                if (tooltip) {
+                                    tooltip.style.left = (e.clientX + 15) + 'px';
+                                    tooltip.style.top = (e.clientY + 15) + 'px';
+                                }
+                            });
+                            
+                            province.addEventListener('mouseleave', function() {
+                                // Remove all effects when mouse leaves
+                                provinces.forEach(p => {
+                                    p.classList.remove('dimmed', 'highlighted');
+                                });
+                                
+                                if (tooltip) {
+                                    tooltip.classList.remove('show');
+                                }
+                            });
+                            
+                            // Click event
+                            province.addEventListener('click', function() {
+                                const currentGroupId = this.getAttribute('data-group-id');
+                                const provinceName = this.getAttribute('data-province-name');
+                                const provinceSpecialty = this.getAttribute('data-province-specialty');
+                                
+                                let displayName = provinceName;
+                                if (currentGroupId === 'VNHS') {
+                                    displayName = 'Quần đảo Hoàng Sa';
+                                } else if (currentGroupId === 'VNTS') {
+                                    displayName = 'Quần đảo Trường Sa';
+                                }
+                                alert(`${displayName}\nĐặc sản: ${provinceSpecialty}`);
+                            });
+                        });
                     }
-                }
-                
-                function showErrorMessage() {
-                    const mapContainer = document.querySelector('.map-container');
-                    if (!mapContainer) return;
-                    
+                })
+                .catch(error => {
+                    console.error('❌ Error loading map:', error);
                     mapContainer.innerHTML = `
-                        <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 15px; border: 2px solid #dc3545;">
-                            <h4 style="color: #dc3545;">❌ Lỗi tải bản đồ</h4>
-                            <p>Không thể tải file SVG. Vui lòng kiểm tra:</p>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>File vn.svg có tồn tại không?</li>
-                                <li>Server có chạy không?</li>
-                                <li>Đường dẫn /vn.svg có đúng không?</li>
-                            </ul>
-                            <button onclick="location.reload()" style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-                                🔄 Thử lại
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 20px;"></i>
+                            <h5 style="color: #dc3545;">Không thể tải bản đồ</h5>
+                            <p class="text-muted">Vui lòng thử lại sau</p>
+                            <button onclick="location.reload()" class="btn btn-primary mt-3">
+                                <i class="fas fa-redo me-2"></i>Thử lại
                             </button>
                         </div>
                     `;
-                }
+                });
+        });
+        
+        // Fade in animation on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const faders = document.querySelectorAll('.fade-in-section');
+            
+            const appearOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -100px 0px"
+            };
+            
+            const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) {
+                        return;
+                    } else {
+                        entry.target.classList.add('is-visible');
+                        appearOnScroll.unobserve(entry.target);
+                    }
+                });
+            }, appearOptions);
+            
+            faders.forEach(fader => {
+                appearOnScroll.observe(fader);
             });
-        </script>
-    </th:block>
+        });
+    </script>
 </body>
 </html>

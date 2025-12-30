@@ -32,7 +32,7 @@
                                 </a>
                             </li>
                             <li class="nav-item dropdown me-4">
-                                <a href="#" class="nav-link text-dark fw-semibold position-relative dropdown-toggle" 
+                                <a href="#" class="nav-link text-dark fw-semibold position-relative" 
                                    data-bs-toggle="dropdown" aria-expanded="false">
                                     Sản Phẩm
                                     <i class="fas fa-chevron-down ms-1" style="font-size: 0.75rem;"></i>
@@ -88,7 +88,7 @@
                                             <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='cao-lau')}">
                                                 <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Cao Lầu Hội An
                                             </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='nem-lui')}"></a>
+                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='nem-lui')}">
                                                 <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Nem Lụi Huế
                                             </a></li>
                                         </ul>
@@ -439,32 +439,46 @@
     position: relative;
 }
 
-.dropdown-submenu > .dropdown-menu {
+/* CRITICAL: Hide submenu by default */
+.dropdown-submenu > .dropdown-menu.submenu-items {
     top: 0;
     left: 100%;
     margin-top: -1px;
     min-width: 250px;
-    display: none;
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
     border: 1px solid #e9ecef;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: absolute;
+    background: white;
+    border-radius: 0 0 12px 12px;
+    padding: 8px 0;
+    z-index: 10002;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
 }
 
-/* Show submenu on hover */
-.dropdown-submenu:hover > .dropdown-menu {
-    display: block;
+/* Show submenu ONLY when hovering its direct parent */
+.dropdown-submenu:hover > .dropdown-menu.submenu-items {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: translateX(0);
     animation: slideInRight 0.3s ease;
 }
 
-/* Hover effects */
+/* Hover effects for parent items */
 .dropdown-submenu > .dropdown-item:hover {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    color: #495057;
+    background: rgba(78, 194, 182, 0.1) !important;
+    color: #2e857c !important;
 }
 
+/* Hover effects for submenu items */
 .submenu-items .dropdown-item:hover {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    transform: translateX(5px);
+    background: rgba(78, 194, 182, 0.15) !important;
+    color: #2e857c !important;
+    transform: translateX(8px);
     transition: all 0.3s ease;
 }
 
@@ -508,23 +522,23 @@
 }
 
 .dropdown-submenu:hover > .dropdown-item i.fa-chevron-right {
-    transform: rotate(90deg);
+    transform: translateX(3px);
 }
 
-/* Color coding for regions */
+/* Color coding for regions - parent items only */
 .dropdown-submenu:nth-child(1) > .dropdown-item:hover {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
+    background: rgba(0, 123, 255, 0.1) !important;
+    color: #007bff !important;
 }
 
 .dropdown-submenu:nth-child(2) > .dropdown-item:hover {
-    background: linear-gradient(135deg, #ffc107, #e0a800);
-    color: white;
+    background: rgba(255, 193, 7, 0.1) !important;
+    color: #e0a800 !important;
 }
 
 .dropdown-submenu:nth-child(3) > .dropdown-item:hover {
-    background: linear-gradient(135deg, #17a2b8, #138496);
-    color: white;
+    background: rgba(23, 162, 184, 0.1) !important;
+    color: #17a2b8 !important;
 }
 </style>
 
