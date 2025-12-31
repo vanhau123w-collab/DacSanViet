@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -156,5 +157,61 @@ public class AdminDashboardController {
         model.addAttribute("pageTitle", "Analytics & Reports");
         model.addAttribute("activePage", "analytics");
         return "admin/analytics/index";
+    }
+    
+    /**
+     * Get News Analytics Data (AJAX)
+     * Requirements: 6.1, 6.2, 6.3, 6.5
+     */
+    @GetMapping("/api/news/analytics")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getNewsAnalytics(
+            @RequestParam(required = false, defaultValue = "30days") String period) {
+        
+        try {
+            Map<String, Object> analytics = dashboardService.getNewsAnalytics(period);
+            return ResponseEntity.ok(analytics);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Không thể tải thống kê tin tức: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+    
+    /**
+     * Get News Views Chart Data (AJAX)
+     * Requirements: 6.1, 6.2
+     */
+    @GetMapping("/api/news/views-chart")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getNewsViewsChart(
+            @RequestParam(required = false, defaultValue = "12") int months) {
+        
+        try {
+            Map<String, Object> chartData = dashboardService.getNewsViewsChartData(months);
+            return ResponseEntity.ok(chartData);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Không thể tải biểu đồ lượt xem: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+    
+    /**
+     * Get Top Categories by Article Count (AJAX)
+     * Requirements: 6.3
+     */
+    @GetMapping("/api/news/top-categories")
+    @ResponseBody
+    public ResponseEntity<?> getTopCategories(
+            @RequestParam(defaultValue = "10") int limit) {
+        
+        try {
+            return ResponseEntity.ok(dashboardService.getTopCategoriesByArticleCount(limit));
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Không thể tải danh mục hàng đầu: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
     }
 }

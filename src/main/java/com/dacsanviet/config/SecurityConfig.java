@@ -69,24 +69,39 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(AbstractHttpConfigurer::disable)
-            .headers(headers -> headers.frameOptions().sameOrigin()) // Allow H2 console frames
+            .csrf(csrf -> csrf
+                // Enable CSRF for form-based endpoints
+                .ignoringRequestMatchers("/api/**", "/h2-console/**", "/ws/**")
+                .csrfTokenRepository(org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse())
+            )
+            .headers(headers -> headers
+                .frameOptions().sameOrigin() // Allow H2 console frames
+                .contentTypeOptions().and()
+                .httpStrictTransportSecurity(hstsConfig -> hstsConfig
+                    .maxAgeInSeconds(31536000)
+                    .includeSubDomains(true)
+                )
+                .and()
+            )
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(authz -> authz
                 // Public endpoints
-                .requestMatchers("/about", "/contact", "/test", "/test-simple").permitAll()
+                .requestMatchers("/about", "/contact", "/news", "/news/**", "/test", "/test-simple").permitAll()
                 .requestMatchers("/privacy-policy", "/terms-of-service", "/shipping-policy").permitAll()
                 .requestMatchers("/error/**").permitAll()
                 .requestMatchers("/init-data", "/clear-test-data", "/check-conflicts", "/view-database", "/database").permitAll()
                 .requestMatchers("/login", "/register").permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/csrf/**").permitAll() // Allow CSRF token endpoint
+                .requestMatchers("/admin/chat").permitAll() // Temporary for testing
+                .requestMatchers("/chat-demo").permitAll() // Demo page
                 
 
                 
                 // Static resources
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/**", "/favicon.ico").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/**", "/favicon.ico", "/*.svg").permitAll()
                 
                 // Product browsing (require login)
                 // Product browsing (public)
@@ -124,6 +139,9 @@ public class SecurityConfig {
                 
                 // WebSocket endpoints
                 .requestMatchers("/ws/**").permitAll()
+                
+                // Chat endpoints (allow all for guest chat)
+                .requestMatchers("/api/chat/**").permitAll()
                 
                 // All other requests require authentication
                 .anyRequest().authenticated()

@@ -7,8 +7,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 /**
- * WebSocket configuration for real-time notifications
- * Enables STOMP messaging over WebSocket
+ * WebSocket configuration for real-time chat functionality
  */
 @Configuration
 @EnableWebSocketMessageBroker
@@ -16,8 +15,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Enable a simple memory-based message broker to carry messages
-        // back to the client on destinations prefixed with "/topic" and "/queue"
+        // Enable a simple memory-based message broker to carry messages back to the client
+        // on destinations prefixed with "/topic" and "/queue"
         config.enableSimpleBroker("/topic", "/queue");
         
         // Designate the "/app" prefix for messages that are bound for methods

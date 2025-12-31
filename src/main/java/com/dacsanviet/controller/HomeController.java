@@ -155,6 +155,27 @@ public class HomeController {
 		return "pages/about";
 	}
 
+	@GetMapping("/contact")
+	public String contact(Model model) {
+		model.addAttribute("pageTitle", "Liên Hệ - Đặc Sản Việt");
+		model.addAttribute("categories", categoryService.getAllActiveCategories());
+		return "pages/contact";
+	}
+
+	// News routes are now handled by NewsController
+
+	@GetMapping("/admin/chat")
+	public String adminChat(Model model) {
+		model.addAttribute("pageTitle", "Quản Lý Chat - Admin");
+		return "admin/chat";
+	}
+
+	@GetMapping("/chat-demo")
+	public String chatDemo(Model model) {
+		model.addAttribute("pageTitle", "Demo Chatbox - Đặc Sản Việt");
+		return "chat-demo";
+	}
+
 	@PostMapping("/api/consultation")
 	@ResponseBody
 	public org.springframework.http.ResponseEntity<?> submitConsultation(

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý bình luận - Admin</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #D2691E;
+            --primary-dark: #8B4513;
+            --secondary-color: #34495e;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        .sidebar {
+            background: var(--secondary-color);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .main-content {
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .comment-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .comment-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .comment-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .comment-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background: #d1edff;
+            color: #0c5460;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .comment-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+        
+        .article-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .article-link:hover {
+            color: var(--primary-dark);
+        }
+        
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .bulk-actions {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .pagination-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar p-0">
+                <div class="p-3">
+                    <h5 class="text-white mb-4">
+                        <i class="fas fa-cog me-2"></i>Admin Panel
+                    </h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="/admin/news">
+                            <i class="fas fa-newspaper me-2"></i>Quản lý tin tức
+                        </a>
+                        <a class="nav-link active" href="/admin/comments">
+                            <i class="fas fa-comments me-2"></i>Quản lý bình luận
+                        </a>
+                        <a class="nav-link" href="/admin/categories">
+                            <i class="fas fa-tags me-2"></i>Danh mục
+                        </a>
+                        <a class="nav-link" href="/admin/users">
+                            <i class="fas fa-users me-2"></i>Người dùng
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-10 main-content p-0">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="container-fluid">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 class="mb-0">
+                                    <i class="fas fa-comments me-2 text-primary"></i>
+                                    Quản lý bình luận
+                                </h2>
+                                <p class="text-muted mb-0">Duyệt và quản lý bình luận từ người dùng</p>
+                            </div>
+                            <div>
+                                <span class="badge bg-primary fs-6" th:text="'Tổng: ' + ${totalElements}">Tổng: 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="container-fluid">
+                    <!-- Success/Error Messages -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    <!-- Filter Section -->
+                    <div class="filter-section">
+                        <form method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label for="status" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">Tất cả</option>
+                                    <option th:each="status : ${statuses}" 
+                                            th:value="${status}" 
+                                            th:text="${status.displayName}"
+                                            th:selected="${selectedStatus == status}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="search" class="form-label">Tìm kiếm</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       th:value="${search}" placeholder="Tìm theo nội dung bình luận...">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search me-1"></i>Lọc
+                                </button>
+                                <a href="/admin/comments" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Bulk Actions -->
+                    <div class="bulk-actions" th:if="${comments != null and !comments.empty}">
+                        <form id="bulkForm">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selectAll">
+                                    <label class="form-check-label" for="selectAll">Chọn tất cả</label>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success btn-sm" onclick="bulkAction('approve')">
+                                        <i class="fas fa-check me-1"></i>Duyệt
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="bulkAction('reject')">
+                                        <i class="fas fa-times me-1"></i>Từ chối
+                                    </button>
+                                </div>
+                                <span class="text-muted" id="selectedCount">0 mục được chọn</span>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Comments List -->
+                    <div th:if="${comments != null and !comments.empty}">
+                        <div th:each="comment : ${comments.content}" class="comment-card">
+                            <div class="comment-header">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input comment-checkbox" type="checkbox" 
+                                               th:value="${comment.id}" th:id="'comment-' + ${comment.id}">
+                                    </div>
+                                    <div class="comment-author">
+                                        <i class="fas fa-user-circle fa-lg text-primary"></i>
+                                        <div>
+                                            <strong th:text="${comment.authorName}"></strong>
+                                            <div class="comment-meta">
+                                                <span>
+                                                    <i class="fas fa-calendar me-1"></i>
+                                                    <span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                                </span>
+                                                <span th:if="${comment.articleTitle != null}">
+                                                    <i class="fas fa-newspaper me-1"></i>
+                                                    <a th:href="@{'/news/' + ${comment.articleId}}" 
+                                                       class="article-link" th:text="${comment.articleTitle}"></a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="status-badge" 
+                                          th:classappend="${comment.status.name() == 'PENDING'} ? 'status-pending' : 
+                                                         (${comment.status.name() == 'APPROVED'} ? 'status-approved' : 'status-rejected')"
+                                          th:text="${comment.status.displayName}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="comment-content" th:text="${comment.content}"></div>
+                            
+                            <div class="comment-actions">
+                                <form th:if="${comment.status.name() != 'APPROVED'}" 
+                                      th:action="@{'/admin/comments/' + ${comment.id} + '/approve'}" 
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-check me-1"></i>Duyệt
+                                    </button>
+                                </form>
+                                
+                                <form th:if="${comment.status.name() != 'REJECTED'}" 
+                                      th:action="@{'/admin/comments/' + ${comment.id} + '/reject'}" 
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-times me-1"></i>Từ chối
+                                    </button>
+                                </form>
+                                
+                                <form th:action="@{'/admin/comments/' + ${comment.id} + '/delete'}" 
+                                      method="post" style="display: inline;"
+                                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa bình luận này?')">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash me-1"></i>Xóa
+                                    </button>
+                                </form>
+                                
+                                <a th:href="@{'/news/' + ${comment.articleId}}" 
+                                   class="btn btn-outline-primary btn-sm" target="_blank">
+                                    <i class="fas fa-external-link-alt me-1"></i>Xem bài viết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- No Comments Message -->
+                    <div th:if="${comments == null or comments.empty}" class="text-center py-5">
+                        <i class="fas fa-comments fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">Không có bình luận nào</h4>
+                        <p class="text-muted">Chưa có bình luận nào phù hợp với bộ lọc hiện tại.</p>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div th:if="${comments != null and comments.totalPages > 1}" class="pagination-wrapper">
+                        <nav aria-label="Comment pagination">
+                            <ul class="pagination justify-content-center mb-0">
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link" 
+                                       th:href="@{/admin/comments(page=${currentPage - 1}, status=${selectedStatus}, search=${search})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                
+                                <li th:each="page : ${#numbers.sequence(0, totalPages - 1)}" 
+                                    class="page-item" th:classappend="${page == currentPage} ? 'active'">
+                                    <a class="page-link" 
+                                       th:href="@{/admin/comments(page=${page}, status=${selectedStatus}, search=${search})}"
+                                       th:text="${page + 1}"></a>
+                                </li>
+                                
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link" 
+                                       th:href="@{/admin/comments(page=${currentPage + 1}, status=${selectedStatus}, search=${search})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const commentCheckboxes = document.querySelectorAll('.comment-checkbox');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            
+            // Select all functionality
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    commentCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateSelectedCount();
+                });
+            }
+            
+            // Individual checkbox change
+            commentCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateSelectedCount();
+                    
+                    // Update select all checkbox
+                    const checkedCount = document.querySelectorAll('.comment-checkbox:checked').length;
+                    if (selectAllCheckbox) {
+                        selectAllCheckbox.checked = checkedCount === commentCheckboxes.length;
+                        selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < commentCheckboxes.length;
+                    }
+                });
+            });
+            
+            function updateSelectedCount() {
+                const checkedCount = document.querySelectorAll('.comment-checkbox:checked').length;
+                if (selectedCountSpan) {
+                    selectedCountSpan.textContent = `${checkedCount} mục được chọn`;
+                }
+            }
+        });
+        
+        function bulkAction(action) {
+            const checkedBoxes = document.querySelectorAll('.comment-checkbox:checked');
+            
+            if (checkedBoxes.length === 0) {
+                alert('Vui lòng chọn ít nhất một bình luận.');
+                return;
+            }
+            
+            const commentIds = Array.from(checkedBoxes).map(cb => cb.value);
+            const actionText = action === 'approve' ? 'duyệt' : 'từ chối';
+            
+            if (confirm(`Bạn có chắc chắn muốn ${actionText} ${commentIds.length} bình luận đã chọn?`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/comments/bulk-${action}`;
+                
+                commentIds.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'commentIds';
+                    input.value = id;
+                    form.appendChild(input);
+                });
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+</body>
+</html>

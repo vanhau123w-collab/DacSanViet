@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Chat - Admin</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #D2691E;
+            --primary-dark: #8B4513;
+            --secondary-color: #34495e;
+            --accent-color: #6B8E23;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-bg);
+        }
+        
+        .chat-admin-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .chat-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .sessions-sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sessions-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+        
+        .sessions-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .session-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .session-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .session-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .session-item.unread {
+            background: #fff3e0;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .session-item.unread.active {
+            background: var(--primary-color);
+        }
+        
+        .session-id {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .session-preview {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        
+        .session-item.active .session-preview {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .session-time {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 0.25rem;
+        }
+        
+        .session-item.active .session-time {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        
+        .chat-messages-container {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .chat-message {
+            margin-bottom: 1rem;
+        }
+        
+        .message-user {
+            text-align: right;
+        }
+        
+        .message-admin {
+            text-align: left;
+        }
+        
+        .message-system {
+            text-align: center;
+        }
+        
+        .message-bubble {
+            display: inline-block;
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .message-user .message-bubble {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .message-admin .message-bubble {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        
+        .message-system .message-bubble {
+            background: #f5f5f5;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .message-info {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 0.25rem;
+        }
+        
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+        }
+        
+        .chat-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chat-input {
+            flex: 1;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        
+        .chat-input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .chat-send-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 0.5rem;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .chat-send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(210, 105, 30, 0.3);
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+        
+        .unread-badge {
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-admin-container">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">
+                        <i class="fas fa-comments me-2"></i>
+                        Quản Lý Chat
+                    </h4>
+                    <small>Hỗ trợ khách hàng trực tuyến</small>
+                </div>
+                <div>
+                    <span id="unread-count" class="badge bg-danger">0</span>
+                    <span class="ms-2">tin nhắn chưa đọc</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="chat-content">
+            <!-- Sessions Sidebar -->
+            <div class="sessions-sidebar">
+                <div class="sessions-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-users me-2"></i>
+                        Phiên Chat
+                    </h6>
+                </div>
+                <div class="sessions-list" id="sessions-list">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Chưa có phiên chat nào</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Main -->
+            <div class="chat-main">
+                <div class="chat-messages-container" id="chat-messages">
+                    <div class="empty-state">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>Chọn một phiên chat để bắt đầu</p>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container" id="chat-input-container" style="display: none;">
+                    <div class="chat-input-wrapper">
+                        <input type="text" id="admin-chat-input" class="chat-input" placeholder="Nhập tin nhắn trả lời...">
+                        <button id="admin-send-btn" class="chat-send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SockJS and Stomp for WebSocket -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    
+    <script>
+        class AdminChatManager {
+            constructor() {
+                this.stompClient = null;
+                this.isConnected = false;
+                this.currentSessionId = null;
+                this.sessions = new Map();
+                
+                this.init();
+            }
+            
+            init() {
+                this.bindEvents();
+                this.connectWebSocket();
+                this.loadUnreadSessions();
+                this.startPeriodicUpdates();
+            }
+            
+            bindEvents() {
+                // Send message on Enter
+                document.getElementById('admin-chat-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.sendAdminReply();
+                    }
+                });
+                
+                // Send button click
+                document.getElementById('admin-send-btn').addEventListener('click', () => {
+                    this.sendAdminReply();
+                });
+            }
+            
+            connectWebSocket() {
+                if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+                    console.warn('SockJS or Stomp not loaded');
+                    return;
+                }
+                
+                try {
+                    const socket = new SockJS('/ws');
+                    this.stompClient = Stomp.over(socket);
+                    this.stompClient.debug = null;
+                    
+                    this.stompClient.connect({}, 
+                        () => this.onWebSocketConnected(),
+                        (error) => this.onWebSocketError(error)
+                    );
+                } catch (error) {
+                    console.error('WebSocket connection error:', error);
+                }
+            }
+            
+            onWebSocketConnected() {
+                this.isConnected = true;
+                console.log('Admin WebSocket connected');
+                
+                // Subscribe to new messages
+                this.stompClient.subscribe('/topic/admin/new-message', (message) => {
+                    const chatMessage = JSON.parse(message.body);
+                    this.handleNewMessage(chatMessage);
+                });
+                
+                // Subscribe to read status updates
+                this.stompClient.subscribe('/topic/admin/messages-read', (message) => {
+                    const sessionId = message.body;
+                    this.markSessionAsRead(sessionId);
+                });
+            }
+            
+            onWebSocketError(error) {
+                console.error('Admin WebSocket error:', error);
+                this.isConnected = false;
+            }
+            
+            async loadUnreadSessions() {
+                try {
+                    const response = await fetch('/api/chat/admin/unread-sessions');
+                    if (response.ok) {
+                        const sessions = await response.json();
+                        for (const sessionId of sessions) {
+                            await this.loadSessionMessages(sessionId);
+                        }
+                        this.updateUnreadCount();
+                    }
+                } catch (error) {
+                    console.error('Error loading unread sessions:', error);
+                }
+            }
+            
+            async loadSessionMessages(sessionId) {
+                try {
+                    const response = await fetch(`/api/chat/history/${sessionId}`);
+                    if (response.ok) {
+                        const messages = await response.json();
+                        this.sessions.set(sessionId, messages);
+                        this.updateSessionsList();
+                    }
+                } catch (error) {
+                    console.error('Error loading session messages:', error);
+                }
+            }
+            
+            handleNewMessage(chatMessage) {
+                const sessionId = chatMessage.sessionId;
+                
+                if (!this.sessions.has(sessionId)) {
+                    this.sessions.set(sessionId, []);
+                }
+                
+                this.sessions.get(sessionId).push(chatMessage);
+                this.updateSessionsList();
+                
+                // If this is the current session, update messages
+                if (this.currentSessionId === sessionId) {
+                    this.displaySessionMessages(sessionId);
+                }
+                
+                this.updateUnreadCount();
+            }
+            
+            updateSessionsList() {
+                const sessionsList = document.getElementById('sessions-list');
+                
+                if (this.sessions.size === 0) {
+                    sessionsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>Chưa có phiên chat nào</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                for (const [sessionId, messages] of this.sessions) {
+                    const lastMessage = messages[messages.length - 1];
+                    const hasUnread = messages.some(m => m.messageType === 'USER' && !m.isRead);
+                    const isActive = sessionId === this.currentSessionId;
+                    
+                    const time = new Date(lastMessage.createdAt).toLocaleTimeString('vi-VN', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    html += `
+                        <div class="session-item ${isActive ? 'active' : ''} ${hasUnread ? 'unread' : ''}" 
+                             onclick="adminChat.selectSession('${sessionId}')">
+                            <div class="session-id">
+                                ${sessionId}
+                                ${hasUnread ? '<span class="unread-badge">!</span>' : ''}
+                            </div>
+                            <div class="session-preview">
+                                ${lastMessage.message.substring(0, 50)}${lastMessage.message.length > 50 ? '...' : ''}
+                            </div>
+                            <div class="session-time">${time}</div>
+                        </div>
+                    `;
+                }
+                
+                sessionsList.innerHTML = html;
+            }
+            
+            selectSession(sessionId) {
+                this.currentSessionId = sessionId;
+                this.displaySessionMessages(sessionId);
+                this.updateSessionsList();
+                this.markSessionAsRead(sessionId);
+                
+                // Show input container
+                document.getElementById('chat-input-container').style.display = 'block';
+                document.getElementById('admin-chat-input').focus();
+            }
+            
+            displaySessionMessages(sessionId) {
+                const messages = this.sessions.get(sessionId) || [];
+                const messagesContainer = document.getElementById('chat-messages');
+                
+                let html = '';
+                messages.forEach(message => {
+                    const time = new Date(message.createdAt).toLocaleTimeString('vi-VN', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    let senderInfo = '';
+                    if (message.messageType === 'USER' && message.senderName) {
+                        senderInfo = message.senderName;
+                        if (message.senderEmail) {
+                            senderInfo += ` (${message.senderEmail})`;
+                        }
+                    } else if (message.messageType === 'ADMIN') {
+                        senderInfo = 'Admin';
+                    }
+                    
+                    html += `
+                        <div class="chat-message message-${message.messageType.toLowerCase()}">
+                            <div class="message-bubble">
+                                ${message.message}
+                            </div>
+                            <div class="message-info">
+                                ${senderInfo ? senderInfo + ' • ' : ''}${time}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                messagesContainer.innerHTML = html;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            async sendAdminReply() {
+                const input = document.getElementById('admin-chat-input');
+                const message = input.value.trim();
+                
+                if (!message || !this.currentSessionId) return;
+                
+                input.value = '';
+                
+                const messageData = {
+                    sessionId: this.currentSessionId,
+                    message: message,
+                    adminId: 1 // TODO: Get actual admin ID
+                };
+                
+                // Send via WebSocket if connected
+                if (this.isConnected && this.stompClient) {
+                    this.stompClient.send('/app/chat.adminReply', {}, JSON.stringify(messageData));
+                }
+                
+                // Add to local messages immediately
+                const adminMessage = {
+                    sessionId: this.currentSessionId,
+                    message: message,
+                    messageType: 'ADMIN',
+                    createdAt: new Date().toISOString(),
+                    adminId: 1,
+                    isRead: true
+                };
+                
+                this.sessions.get(this.currentSessionId).push(adminMessage);
+                this.displaySessionMessages(this.currentSessionId);
+                this.updateSessionsList();
+            }
+            
+            async markSessionAsRead(sessionId) {
+                try {
+                    await fetch(`/api/chat/mark-read/${sessionId}`, {
+                        method: 'POST'
+                    });
+                    
+                    // Update local data
+                    const messages = this.sessions.get(sessionId) || [];
+                    messages.forEach(m => {
+                        if (m.messageType === 'USER') {
+                            m.isRead = true;
+                        }
+                    });
+                    
+                    this.updateSessionsList();
+                    this.updateUnreadCount();
+                } catch (error) {
+                    console.error('Error marking session as read:', error);
+                }
+            }
+            
+            async updateUnreadCount() {
+                try {
+                    const response = await fetch('/api/chat/admin/unread-count');
+                    if (response.ok) {
+                        const data = await response.json();
+                        document.getElementById('unread-count').textContent = data.count;
+                    }
+                } catch (error) {
+                    console.error('Error updating unread count:', error);
+                }
+            }
+            
+            startPeriodicUpdates() {
+                // Refresh unread sessions every 30 seconds
+                setInterval(() => {
+                    this.loadUnreadSessions();
+                }, 30000);
+            }
+        }
+        
+        // Initialize admin chat manager
+        let adminChat;
+        document.addEventListener('DOMContentLoaded', function() {
+            adminChat = new AdminChatManager();
+        });
+    </script>
+</body>
+</html>

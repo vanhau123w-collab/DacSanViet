@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Chi tiết tin tức - Đặc Sản Việt</title>
+    <meta name="description" th:content="${pageDescription}">
+    <meta name="keywords" th:content="${pageKeywords}">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" th:content="${article.title}">
+    <meta property="og:description" th:content="${article.excerpt}">
+    <meta property="og:image" th:content="${article.featuredImage}">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" th:content="${article.publishedAt}">
+    <meta property="article:author" th:content="${article.authorName}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #D2691E;
+            --primary-dark: #8B4513;
+            --secondary-color: #34495e;
+            --accent-color: #6B8E23;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            color: #333;
+        }
+        
+        /* Header Styles */
+        .navbar {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #fff;
+        }
+        
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: #fff;
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb-section {
+            background: var(--light-bg);
+            padding: 20px 0;
+        }
+        
+        .breadcrumb {
+            background: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item.active {
+            color: #666;
+        }
+        
+        /* Article Header */
+        .article-header {
+            padding: 60px 0 40px;
+            background: white;
+        }
+        
+        .article-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            line-height: 1.3;
+            margin-bottom: 20px;
+        }
+        
+        .article-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .meta-item i {
+            color: var(--primary-color);
+            margin-right: 8px;
+        }
+        
+        .article-category {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+        
+        .article-category:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        /* Article Content */
+        .article-content {
+            padding: 40px 0;
+        }
+        
+        .article-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .article-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #444;
+        }
+        
+        .article-body h2,
+        .article-body h3,
+        .article-body h4 {
+            color: var(--secondary-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .article-body p {
+            margin-bottom: 1.5rem;
+        }
+        
+        .article-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .article-body blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 20px;
+            margin: 30px 0;
+            font-style: italic;
+            color: #666;
+            background: var(--light-bg);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        /* Social Share */
+        .social-share {
+            background: var(--light-bg);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 40px 0;
+            text-align: center;
+        }
+        
+        .social-share h5 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .share-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            margin: 5px;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            color: white;
+        }
+        
+        .share-facebook { background: #3b5998; }
+        .share-twitter { background: #1da1f2; }
+        .share-linkedin { background: #0077b5; }
+        .share-whatsapp { background: #25d366; }
+        
+        /* Related Articles */
+        .related-articles {
+            background: var(--light-bg);
+            padding: 60px 0;
+        }
+        
+        .related-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .related-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .related-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .related-card-body {
+            padding: 20px;
+        }
+        
+        .related-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .related-date {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .sidebar h5 {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .recent-item {
+            display: flex;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .recent-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .recent-image {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+        
+        .recent-content h6 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+        
+        .recent-content a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+        
+        .recent-content a:hover {
+            color: var(--primary-color);
+        }
+        
+        .recent-date {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            color: white;
+        }
+        
+        /* Comments Section */
+        .comments-section {
+            margin-top: 50px;
+            padding-top: 40px;
+            border-top: 2px solid #eee;
+        }
+        
+        .comments-title {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+        }
+        
+        .comment-form-section {
+            background: var(--light-bg);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .comment-form-section h5 {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .comment-form .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .comment-form .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(210, 105, 30, 0.25);
+        }
+        
+        .comment-form .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .comment-form .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(210, 105, 30, 0.3);
+        }
+        
+        .reply-indicator {
+            margin-bottom: 20px;
+        }
+        
+        .reply-indicator .alert {
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            color: #1565c0;
+        }
+        
+        .comments-list {
+            margin-top: 30px;
+        }
+        
+        .comment-item {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .comment-item:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .comment-reply {
+            margin-left: 40px;
+            margin-top: 15px;
+            background: var(--light-bg);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .comment-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .comment-author strong {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        .comment-author i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+        
+        .comment-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .comment-body {
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .reply-btn {
+            border-radius: 20px;
+            font-size: 0.9rem;
+            padding: 6px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .reply-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .comment-replies {
+            margin-top: 20px;
+            padding-left: 20px;
+            border-left: 2px solid #eee;
+        }
+        
+        .no-comments {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--light-bg);
+            border-radius: 15px;
+        }
+        
+        .no-comments i {
+            opacity: 0.5;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .article-title {
+                font-size: 2rem;
+            }
+            
+            .article-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .article-body {
+                font-size: 1rem;
+            }
+            
+            .share-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-leaf me-2"></i>Đặc Sản Việt
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/news">Tin tức</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Giới thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Liên hệ</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-section">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="/news">Tin tức</a></li>
+                    <li class="breadcrumb-item" th:if="${article.categoryName != null}">
+                        <a th:href="@{/news/category/{slug}(slug=${article.categorySlug})}" 
+                           th:text="${article.categoryName}"></a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${article.title}"></li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Article Content -->
+    <div class="container">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Article Header -->
+                <article class="article-header">
+                    <h1 class="article-title" th:text="${article.title}"></h1>
+                    
+                    <div class="article-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span th:text="${#temporals.format(article.publishedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                        </div>
+                        <div class="meta-item" th:if="${article.authorName != null}">
+                            <i class="fas fa-user"></i>
+                            <span th:text="${article.authorName}"></span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span th:text="${article.viewCount} + ' lượt xem'"></span>
+                        </div>
+                        <div th:if="${article.categoryName != null}">
+                            <a th:href="@{/news/category/{slug}(slug=${article.categorySlug})}" 
+                               class="article-category" th:text="${article.categoryName}"></a>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Article Content -->
+                <div class="article-content">
+                    <img th:if="${article.featuredImage != null}" 
+                         th:src="${article.featuredImage}" 
+                         th:alt="${article.title}" 
+                         class="article-image">
+                    
+                    <div class="article-body" th:utext="${article.content}"></div>
+                </div>
+                
+                <!-- Social Share -->
+                <div class="social-share">
+                    <h5><i class="fas fa-share-alt me-2"></i>Chia sẻ bài viết</h5>
+                    <a th:href="'https://www.facebook.com/sharer/sharer.php?u=' + ${#httpServletRequest.requestURL}" 
+                       target="_blank" class="share-btn share-facebook">
+                        <i class="fab fa-facebook-f me-2"></i>Facebook
+                    </a>
+                    <a th:href="'https://twitter.com/intent/tweet?url=' + ${#httpServletRequest.requestURL} + '&text=' + ${article.title}" 
+                       target="_blank" class="share-btn share-twitter">
+                        <i class="fab fa-twitter me-2"></i>Twitter
+                    </a>
+                    <a th:href="'https://www.linkedin.com/sharing/share-offsite/?url=' + ${#httpServletRequest.requestURL}" 
+                       target="_blank" class="share-btn share-linkedin">
+                        <i class="fab fa-linkedin-in me-2"></i>LinkedIn
+                    </a>
+                    <a th:href="'https://wa.me/?text=' + ${article.title} + ' ' + ${#httpServletRequest.requestURL}" 
+                       target="_blank" class="share-btn share-whatsapp">
+                        <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                    </a>
+                </div>
+                
+                <!-- Comments Section -->
+                <div class="comments-section">
+                    <h4 class="comments-title">
+                        <i class="fas fa-comments me-2"></i>
+                        Bình luận (<span th:text="${comments != null ? comments.size() : 0}">0</span>)
+                    </h4>
+                    
+                    <!-- Comment Form -->
+                    <div class="comment-form-section">
+                        <h5 class="mb-3">Để lại bình luận</h5>
+                        
+                        <!-- Success/Error Messages -->
+                        <div th:if="${commentSuccess}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span th:text="${commentSuccess}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        
+                        <div th:if="${commentError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <span th:text="${commentError}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        
+                        <form th:action="@{/news/comments/submit}" method="post" th:object="${commentDto}" class="comment-form">
+                            <input type="hidden" th:field="*{articleId}">
+                            <input type="hidden" th:field="*{parentId}" id="parentCommentId">
+                            
+                            <!-- Guest fields (shown when not authenticated) -->
+                            <div sec:authorize="!isAuthenticated()" class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="guestName" class="form-label">Tên của bạn <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" th:field="*{guestName}" id="guestName" 
+                                           placeholder="Nhập tên của bạn" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="guestEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" th:field="*{guestEmail}" id="guestEmail" 
+                                           placeholder="Nhập email của bạn" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Comment content -->
+                            <div class="mb-3">
+                                <label for="commentContent" class="form-label">Nội dung bình luận <span class="text-danger">*</span></label>
+                                <textarea class="form-control" th:field="*{content}" id="commentContent" rows="4" 
+                                          placeholder="Chia sẻ ý kiến của bạn về bài viết..." required maxlength="1000"></textarea>
+                                <div class="form-text">Tối đa 1000 ký tự</div>
+                            </div>
+                            
+                            <!-- Reply indicator (hidden by default) -->
+                            <div id="replyIndicator" class="reply-indicator" style="display: none;">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-reply me-2"></i>
+                                    Đang trả lời bình luận của <strong id="replyToName"></strong>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="cancelReply()">
+                                        <i class="fas fa-times"></i> Hủy
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Bình luận sẽ được duyệt trước khi hiển thị
+                                </small>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Gửi bình luận
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Comments List -->
+                    <div class="comments-list" th:if="${comments != null and !comments.empty}">
+                        <div th:each="comment : ${comments}" class="comment-item" th:classappend="${comment.reply} ? 'comment-reply' : ''">
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <div class="comment-author">
+                                        <i class="fas fa-user-circle me-2"></i>
+                                        <strong th:text="${comment.authorName}"></strong>
+                                        <span class="comment-date" th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </div>
+                                </div>
+                                <div class="comment-body" th:text="${comment.content}"></div>
+                                <div class="comment-actions">
+                                    <button type="button" class="btn btn-sm btn-outline-primary reply-btn" 
+                                            th:onclick="'replyToComment(' + ${comment.id} + ', \'' + ${comment.authorName} + '\')'">
+                                        <i class="fas fa-reply me-1"></i>Trả lời
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Replies -->
+                            <div th:if="${comment.replies != null and !comment.replies.empty}" class="comment-replies">
+                                <div th:each="reply : ${comment.replies}" class="comment-item comment-reply">
+                                    <div class="comment-content">
+                                        <div class="comment-header">
+                                            <div class="comment-author">
+                                                <i class="fas fa-user-circle me-2"></i>
+                                                <strong th:text="${reply.authorName}"></strong>
+                                                <span class="comment-date" th:text="${#temporals.format(reply.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="comment-body" th:text="${reply.content}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- No Comments Message -->
+                    <div th:if="${comments == null or comments.empty}" class="no-comments">
+                        <div class="text-center py-4">
+                            <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Chưa có bình luận nào. Hãy là người đầu tiên bình luận!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Recent Articles -->
+                <div class="sidebar" th:if="${recentArticles != null and !recentArticles.empty}">
+                    <h5><i class="fas fa-clock me-2"></i>Tin mới nhất</h5>
+                    <div th:each="recent : ${recentArticles}" class="recent-item">
+                        <img th:src="${recent.thumbnailImage != null ? recent.thumbnailImage : '/images/news-placeholder.jpg'}" 
+                             th:alt="${recent.title}" class="recent-image">
+                        <div class="recent-content">
+                            <h6><a th:href="@{/news/{slug}(slug=${recent.slug})}" th:text="${recent.title}"></a></h6>
+                            <div class="recent-date" th:text="${#temporals.format(recent.publishedAt, 'dd/MM/yyyy')}"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Categories -->
+                <div class="sidebar" th:if="${categories != null and !categories.empty}">
+                    <h5><i class="fas fa-list me-2"></i>Danh mục</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a th:each="category : ${categories}" 
+                           th:href="@{/news/category/{slug}(slug=${category.slug})}"
+                           class="btn btn-outline-primary btn-sm"
+                           th:text="${category.name}"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Articles -->
+    <section class="related-articles" th:if="${relatedArticles != null and !relatedArticles.empty}">
+        <div class="container">
+            <h2 class="text-center mb-5" style="color: var(--primary-color); font-weight: 800;">
+                <i class="fas fa-newspaper me-3"></i>Tin liên quan
+            </h2>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6" th:each="related : ${relatedArticles}">
+                    <div class="related-card">
+                        <img th:src="${related.thumbnailImage != null ? related.thumbnailImage : '/images/news-placeholder.jpg'}" 
+                             th:alt="${related.title}">
+                        <div class="related-card-body">
+                            <h6 class="related-title">
+                                <a th:href="@{/news/{slug}(slug=${related.slug})}" 
+                                   th:text="${related.title}" 
+                                   style="text-decoration: none; color: inherit;"></a>
+                            </h6>
+                            <div class="related-date" th:text="${#temporals.format(related.publishedAt, 'dd/MM/yyyy')}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Back to Top -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white mb-3">
+                        <i class="fas fa-leaf me-2"></i>Đặc Sản Việt
+                    </h5>
+                    <p class="text-light-emphasis">
+                        Chuyên cung cấp các sản phẩm đặc sản truyền thống Việt Nam chất lượng cao, 
+                        mang đến hương vị đậm đà bản sắc dân tộc.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="text-white mb-3">Sản phẩm</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/products" class="text-light-emphasis text-decoration-none">Tất cả sản phẩm</a></li>
+                        <li><a href="/products/category/banh-keo" class="text-light-emphasis text-decoration-none">Bánh kẹo</a></li>
+                        <li><a href="/products/category/do-kho" class="text-light-emphasis text-decoration-none">Đồ khô</a></li>
+                        <li><a href="/products/category/gia-vi" class="text-light-emphasis text-decoration-none">Gia vị</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="text-white mb-3">Thông tin</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/about" class="text-light-emphasis text-decoration-none">Giới thiệu</a></li>
+                        <li><a href="/news" class="text-light-emphasis text-decoration-none">Tin tức</a></li>
+                        <li><a href="/contact" class="text-light-emphasis text-decoration-none">Liên hệ</a></li>
+                        <li><a href="/privacy" class="text-light-emphasis text-decoration-none">Chính sách bảo mật</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h6 class="text-white mb-3">Liên hệ</h6>
+                    <div class="contact-info">
+                        <p class="text-light-emphasis mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh
+                        </p>
+                        <p class="text-light-emphasis mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            <a href="tel:+84123456789" class="text-light-emphasis text-decoration-none">0123 456 789</a>
+                        </p>
+                        <p class="text-light-emphasis mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            <a href="mailto:info@dacsanviet.com" class="text-light-emphasis text-decoration-none">info@dacsanviet.com</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-light-emphasis mb-0">
+                        &copy; 2024 Đặc Sản Việt. Tất cả quyền được bảo lưu.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-light-emphasis mb-0">
+                        Thiết kế bởi <a href="#" class="text-light text-decoration-none">Đặc Sản Việt Team</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Back to top button
+            const backToTop = document.getElementById('backToTop');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('show');
+                } else {
+                    backToTop.classList.remove('show');
+                }
+            });
+            
+            backToTop.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Social share tracking (optional)
+            document.querySelectorAll('.share-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Track social share event
+                    console.log('Shared via:', this.textContent.trim());
+                });
+            });
+            
+            // Character counter for comment textarea
+            const commentTextarea = document.getElementById('commentContent');
+            if (commentTextarea) {
+                const maxLength = 1000;
+                const formText = commentTextarea.nextElementSibling;
+                
+                commentTextarea.addEventListener('input', function() {
+                    const currentLength = this.value.length;
+                    const remaining = maxLength - currentLength;
+                    formText.textContent = `${currentLength}/${maxLength} ký tự`;
+                    
+                    if (remaining < 50) {
+                        formText.classList.add('text-warning');
+                    } else {
+                        formText.classList.remove('text-warning');
+                    }
+                    
+                    if (remaining < 0) {
+                        formText.classList.add('text-danger');
+                        formText.classList.remove('text-warning');
+                    } else {
+                        formText.classList.remove('text-danger');
+                    }
+                });
+            }
+        });
+        
+        // Reply to comment functionality
+        function replyToComment(commentId, authorName) {
+            // Set parent comment ID
+            document.getElementById('parentCommentId').value = commentId;
+            
+            // Show reply indicator
+            const replyIndicator = document.getElementById('replyIndicator');
+            const replyToName = document.getElementById('replyToName');
+            replyToName.textContent = authorName;
+            replyIndicator.style.display = 'block';
+            
+            // Scroll to comment form
+            document.querySelector('.comment-form-section').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+            
+            // Focus on comment textarea
+            document.getElementById('commentContent').focus();
+        }
+        
+        // Cancel reply functionality
+        function cancelReply() {
+            // Clear parent comment ID
+            document.getElementById('parentCommentId').value = '';
+            
+            // Hide reply indicator
+            document.getElementById('replyIndicator').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

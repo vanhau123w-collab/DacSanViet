@@ -107,6 +107,88 @@
             </div>
         </div>
 
+        <!-- News Analytics Section -->
+        <div style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem; color: var(--text-primary);">Thống Kê Tin Tức</h2>
+            
+            <!-- News Stats Grid -->
+            <div class="stats-grid" style="margin-bottom: 1.5rem;">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Tổng Bài Viết</span>
+                        <div class="stat-icon" style="background: rgba(63, 81, 181, 0.2); color: #3f51b5;">
+                            <i class="bi bi-newspaper"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="totalArticles">0</div>
+                    <div class="stat-change">
+                        <span id="articlesChangeText">Đã xuất bản</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Tổng Lượt Xem</span>
+                        <div class="stat-icon" style="background: rgba(76, 175, 80, 0.2); color: #4caf50;">
+                            <i class="bi bi-eye"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="totalViews">0</div>
+                    <div class="stat-change">
+                        <span>Tất cả bài viết</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Tin Nổi Bật</span>
+                        <div class="stat-icon" style="background: rgba(255, 193, 7, 0.2); color: #ffc107;">
+                            <i class="bi bi-star"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="featuredArticles">0</div>
+                    <div class="stat-change">
+                        <span>Đang hiển thị</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Bài Mới (30 ngày)</span>
+                        <div class="stat-icon" style="background: rgba(233, 30, 99, 0.2); color: #e91e63;">
+                            <i class="bi bi-plus-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="recentArticles">0</div>
+                    <div class="stat-change">
+                        <span>Vừa tạo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Charts -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                <div class="data-table-container">
+                    <div class="table-header">
+                        <h3>Lượt Xem Tin Tức Theo Tháng</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.875rem;">Xu hướng lượt xem 12 tháng qua</p>
+                    </div>
+                    <div style="padding: 2rem;">
+                        <canvas id="newsViewsChart" height="80"></canvas>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <div class="table-header">
+                        <h3>Bài Viết Theo Danh Mục</h3>
+                    </div>
+                    <div style="padding: 2rem;">
+                        <canvas id="categoriesChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Product Performance & Demographics -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
             <div class="data-table-container">
@@ -125,6 +207,17 @@
                 <div style="padding: 2rem;">
                     <canvas id="demographicsChart" height="200"></canvas>
                 </div>
+            </div>
+        </div>
+
+        <!-- Most Viewed Articles Widget -->
+        <div class="data-table-container" style="margin-top: 1.5rem;">
+            <div class="table-header">
+                <h3>Bài Viết Được Xem Nhiều Nhất</h3>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Top 10 bài viết có lượt xem cao nhất</p>
+            </div>
+            <div id="mostViewedArticles" style="padding: 1rem;">
+                <!-- Dynamic content -->
             </div>
         </div>
     </div>

@@ -9,6 +9,8 @@ import com.dacsanviet.repository.OrderItemRepository;
 import com.dacsanviet.repository.OrderRepository;
 import com.dacsanviet.repository.ProductRepository;
 import com.dacsanviet.repository.UserRepository;
+import com.dacsanviet.repository.NewsArticleRepository;
+import com.dacsanviet.repository.NewsCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +41,12 @@ public class DashboardService {
     
     @Autowired
     private OrderItemRepository orderItemRepository;
+    
+    @Autowired
+    private NewsArticleRepository newsArticleRepository;
+    
+    @Autowired
+    private NewsCategoryRepository newsCategoryRepository;
 
     /**
      * Get Dashboard Statistics
@@ -242,5 +250,153 @@ public class DashboardService {
             .multiply(BigDecimal.valueOf(100));
         
         return percentage.doubleValue();
+    }
+    
+    /**
+     * Get News Analytics Statistics
+     * Requirements: 6.1, 6.2, 6.3, 6.5
+     */
+    public Map<String, Object> getNewsAnalytics(String period) {
+        Map<String, Object> analytics = new HashMap<>();
+        
+        LocalDateTime startDate = getStartDateByPeriod(period);
+        LocalDateTime endDate = LocalDateTime.now();
+        
+        // Total articles count by status
+        Map<String, Long> articlesByStatus = newsArticleRepository.getArticleStatsByStatus()
+            .stream()
+            .collect(Collectors.toMap(
+                row -> row[0].toString(),
+                row -> (Long) row[1]
+            ));
+        
+        analytics.put("articlesByStatus", articlesByStatus);
+        
+        // Total published articles
+        Long totalPublished = articlesByStatus.getOrDefault("PUBLISHED", 0L);
+        analytics.put("totalPublishedArticles", totalPublished);
+        
+        // Total views for all published articles
+        Long totalViews = newsArticleRepository.getTotalViewCount();
+        analytics.put("totalViews", totalViews != null ? totalViews : 0L);
+        
+        // Most viewed articles (top 10)
+        List<Map<String, Object>> mostViewedArticles = newsArticleRepository
+            .findMostViewedArticles(org.springframework.data.domain.PageRequest.of(0, 10))
+            .stream()
+            .map(article -> {
+                Map<String, Object> articleData = new HashMap<>();
+                articleData.put("id", article.getId());
+                articleData.put("title", article.getTitle());
+                articleData.put("slug", article.getSlug());
+                articleData.put("viewCount", article.getViewCount());
+                articleData.put("publishedAt", article.getPublishedAt());
+                articleData.put("categoryName", article.getCategory() != null ? 
+                    article.getCategory().getName() : "Không có danh mục");
+                return articleData;
+            })
+            .collect(Collectors.toList());
+        
+        analytics.put("mostViewedArticles", mostViewedArticles);
+        
+        // Articles by category statistics
+        List<Map<String, Object>> articlesByCategory = newsArticleRepository
+            .getPublishedArticleStatsByCategory()
+            .stream()
+            .map(row -> {
+                Map<String, Object> categoryData = new HashMap<>();
+                categoryData.put("categoryName", (String) row[0]);
+                categoryData.put("articleCount", (Long) row[1]);
+                return categoryData;
+            })
+            .collect(Collectors.toList());
+        
+        analytics.put("articlesByCategory", articlesByCategory);
+        
+        // View statistics by month (last 12 months)
+        LocalDateTime twelveMonthsAgo = LocalDateTime.now().minusMonths(12);
+        List<Map<String, Object>> viewsByMonth = newsArticleRepository
+            .getViewStatsByMonth(twelveMonthsAgo)
+            .stream()
+            .map(row -> {
+                Map<String, Object> monthData = new HashMap<>();
+                monthData.put("year", (Integer) row[0]);
+                monthData.put("month", (Integer) row[1]);
+                monthData.put("views", (Long) row[2]);
+                monthData.put("monthLabel", String.format("%d-%02d", (Integer) row[0], (Integer) row[1]));
+                return monthData;
+            })
+            .collect(Collectors.toList());
+        
+        analytics.put("viewsByMonth", viewsByMonth);
+        
+        // Recent articles (last 30 days)
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        List<com.dacsanviet.model.NewsArticle> recentArticles = newsArticleRepository
+            .findArticlesCreatedBetween(thirtyDaysAgo, endDate);
+        
+        analytics.put("recentArticlesCount", recentArticles.size());
+        
+        // Featured articles count
+        Long featuredCount = newsArticleRepository.countByStatus(com.dacsanviet.model.NewsStatus.PUBLISHED);
+        // Get actual featured count
+        List<com.dacsanviet.model.NewsArticle> featuredArticles = newsArticleRepository
+            .findFeaturedArticles(org.springframework.data.domain.PageRequest.of(0, 100));
+        analytics.put("featuredArticlesCount", featuredArticles.size());
+        
+        return analytics;
+    }
+    
+    /**
+     * Get News View Statistics Chart Data
+     * Requirements: 6.1, 6.2
+     */
+    public Map<String, Object> getNewsViewsChartData(int months) {
+        LocalDateTime sinceDate = LocalDateTime.now().minusMonths(months);
+        List<Object[]> stats = newsArticleRepository.getViewStatsByMonth(sinceDate);
+        
+        List<String> labels = new ArrayList<>();
+        List<Long> data = new ArrayList<>();
+        
+        // Create a map for easy lookup
+        Map<String, Long> viewsMap = stats.stream()
+            .collect(Collectors.toMap(
+                row -> String.format("%d-%02d", (Integer) row[0], (Integer) row[1]),
+                row -> (Long) row[2]
+            ));
+        
+        // Generate labels for all months in range
+        LocalDateTime current = sinceDate.withDayOfMonth(1);
+        LocalDateTime now = LocalDateTime.now().withDayOfMonth(1);
+        
+        while (!current.isAfter(now)) {
+            String monthKey = String.format("%d-%02d", current.getYear(), current.getMonthValue());
+            labels.add(monthKey);
+            data.add(viewsMap.getOrDefault(monthKey, 0L));
+            current = current.plusMonths(1);
+        }
+        
+        Map<String, Object> chartData = new HashMap<>();
+        chartData.put("labels", labels);
+        chartData.put("data", data);
+        
+        return chartData;
+    }
+    
+    /**
+     * Get Top Categories by Article Count
+     * Requirements: 6.3
+     */
+    public List<Map<String, Object>> getTopCategoriesByArticleCount(int limit) {
+        return newsArticleRepository.getPublishedArticleStatsByCategory()
+            .stream()
+            .limit(limit)
+            .map(row -> {
+                Map<String, Object> categoryData = new HashMap<>();
+                categoryData.put("name", (String) row[0]);
+                categoryData.put("articleCount", (Long) row[1]);
+                return categoryData;
+            })
+            .collect(Collectors.toList());
     }
 }

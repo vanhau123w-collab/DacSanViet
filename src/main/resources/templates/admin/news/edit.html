@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Chỉnh Sửa Bài Viết - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/admin-dashboard.css}">
+    <style>
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+        }
+        
+        .card-header h5 {
+            color: var(--text-primary);
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .form-control, .form-select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: var(--bg-secondary);
+            border-color: var(--primary-color);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.15);
+        }
+        
+        .form-control-lg {
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+        
+        .btn-outline-secondary {
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .btn-outline-secondary:hover {
+            background: var(--hover-bg);
+            border-color: var(--text-primary);
+        }
+        
+        .text-danger {
+            color: var(--danger-color) !important;
+        }
+        
+        .text-muted {
+            color: var(--text-muted) !important;
+            font-size: 0.85rem;
+        }
+        
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .rounded {
+            border-radius: 8px !important;
+        }
+        
+        .image-preview {
+            position: relative;
+            display: inline-block;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+        
+        .image-preview img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+        }
+        
+        .image-preview .remove-image {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .seo-preview {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .seo-title {
+            color: #1a0dab;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-decoration: none;
+            margin-bottom: 0.25rem;
+        }
+        
+        .seo-url {
+            color: #006621;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .seo-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .char-counter {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+        
+        .char-counter.warning {
+            color: var(--warning-color);
+        }
+        
+        .char-counter.error {
+            color: var(--danger-color);
+        }
+        
+        .status-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .status-option {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .status-option:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .status-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(255, 107, 53, 0.1);
+        }
+        
+        .status-option i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .featured-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .featured-toggle:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .featured-toggle.active {
+            border-color: var(--primary-color);
+            background: rgba(255, 107, 53, 0.1);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 12px;
+            transition: background 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: var(--primary-color);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+        
+        .ck-editor__editable {
+            min-height: 300px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: var(--success-color);
+        }
+        
+        .notification.error {
+            background: var(--danger-color);
+        }
+        
+        .notification.warning {
+            background: var(--warning-color);
+        }
+        
+        .article-stats {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+    
+    <!-- Main Content -->
+    <div class="admin-main">
+        <div class="container-fluid py-4">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-1">
+                        <i class="bi bi-pencil-square me-2"></i>Chỉnh Sửa Bài Viết
+                    </h1>
+                    <p class="text-muted mb-0">Cập nhật thông tin bài viết tin tức</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/news/{slug}(slug=${article?.slug})}" class="btn btn-outline-info" target="_blank">
+                        <i class="bi bi-eye me-1"></i>Xem trước
+                    </a>
+                    <a th:href="@{/admin/news}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Quay lại
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Loading State -->
+            <div id="loadingState" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <div class="mt-2">Đang tải bài viết...</div>
+            </div>
+            
+            <!-- Form -->
+            <form id="newsForm" style="display: none;">
+                <div class="row">
+                    <!-- Left Column - Main Content -->
+                    <div class="col-lg-8">
+                        <!-- Basic Info Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="bi bi-info-circle me-2"></i>Thông tin cơ bản</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Title -->
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">
+                                        Tiêu đề bài viết <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg" id="title" name="title" 
+                                           placeholder="Nhập tiêu đề bài viết" required maxlength="200">
+                                    <div class="char-counter" id="titleCounter">0/200</div>
+                                </div>
+                                
+                                <!-- Slug -->
+                                <div class="mb-3">
+                                    <label for="slug" class="form-label">
+                                        URL Slug <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="slug" name="slug" 
+                                           placeholder="url-slug-bai-viet" required maxlength="250">
+                                    <small class="text-muted">URL thân thiện cho bài viết</small>
+                                </div>
+                                
+                                <!-- Category -->
+                                <div class="mb-3">
+                                    <label for="categoryId" class="form-label">
+                                        Danh mục <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="categoryId" name="categoryId" required>
+                                        <option value="">Chọn danh mục</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Excerpt -->
+                                <div class="mb-3">
+                                    <label for="excerpt" class="form-label">Tóm tắt</label>
+                                    <textarea class="form-control" id="excerpt" name="excerpt" rows="3" 
+                                              placeholder="Tóm tắt ngắn gọn về bài viết" maxlength="300"></textarea>
+                                    <div class="char-counter" id="excerptCounter">0/300</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Content Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="bi bi-file-text me-2"></i>Nội dung bài viết</h5>
+                            </div>
+                            <div class="card-body">
+                                <textarea id="content" name="content"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- SEO Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="bi bi-search me-2"></i>Tối ưu SEO</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Meta Description -->
+                                <div class="mb-3">
+                                    <label for="metaDescription" class="form-label">Meta Description</label>
+                                    <textarea class="form-control" id="metaDescription" name="metaDescription" rows="3" 
+                                              placeholder="Mô tả ngắn gọn cho search engines (150-160 ký tự)" maxlength="160"></textarea>
+                                    <div class="char-counter" id="metaDescCounter">0/160</div>
+                                </div>
+                                
+                                <!-- Meta Keywords -->
+                                <div class="mb-3">
+                                    <label for="metaKeywords" class="form-label">Meta Keywords</label>
+                                    <input type="text" class="form-control" id="metaKeywords" name="metaKeywords" 
+                                           placeholder="từ khóa, tin tức, đặc sản việt" maxlength="255">
+                                    <small class="text-muted">Các từ khóa cách nhau bằng dấu phẩy</small>
+                                </div>
+                                
+                                <!-- SEO Preview -->
+                                <div class="seo-preview">
+                                    <div class="seo-title" id="seoPreviewTitle">Tiêu đề bài viết sẽ hiển thị ở đây</div>
+                                    <div class="seo-url" id="seoPreviewUrl">https://dacsanviet.com/news/url-slug</div>
+                                    <div class="seo-description" id="seoPreviewDesc">Mô tả meta sẽ hiển thị ở đây...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column - Settings & Images -->
+                    <div class="col-lg-4">
+                        <!-- Article Stats -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="bi bi-graph-up me-2"></i>Thống kê bài viết</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="article-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Lượt xem</span>
+                                        <span class="stat-value" id="viewCount">0</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Ngày tạo</span>
+                                        <span class="stat-value" id="createdAt">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Cập nhật cuối</span>
+                                        <span class="stat-value" id="updatedAt">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Tác giả</span>
+                                        <span class="stat-value" id="authorName">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Publish Settings -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="bi bi-gear me-2"></i>Cài đặt xuất bản</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Status -->
+                                <div class="mb-3">
+                                    <label class="form-label">Trạng thái</label>
+                                    <div class="status-options">
+                                        <div class="status-option" data-status="DRAFT">
+                                            <i class="bi bi-file-earmark-text text-secondary"></i>
+                                            <div>Bản nháp</div>
+                                        </div>
+                                        <div class="status-option" data-status="PUBLISHED">
+                                            <i class="bi bi-check-circle text-success"></i>
+                                            <div>Xuất bản</div>
+                                        </div>
+                                        <div class="status-option" data-status="ARCHIVED">
+                                            <i class="bi bi-archive text-warning"></i>
+                                            <div>Lưu trữ</div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="status" name="status" value="DRAFT">
+                                </div>
+                                
+                                <!-- Featured Toggle -->
+                                <div class="mb-3">
+                                    <label class="form-label">Bài viết nổi bật</label>
+                                    <div class="featured-toggle" id="featuredToggle">
+                                        <div class="toggle-switch" id="featuredSwitch"></div>
+                                        <div>
+                                            <strong>Đánh dấu nổi bật</strong>
+                                            <div class="text-muted small">Hiển thị ở vị trí đặc biệt</div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="isFeatured" name="isFeatured" value="false">
+                                </div>
+                                
+                                <!-- Publish Date -->
+                                <div class="mb-3">
+                                    <label for="publishedAt" class="form-label">Ngày xuất bản</label>
+                                    <input type="datetime-local" class="form-control" id="publishedAt" name="publishedAt">
+                                    <small class="text-muted">Để trống để xuất bản ngay</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Featured Image -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="bi bi-image me-2"></i>Hình ảnh đại diện</h5>
+                            </div>
+                            <div class="card-body">
+                                <input type="file" class="form-control" id="featuredImage" name="featuredImage" 
+                                       accept="image/*" onchange="previewFeaturedImage(this)">
+                                <small class="text-muted">Định dạng: JPG, PNG, WebP. Tối đa 5MB</small>
+                                <div id="featuredImagePreview" class="mt-3"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="card">
+                            <div class="card-body">
+                                <button type="submit" class="btn btn-primary w-100 mb-2" id="saveBtn">
+                                    <i class="bi bi-check-circle me-1"></i>Cập nhật bài viết
+                                </button>
+                                <button type="button" class="btn btn-outline-danger w-100 mb-2" id="deleteBtn">
+                                    <i class="bi bi-trash me-1"></i>Xóa bài viết
+                                </button>
+                                <a th:href="@{/admin/news}" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-x-circle me-1"></i>Hủy
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- CKEditor 5 -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
+    
+    <script>
+        let contentEditor;
+        let articleId;
+        let currentArticle;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            articleId = getArticleIdFromUrl();
+            if (articleId) {
+                loadArticle();
+            } else {
+                showNotification('ID bài viết không hợp lệ', 'error');
+                window.location.href = '/admin/news';
+            }
+        });
+        
+        // Get article ID from URL
+        function getArticleIdFromUrl() {
+            const pathParts = window.location.pathname.split('/');
+            const editIndex = pathParts.indexOf('edit');
+            return editIndex !== -1 && pathParts[editIndex + 1] ? pathParts[editIndex + 1] : null;
+        }
+        
+        // Load article data
+        async function loadArticle() {
+            try {
+                const [articleResponse, categoriesResponse] = await Promise.all([
+                    fetch(`/api/admin/news/${articleId}`),
+                    fetch('/api/admin/news/categories/active')
+                ]);
+                
+                if (!articleResponse.ok) {
+                    throw new Error('Không tìm thấy bài viết');
+                }
+                
+                currentArticle = await articleResponse.json();
+                const categories = categoriesResponse.ok ? await categoriesResponse.json() : [];
+                
+                populateForm(currentArticle, categories);
+                initializeEditor();
+                setupEventListeners();
+                
+                // Hide loading, show form
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('newsForm').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading article:', error);
+                showNotification(error.message || 'Lỗi khi tải bài viết', 'error');
+                setTimeout(() => window.location.href = '/admin/news', 2000);
+            }
+        }
+        
+        // Populate form with article data
+        function populateForm(article, categories) {
+            // Basic info
+            document.getElementById('title').value = article.title || '';
+            document.getElementById('slug').value = article.slug || '';
+            document.getElementById('excerpt').value = article.excerpt || '';
+            document.getElementById('metaDescription').value = article.metaDescription || '';
+            document.getElementById('metaKeywords').value = article.metaKeywords || '';
+            
+            // Categories
+            const categorySelect = document.getElementById('categoryId');
+            categorySelect.innerHTML = '<option value="">Chọn danh mục</option>';
+            categories.forEach(category => {
+                const selected = category.id === article.categoryId ? 'selected' : '';
+                categorySelect.innerHTML += `<option value="${category.id}" ${selected}>${category.name}</option>`;
+            });
+            
+            // Status
+            document.querySelectorAll('.status-option').forEach(option => {
+                if (option.dataset.status === article.status) {
+                    option.classList.add('selected');
+                }
+            });
+            document.getElementById('status').value = article.status || 'DRAFT';
+            
+            // Featured
+            if (article.isFeatured) {
+                document.getElementById('featuredToggle').classList.add('active');
+                document.getElementById('featuredSwitch').classList.add('active');
+                document.getElementById('isFeatured').value = 'true';
+            }
+            
+            // Publish date
+            if (article.publishedAt) {
+                const date = new Date(article.publishedAt);
+                document.getElementById('publishedAt').value = date.toISOString().slice(0, 16);
+            }
+            
+            // Stats
+            document.getElementById('viewCount').textContent = article.viewCount || 0;
+            document.getElementById('createdAt').textContent = formatDate(article.createdAt);
+            document.getElementById('updatedAt').textContent = formatDate(article.updatedAt);
+            document.getElementById('authorName').textContent = article.authorName || 'Không xác định';
+            
+            // Featured image
+            if (article.featuredImage) {
+                document.getElementById('featuredImagePreview').innerHTML = `
+                    <div class="image-preview">
+                        <img src="${article.featuredImage}" alt="Current featured image">
+                        <button type="button" class="remove-image" onclick="removeFeaturedImage()">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            // Update counters and preview
+            updateCharCounter('titleCounter', article.title?.length || 0, 200);
+            updateCharCounter('excerptCounter', article.excerpt?.length || 0, 300);
+            updateCharCounter('metaDescCounter', article.metaDescription?.length || 0, 160);
+            updateSEOPreview();
+        }
+        
+        // Initialize CKEditor
+        function initializeEditor() {
+            ClassicEditor
+                .create(document.querySelector('#content'), {
+                    toolbar: [
+                        'heading', '|',
+                        'bold', 'italic', 'underline', 'strikethrough', '|',
+                        'link', 'uploadImage', 'insertTable', 'blockQuote', '|',
+                        'bulletedList', 'numberedList', '|',
+                        'outdent', 'indent', '|',
+                        'undo', 'redo'
+                    ],
+                    image: {
+                        toolbar: [
+                            'imageTextAlternative', 'imageCaption', '|',
+                            'imageStyle:inline', 'imageStyle:block', 'imageStyle:side'
+                        ]
+                    },
+                    table: {
+                        contentToolbar: [
+                            'tableColumn', 'tableRow', 'mergeTableCells'
+                        ]
+                    }
+                })
+                .then(editor => {
+                    contentEditor = editor;
+                    editor.setData(currentArticle.content || '');
+                    console.log('Content editor ready!');
+                })
+                .catch(error => {
+                    console.error('Error initializing content editor:', error);
+                });
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Title input
+            document.getElementById('title').addEventListener('input', function() {
+                updateCharCounter('titleCounter', this.value.length, 200);
+                updateSEOPreview();
+            });
+            
+            // Slug input
+            document.getElementById('slug').addEventListener('input', function() {
+                updateSEOPreview();
+            });
+            
+            // Excerpt input
+            document.getElementById('excerpt').addEventListener('input', function() {
+                updateCharCounter('excerptCounter', this.value.length, 300);
+            });
+            
+            // Meta description input
+            document.getElementById('metaDescription').addEventListener('input', function() {
+                const length = this.value.length;
+                updateCharCounter('metaDescCounter', length, 160);
+                updateSEOPreview();
+            });
+            
+            // Status options
+            document.querySelectorAll('.status-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.status-option').forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('status').value = this.dataset.status;
+                });
+            });
+            
+            // Featured toggle
+            document.getElementById('featuredToggle').addEventListener('click', function() {
+                const isActive = this.classList.contains('active');
+                if (isActive) {
+                    this.classList.remove('active');
+                    document.getElementById('featuredSwitch').classList.remove('active');
+                    document.getElementById('isFeatured').value = 'false';
+                } else {
+                    this.classList.add('active');
+                    document.getElementById('featuredSwitch').classList.add('active');
+                    document.getElementById('isFeatured').value = 'true';
+                }
+            });
+            
+            // Form submission
+            document.getElementById('newsForm').addEventListener('submit', handleFormSubmit);
+            
+            // Delete button
+            document.getElementById('deleteBtn').addEventListener('click', deleteArticle);
+        }
+        
+        // Update character counter
+        function updateCharCounter(counterId, current, max) {
+            const counter = document.getElementById(counterId);
+            counter.textContent = `${current}/${max}`;
+            
+            if (current > max * 0.9) {
+                counter.className = 'char-counter warning';
+            } else if (current > max) {
+                counter.className = 'char-counter error';
+            } else {
+                counter.className = 'char-counter';
+            }
+        }
+        
+        // Update SEO preview
+        function updateSEOPreview() {
+            const title = document.getElementById('title').value || 'Tiêu đề bài viết sẽ hiển thị ở đây';
+            const slug = document.getElementById('slug').value || 'url-slug';
+            const metaDesc = document.getElementById('metaDescription').value || 'Mô tả meta sẽ hiển thị ở đây...';
+            
+            document.getElementById('seoPreviewTitle').textContent = title;
+            document.getElementById('seoPreviewUrl').textContent = `https://dacsanviet.com/news/${slug}`;
+            document.getElementById('seoPreviewDesc').textContent = metaDesc;
+        }
+        
+        // Preview featured image
+        function previewFeaturedImage(input) {
+            const preview = document.getElementById('featuredImagePreview');
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('Kích thước file không được vượt quá 5MB', 'error');
+                    input.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/)) {
+                    showNotification('Chỉ chấp nhận file JPG, PNG, WebP', 'error');
+                    input.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `
+                        <div class="image-preview">
+                            <img src="${e.target.result}" alt="Preview">
+                            <button type="button" class="remove-image" onclick="removeFeaturedImage()">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Remove featured image
+        function removeFeaturedImage() {
+            document.getElementById('featuredImage').value = '';
+            document.getElementById('featuredImagePreview').innerHTML = '';
+        }
+        
+        // Handle form submission
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const saveBtn = document.getElementById('saveBtn');
+            const originalText = saveBtn.innerHTML;
+            
+            try {
+                // Show loading state
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Đang cập nhật...';
+                
+                // Get content from editor
+                const content = contentEditor.getData();
+                
+                // Create FormData
+                const formData = new FormData();
+                formData.append('title', document.getElementById('title').value);
+                formData.append('slug', document.getElementById('slug').value);
+                formData.append('content', content);
+                formData.append('excerpt', document.getElementById('excerpt').value);
+                formData.append('categoryId', document.getElementById('categoryId').value);
+                formData.append('status', document.getElementById('status').value);
+                formData.append('isFeatured', document.getElementById('isFeatured').value);
+                formData.append('metaDescription', document.getElementById('metaDescription').value);
+                formData.append('metaKeywords', document.getElementById('metaKeywords').value);
+                
+                const publishedAt = document.getElementById('publishedAt').value;
+                if (publishedAt) {
+                    formData.append('publishedAt', publishedAt);
+                }
+                
+                // Add featured image if selected
+                const featuredImageFile = document.getElementById('featuredImage').files[0];
+                if (featuredImageFile) {
+                    formData.append('featuredImage', featuredImageFile);
+                }
+                
+                // Submit form
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+                
+                const response = await fetch(`/api/admin/news/${articleId}/update`, {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showNotification('Bài viết đã được cập nhật thành công!', 'success');
+                    
+                    // Reload article data
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Có lỗi xảy ra khi cập nhật bài viết');
+                }
+                
+            } catch (error) {
+                console.error('Error updating article:', error);
+                showNotification(error.message || 'Lỗi khi cập nhật bài viết', 'error');
+            } finally {
+                // Restore button state
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalText;
+            }
+        }
+        
+        // Delete article
+        async function deleteArticle() {
+            if (!confirm('Bạn có chắc muốn xóa bài viết này? Bài viết sẽ được chuyển vào trạng thái lưu trữ.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/admin/news/${articleId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showNotification('Bài viết đã được xóa thành công!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/admin/news';
+                    }, 2000);
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Có lỗi xảy ra khi xóa bài viết');
+                }
+            } catch (error) {
+                console.error('Error deleting article:', error);
+                showNotification(error.message || 'Lỗi khi xóa bài viết', 'error');
+            }
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Remove existing notification
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+            
+            // Create notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            // Hide notification
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

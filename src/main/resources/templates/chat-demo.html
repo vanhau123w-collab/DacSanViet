@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Chatbox - Đặc Sản Việt</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 3rem;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .demo-header h1 {
+            color: #D2691E;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list i {
+            color: #D2691E;
+            margin-right: 1rem;
+            width: 20px;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .instructions h3 {
+            color: #D2691E;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-demo {
+            background: linear-gradient(135deg, #D2691E 0%, #8B4513 100%);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        
+        .btn-demo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(210, 105, 30, 0.4);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>
+                <i class="fas fa-comments me-3"></i>
+                Demo Hệ Thống Chatbox
+            </h1>
+            <p>Hệ thống chat trực tuyến với WebSocket và hỗ trợ admin</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3><i class="fas fa-star me-2"></i>Tính Năng</h3>
+                <ul class="feature-list">
+                    <li>
+                        <i class="fas fa-bolt"></i>
+                        Chat thời gian thực với WebSocket
+                    </li>
+                    <li>
+                        <i class="fas fa-mobile-alt"></i>
+                        Giao diện responsive, tương thích mobile
+                    </li>
+                    <li>
+                        <i class="fas fa-user-shield"></i>
+                        Hỗ trợ chat khách vãng lai (không cần đăng ký)
+                    </li>
+                    <li>
+                        <i class="fas fa-database"></i>
+                        Lưu trữ lịch sử chat trong database
+                    </li>
+                    <li>
+                        <i class="fas fa-bell"></i>
+                        Thông báo tin nhắn chưa đọc cho admin
+                    </li>
+                    <li>
+                        <i class="fas fa-tools"></i>
+                        Giao diện quản lý chat cho admin
+                    </li>
+                    <li>
+                        <i class="fas fa-sync-alt"></i>
+                        Fallback REST API khi WebSocket không khả dụng
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="col-md-6">
+                <h3><i class="fas fa-cogs me-2"></i>Công Nghệ</h3>
+                <ul class="feature-list">
+                    <li>
+                        <i class="fab fa-java"></i>
+                        Spring Boot + WebSocket
+                    </li>
+                    <li>
+                        <i class="fas fa-database"></i>
+                        JPA/Hibernate + H2 Database
+                    </li>
+                    <li>
+                        <i class="fab fa-js-square"></i>
+                        JavaScript ES6 + SockJS + Stomp
+                    </li>
+                    <li>
+                        <i class="fab fa-bootstrap"></i>
+                        Bootstrap 5 + Font Awesome
+                    </li>
+                    <li>
+                        <i class="fas fa-shield-alt"></i>
+                        Spring Security
+                    </li>
+                    <li>
+                        <i class="fas fa-mobile-alt"></i>
+                        Responsive Design
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-play-circle me-2"></i>Hướng Dẫn Sử Dụng</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Cho Khách Hàng:</h5>
+                    <ol>
+                        <li>Nhấn vào nút chat ở góc dưới bên phải</li>
+                        <li>Nhập tên và email (tùy chọn)</li>
+                        <li>Gửi tin nhắn và chờ admin phản hồi</li>
+                        <li>Chat được lưu theo session ID</li>
+                    </ol>
+                </div>
+                <div class="col-md-6">
+                    <h5>Cho Admin:</h5>
+                    <ol>
+                        <li>Truy cập trang quản lý chat</li>
+                        <li>Xem danh sách phiên chat và tin nhắn chưa đọc</li>
+                        <li>Chọn phiên chat để xem và trả lời</li>
+                        <li>Tin nhắn được đồng bộ real-time</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <a href="/contact" class="btn-demo">
+                    <i class="fas fa-comments me-2"></i>
+                    Thử Chatbox (Trang Liên Hệ)
+                </a>
+                <a href="/admin/chat" class="btn-demo ms-3">
+                    <i class="fas fa-cog me-2"></i>
+                    Quản Lý Chat (Admin)
+                </a>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Chatbox sẽ xuất hiện ở góc dưới bên phải trên các trang có tích hợp
+            </small>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

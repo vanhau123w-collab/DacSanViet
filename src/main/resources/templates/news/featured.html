@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Tin Nổi Bật - Đặc Sản Việt</title>
+    <meta name="description" th:content="${pageDescription}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #D2691E;
+            --primary-dark: #8B4513;
+            --secondary-color: #34495e;
+            --accent-color: #6B8E23;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        .navbar {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #fff;
+        }
+        
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: #fff;
+        }
+        
+        /* Hero Section */
+        .featured-hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 100px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .featured-hero::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: backgroundScroll 30s linear infinite;
+        }
+        
+        @keyframes backgroundScroll {
+            from { transform: translate(0, 0); }
+            to { transform: translate(30px, 30px); }
+        }
+        
+        .featured-hero h1 {
+            animation: fadeInUp 1s ease;
+            position: relative;
+            z-index: 1;
+            font-weight: 800;
+        }
+        
+        .featured-hero p {
+            animation: fadeInUp 1.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* News Section */
+        .news-section {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .news-card {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            height: 100%;
+            border: none;
+            overflow: hidden;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(210, 105, 30, 0.2);
+        }
+        
+        .news-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .news-card:hover img {
+            transform: scale(1.1);
+        }
+        
+        .news-card-body {
+            padding: 30px;
+        }
+        
+        .news-date {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .news-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            line-height: 1.4;
+        }
+        
+        .news-excerpt {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .news-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .featured-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .read-more-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border: none;
+            padding: 10px 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 25px;
+            transition: all 0.4s ease;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .read-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(210, 105, 30, 0.4);
+            color: white;
+        }
+        
+        /* Section Titles */
+        .section-title {
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        .animate-delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-leaf me-2"></i>Đặc Sản Việt
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/news">Tin tức</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Giới thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Liên hệ</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="featured-hero">
+        <div class="container">
+            <h1 class="display-3 fw-bold mb-4">
+                <i class="fas fa-fire me-3"></i>
+                Tin Nổi Bật
+            </h1>
+            <p class="lead fs-4">
+                Những tin tức được quan tâm và đọc nhiều nhất
+            </p>
+        </div>
+    </section>
+    
+    <!-- Featured News Section -->
+    <section class="news-section">
+        <div class="container">
+            <!-- Articles Grid -->
+            <div th:if="${articles != null and !articles.empty}" class="row g-4">
+                <div class="col-lg-4 col-md-6" th:each="article, iterStat : ${articles}">
+                    <div class="news-card animate-fade-in-up position-relative" 
+                         th:classappend="'animate-delay-' + ${(iterStat.index % 3) + 1}">
+                        <div class="featured-badge">
+                            <i class="fas fa-star me-1"></i>Nổi bật
+                        </div>
+                        <img th:src="${article.thumbnailImage != null ? article.thumbnailImage : '/images/news-placeholder.jpg'}" 
+                             th:alt="${article.title}">
+                        <div class="news-card-body">
+                            <div class="news-date">
+                                <i class="fas fa-calendar me-2"></i>
+                                <span th:text="${#temporals.format(article.publishedAt, 'dd/MM/yyyy')}"></span>
+                            </div>
+                            <h4 class="news-title" th:text="${article.title}"></h4>
+                            <p class="news-excerpt" th:text="${article.excerpt}"></p>
+                            <div class="mb-3" th:if="${article.categoryName != null}">
+                                <span class="news-tag" th:text="${article.categoryName}"></span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a th:href="@{/news/{slug}(slug=${article.slug})}" class="read-more-btn">
+                                    <i class="fas fa-arrow-right me-2"></i>Đọc tiếp
+                                </a>
+                                <small class="text-muted">
+                                    <i class="fas fa-eye me-1"></i>
+                                    <span th:text="${article.viewCount}"></span> lượt xem
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty State -->
+            <div th:unless="${articles != null and !articles.empty}" class="empty-state">
+                <i class="fas fa-star"></i>
+                <h3>Chưa có tin nổi bật nào</h3>
+                <p>Hiện tại chưa có bài viết nào được đánh dấu là nổi bật.</p>
+                <a href="/news" class="btn btn-primary mt-3">
+                    <i class="fas fa-arrow-left me-2"></i>Xem tất cả tin tức
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white mb-3">
+                        <i class="fas fa-leaf me-2"></i>Đặc Sản Việt
+                    </h5>
+                    <p class="text-light-emphasis">
+                        Chuyên cung cấp các sản phẩm đặc sản truyền thống Việt Nam chất lượng cao, 
+                        mang đến hương vị đậm đà bản sắc dân tộc.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="text-white mb-3">Sản phẩm</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/products" class="text-light-emphasis text-decoration-none">Tất cả sản phẩm</a></li>
+                        <li><a href="/products/category/banh-keo" class="text-light-emphasis text-decoration-none">Bánh kẹo</a></li>
+                        <li><a href="/products/category/do-kho" class="text-light-emphasis text-decoration-none">Đồ khô</a></li>
+                        <li><a href="/products/category/gia-vi" class="text-light-emphasis text-decoration-none">Gia vị</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="text-white mb-3">Thông tin</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/about" class="text-light-emphasis text-decoration-none">Giới thiệu</a></li>
+                        <li><a href="/news" class="text-light-emphasis text-decoration-none">Tin tức</a></li>
+                        <li><a href="/contact" class="text-light-emphasis text-decoration-none">Liên hệ</a></li>
+                        <li><a href="/privacy" class="text-light-emphasis text-decoration-none">Chính sách bảo mật</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h6 class="text-white mb-3">Liên hệ</h6>
+                    <div class="contact-info">
+                        <p class="text-light-emphasis mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh
+                        </p>
+                        <p class="text-light-emphasis mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            <a href="tel:+84123456789" class="text-light-emphasis text-decoration-none">0123 456 789</a>
+                        </p>
+                        <p class="text-light-emphasis mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            <a href="mailto:info@dacsanviet.com" class="text-light-emphasis text-decoration-none">info@dacsanviet.com</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-light-emphasis mb-0">
+                        &copy; 2024 Đặc Sản Việt. Tất cả quyền được bảo lưu.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-light-emphasis mb-0">
+                        Thiết kế bởi <a href="#" class="text-light text-decoration-none">Đặc Sản Việt Team</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe cards for animation
+            document.querySelectorAll('.animate-fade-in-up').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

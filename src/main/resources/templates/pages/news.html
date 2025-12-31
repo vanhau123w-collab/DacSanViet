@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin Tức - Đặc Sản Việt</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #D2691E;
+            --primary-dark: #8B4513;
+            --secondary-color: #34495e;
+            --accent-color: #6B8E23;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        .navbar {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #fff;
+        }
+        
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: #fff;
+        }
+        
+        /* Common animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        .animate-delay-4 { animation-delay: 0.4s; }
+        
+        /* Hero Section */
+        .news-hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 100px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .news-hero::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: backgroundScroll 30s linear infinite;
+        }
+        
+        @keyframes backgroundScroll {
+            from { transform: translate(0, 0); }
+            to { transform: translate(30px, 30px); }
+        }
+        
+        .news-hero h1 {
+            animation: fadeInUp 1s ease;
+            position: relative;
+            z-index: 1;
+            font-weight: 800;
+        }
+        
+        .news-hero p {
+            animation: fadeInUp 1.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* News Section */
+        .news-section {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .news-card {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            height: 100%;
+            border: none;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(210, 105, 30, 0.2);
+        }
+        
+        .news-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .news-card:hover img {
+            transform: scale(1.1);
+        }
+        
+        .news-card-body {
+            padding: 30px;
+        }
+        
+        .news-date {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .news-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            line-height: 1.4;
+        }
+        
+        .news-excerpt {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .news-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .read-more-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border: none;
+            padding: 10px 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 25px;
+            transition: all 0.4s ease;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .read-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(210, 105, 30, 0.4);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+            color: white;
+        }
+        
+        /* Featured News */
+        .featured-news {
+            padding: 80px 0;
+            background: var(--light-bg);
+        }
+        
+        .featured-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+        }
+        
+        .featured-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .featured-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .featured-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* Section Titles */
+        .section-title {
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark-bg);
+            color: #ecf0f1;
+            padding: 40px 0 20px;
+        }
+        
+        .footer h6 {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .footer a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+        
+        .footer-bottom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: #fff;
+            font-size: 14px;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        /* Animations */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Newsletter */
+        .newsletter {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+            color: white;
+        }
+        
+        .newsletter-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-input {
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .newsletter-btn {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .newsletter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://files.catbox.moe/4ka4id.webp" alt="Đặc Sản Việt" style="height: 40px;">
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Giới thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/news">Tin tức</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Liên hệ</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    <a href="/cart" class="text-white me-3">
+                        <i class="bi bi-bag fs-4"></i>
+                    </a>
+                    <a href="/login" class="btn btn-outline-light btn-sm me-2">Đăng nhập</a>
+                    <a href="/register" class="btn btn-light btn-sm">Đăng ký</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="news-hero">
+        <div class="container">
+            <h1 class="display-3 fw-bold mb-4">Tin Tức & Sự Kiện</h1>
+            <p class="lead fs-4">
+                <i class="fas fa-newspaper me-2"></i>
+                Cập nhật những tin tức mới nhất về đặc sản Việt Nam
+                <i class="fas fa-star ms-2"></i>
+            </p>
+        </div>
+    </section>
+    
+    <!-- Featured News Section -->
+    <section class="featured-news fade-in-section">
+        <div class="container">
+            <h2 class="text-center mb-5 section-title" style="color: var(--primary-color);">
+                <i class="fas fa-fire me-3"></i>
+                Tin Nổi Bật
+            </h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="featured-card position-relative">
+                        <div class="featured-badge">
+                            <i class="fas fa-star me-1"></i>Nổi bật
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=800&q=80" 
+                             alt="Tin nổi bật" class="img-fluid">
+                        <div class="p-4">
+                            <div class="news-date">
+                                <i class="fas fa-calendar me-2"></i>30 Tháng 12, 2024
+                            </div>
+                            <h3 class="news-title">Khám Phá Đặc Sản Tết Nguyên Đán 2025 - Hương Vị Truyền Thống Không Thể Thiếu</h3>
+                            <p class="news-excerpt">
+                                Tết Nguyên Đán đang đến gần, cùng khám phá những món đặc sản truyền thống không thể thiếu trong mâm cơm ngày Tết. 
+                                Từ bánh chưng miền Bắc đến bánh tét miền Nam, mỗi món ăn đều mang trong mình câu chuyện văn hóa độc đáo...
+                            </p>
+                            <div class="mb-3">
+                                <span class="news-tag">Tết 2025</span>
+                                <span class="news-tag">Đặc sản</span>
+                                <span class="news-tag">Truyền thống</span>
+                            </div>
+                            <a href="#" class="read-more-btn">
+                                <i class="fas fa-arrow-right me-2"></i>Đọc tiếp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Latest News Section -->
+    <section class="news-section fade-in-section">
+        <div class="container">
+            <h2 class="text-center mb-5 section-title" style="color: var(--primary-color);">
+                <i class="fas fa-clock me-3"></i>
+                Tin Tức Mới Nhất
+            </h2>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="news-card animate-fade-in-up">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&q=80" 
+                             alt="Nem chua Thanh Hóa">
+                        <div class="news-card-body">
+                            <div class="news-date">
+                                <i class="fas fa-calendar me-2"></i>28 Tháng 12, 2024
+                            </div>
+                            <h4 class="news-title">Bí Quyết Làm Nem Chua Thanh Hóa Chuẩn Vị</h4>
+                            <p class="news-excerpt">
+                                Nem chua Thanh Hóa nổi tiếng với hương vị chua ngọt đặc trưng. Cùng tìm hiểu bí quyết làm nem chua thơm ngon như người địa phương...
+                            </p>
+                            <div class="mb-3">
+                                <span class="news-tag">Nem chua</span>
+                                <span class="news-tag">Thanh Hóa</span>
+                            </div>
+                            <a href="#" class="read-more-btn">
+                                <i class="fas fa-arrow-right me-2"></i>Đọc tiếp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="news-card animate-fade-in-up animate-delay-1">
+                        <img src="https://images.unsplash.com/photo-1559847844-d721426d6edc?w=400&q=80" 
+                             alt="Bánh tráng nướng">
+                        <div class="news-card-body">
+                            <div class="news-date">
+                                <i class="fas fa-calendar me-2"></i>25 Tháng 12, 2024
+                            </div>
+                            <h4 class="news-title">Bánh Tráng Nướng Đà Lạt - Món Ăn Vặt Được Yêu Thích</h4>
+                            <p class="news-excerpt">
+                                Bánh tráng nướng Đà Lạt với hương vị giòn rụm, thơm lừng đã trở thành món ăn vặt được nhiều người yêu thích khắp cả nước...
+                            </p>
+                            <div class="mb-3">
+                                <span class="news-tag">Bánh tráng</span>
+                                <span class="news-tag">Đà Lạt</span>
+                            </div>
+                            <a href="#" class="read-more-btn">
+                                <i class="fas fa-arrow-right me-2"></i>Đọc tiếp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="news-card animate-fade-in-up animate-delay-2">
+                        <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&q=80" 
+                             alt="Bún bò Huế">
+                        <div class="news-card-body">
+                            <div class="news-date">
+                                <i class="fas fa-calendar me-2"></i>22 Tháng 12, 2024
+                            </div>
+                            <h4 class="news-title">Lễ Hội Ẩm Thực Huế 2025 - Tôn Vinh Văn Hóa Ẩm Thực Cung Đình</h4>
+                            <p class="news-excerpt">
+                                Lễ hội ẩm thực Huế 2025 sẽ diễn ra vào tháng 3, mang đến cơ hội thưởng thức những món ăn cung đình tinh tế và đặc sắc...
+                            </p>
+                            <div class="mb-3">
+                                <span class="news-tag">Lễ hội</span>
+                                <span class="news-tag">Huế</span>
+                            </div>
+                            <a href="#" class="read-more-btn">
+                                <i class="fas fa-arrow-right me-2"></i>Đọc tiếp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="news-card animate-fade-in-up animate-delay-3">
+                        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80" 
+                             alt="Chợ đặc sản">
+                        <div class="news-card-body">
+                            <div class="news-date">
+                                <i class="fas fa-calendar me-2"></i>20 Tháng 12, 2024
+                            </div>
+                            <h4 class="news-title">Khai Trương Cửa Hàng Đặc Sản Việt Chi Nhánh Mới</h4>
+                            <p class="news-excerpt">
+                                Chúng tôi vui mừng thông báo khai trương chi nhánh mới tại quận 7, mang đến cho khách hàng nhiều lựa chọn đặc sản hơn...
+                            </p>
+                            <div class="mb-3">
+                                <span class="news-tag">Khai trương</span>
+                                <span class="news-tag">Chi nhánh mới</span>
+                            </div>
+                            <a href="#" class="read-more-btn">
+                                <i class="fas fa-arrow-right me-2"></i>Đọc tiếp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="news-card animate-fade-in-up animate-delay-4">
+                        <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=400&q=80" 
+                             alt="Bánh chưng">
+                        <div class="news-card-body">
+                            <div class="news-date">
+                                <i class="fas fa-calendar me-2"></i>18 Tháng 12, 2024
+                            </div>
+                            <h4 class="news-title">Cách Bảo Quản Đặc Sản Tươi Ngon Trong Mùa Tết</h4>
+                            <p class="news-excerpt">
+                                Hướng dẫn chi tiết cách bảo quản các loại đặc sản để giữ được hương vị tốt nhất trong suốt mùa Tết dài ngày...
+                            </p>
+                            <div class="mb-3">
+                                <span class="news-tag">Bảo quản</span>
+                                <span class="news-tag">Mẹo hay</span>
+                            </div>
+                            <a href="#" class="read-more-btn">
+                                <i class="fas fa-arrow-right me-2"></i>Đọc tiếp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="news-card animate-fade-in-up animate-delay-1">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&q=80" 
+                             alt="Khuyến mãi">
+                        <div class="news-card-body">
+                            <div class="news-date">
+                                <i class="fas fa-calendar me-2"></i>15 Tháng 12, 2024
+                            </div>
+                            <h4 class="news-title">Chương Trình Khuyến Mãi Tháng 12 - Giảm Giá Lên Đến 30%</h4>
+                            <p class="news-excerpt">
+                                Nhân dịp cuối năm, chúng tôi triển khai chương trình khuyến mãi lớn với mức giảm giá hấp dẫn cho tất cả sản phẩm...
+                            </p>
+                            <div class="mb-3">
+                                <span class="news-tag">Khuyến mãi</span>
+                                <span class="news-tag">Giảm giá</span>
+                            </div>
+                            <a href="#" class="read-more-btn">
+                                <i class="fas fa-arrow-right me-2"></i>Đọc tiếp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="text-center mt-5">
+                <nav aria-label="News pagination">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="#">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">3</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Newsletter Section -->
+    <section class="newsletter fade-in-section">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="fw-bold mb-4">
+                    <i class="fas fa-envelope-open me-3"></i>
+                    Đăng Ký Nhận Tin
+                </h2>
+                <p class="lead mb-4">
+                    Nhận thông tin về những sản phẩm đặc sản mới nhất và các chương trình khuyến mãi hấp dẫn
+                </p>
+                <div class="newsletter-form">
+                    <form id="newsletterForm">
+                        <input type="email" class="newsletter-input" placeholder="Nhập địa chỉ email của bạn..." required>
+                        <button type="submit" class="newsletter-btn">
+                            <i class="fas fa-paper-plane me-2"></i>Đăng Ký Ngay
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="mb-4">
+                        <img src="https://files.catbox.moe/4ka4id.webp" alt="Đặc Sản Việt" style="height: 100px; width: auto;">
+                    </div>
+                    <div>
+                        <div class="mb-3 d-flex align-items-start">
+                            <i class="bi bi-geo-alt-fill me-2 mt-1 text-primary"></i>
+                            <span style="font-size: 0.9rem;">01 Võ Văn Ngân, Phường Thủ Đức, TP Hồ Chí Minh</span>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-telephone-fill me-2 text-primary"></i>
+                            <a href="tel:(028)38212430" style="font-size: 0.9rem;">(028) 3896 8641</a>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-envelope-fill me-2 text-primary"></i>
+                            <a href="mailto:dacsanviethotro@gmail.com" style="font-size: 0.9rem;">dacsanviethotro@gmail.com</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Về chúng tôi</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/">Trang chủ</a></li>
+                        <li class="mb-2"><a href="/about">Giới thiệu</a></li>
+                        <li class="mb-2"><a href="/products">Sản phẩm</a></li>
+                        <li class="mb-2"><a href="/news">Tin tức</a></li>
+                        <li class="mb-2"><a href="/contact">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Chính sách</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/privacy-policy">Chính sách bảo mật</a></li>
+                        <li class="mb-2"><a href="/shipping-policy">Chính sách vận chuyển</a></li>
+                        <li class="mb-2"><a href="/terms-of-service">Chính sách đổi trả</a></li>
+                        <li class="mb-2"><a href="/terms-of-service">Quy định sử dụng</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-5 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Theo dõi chúng tôi</h6>
+                    <div class="d-flex gap-3 mb-3">
+                        <a href="https://www.facebook.com/nhatthien.nguyen.566" class="text-light fs-4">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://www.youtube.com/@tee.2105" class="text-light fs-4">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                        <a href="https://www.tiktok.com/@nkqt.tee" class="text-light fs-4">
+                            <i class="bi bi-tiktok"></i>
+                        </a>
+                    </div>
+                    <p class="text-muted mb-0">
+                        Đăng ký nhận tin để cập nhật những sản phẩm đặc sản mới nhất từ khắp các vùng miền Việt Nam.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="mb-0">Copyright © 2025 Đặc Sản Việt - Kết nối hương vị quê hương đến mọi miền</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SockJS and Stomp for WebSocket -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    
+    <!-- Chatbox -->
+    <script src="/js/chatbox.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simple intersection observer for animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe elements for animation
+            document.querySelectorAll('.fade-in-section').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Newsletter form handling
+            const newsletterForm = document.getElementById('newsletterForm');
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = this.querySelector('input[type="email"]').value;
+                    
+                    if (!email) {
+                        alert('Vui lòng nhập địa chỉ email');
+                        return;
+                    }
+                    
+                    // Email validation
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        alert('Vui lòng nhập địa chỉ email hợp lệ');
+                        return;
+                    }
+                    
+                    // Show loading state
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang đăng ký...';
+                    submitBtn.disabled = true;
+                    
+                    // Simulate form submission
+                    setTimeout(() => {
+                        alert('Cảm ơn bạn đã đăng ký! Chúng tôi sẽ gửi tin tức mới nhất đến email của bạn.');
+                        
+                        // Reset form
+                        this.reset();
+                        
+                        // Reset button
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }, 2000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

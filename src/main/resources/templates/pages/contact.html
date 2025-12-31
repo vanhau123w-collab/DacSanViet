@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liên Hệ - Đặc Sản Việt</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #D2691E;
+            --primary-dark: #8B4513;
+            --secondary-color: #34495e;
+            --accent-color: #6B8E23;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        .navbar {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #fff;
+        }
+        
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: #fff;
+        }
+        
+        /* Common animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        .animate-delay-4 { animation-delay: 0.4s; }
+        
+        /* Hero Section */
+        .contact-hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 100px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .contact-hero::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: backgroundScroll 30s linear infinite;
+        }
+        
+        @keyframes backgroundScroll {
+            from { transform: translate(0, 0); }
+            to { transform: translate(30px, 30px); }
+        }
+        
+        .contact-hero h1 {
+            animation: fadeInUp 1s ease;
+            position: relative;
+            z-index: 1;
+            font-weight: 800;
+        }
+        
+        .contact-hero p {
+            animation: fadeInUp 1.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Contact Info Section */
+        .contact-info {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .contact-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-align: center;
+            height: 100%;
+            border: none;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(210, 105, 30, 0.2);
+        }
+        
+        .contact-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: white;
+            transition: all 0.4s ease;
+        }
+        
+        .contact-card:hover .contact-icon {
+            transform: scale(1.1) rotate(360deg);
+            box-shadow: 0 10px 30px rgba(210, 105, 30, 0.4);
+        }
+        
+        /* Contact Form */
+        .contact-form {
+            padding: 80px 0;
+            background: var(--light-bg);
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+        
+        .form-card::before {
+            content: '✉️';
+            position: absolute;
+            font-size: 200px;
+            opacity: 0.05;
+            right: -50px;
+            top: -50px;
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(210, 105, 30, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(210, 105, 30, 0.4);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+        }
+        
+        /* Map Section */
+        .map-section {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .map-container {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            height: 400px;
+            transition: all 0.4s ease;
+        }
+        
+        .map-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        
+        /* Section Titles */
+        .section-title {
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark-bg);
+            color: #ecf0f1;
+            padding: 40px 0 20px;
+        }
+        
+        .footer h6 {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .footer a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+        
+        .footer-bottom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: #fff;
+            font-size: 14px;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        /* Animations */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="https://files.catbox.moe/4ka4id.webp" alt="Đặc Sản Việt" style="height: 40px;">
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Giới thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/contact">Liên hệ</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    <a href="/cart" class="text-white me-3">
+                        <i class="bi bi-bag fs-4"></i>
+                    </a>
+                    <a href="/login" class="btn btn-outline-light btn-sm me-2">Đăng nhập</a>
+                    <a href="/register" class="btn btn-light btn-sm">Đăng ký</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="contact-hero">
+        <div class="container">
+            <h1 class="display-3 fw-bold mb-4">Liên Hệ Với Chúng Tôi</h1>
+            <p class="lead fs-4">
+                <i class="fas fa-headset me-2"></i>
+                Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn!
+                <i class="fas fa-heart ms-2"></i>
+            </p>
+        </div>
+    </section>
+    
+    <!-- Contact Info Section -->
+    <section class="contact-info fade-in-section">
+        <div class="container">
+            <h2 class="text-center mb-5 section-title" style="color: var(--primary-color);">
+                <i class="fas fa-address-book me-3"></i>
+                Thông Tin Liên Hệ
+            </h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="contact-card animate-fade-in-up">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3" style="color: var(--primary-color);">Địa Chỉ</h4>
+                        <p class="text-muted mb-0">
+                            01 Võ Văn Ngân, Phường Thủ Đức<br>
+                            TP Hồ Chí Minh, Việt Nam
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="contact-card animate-fade-in-up animate-delay-1">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3" style="color: var(--primary-color);">Điện Thoại</h4>
+                        <p class="text-muted mb-2">
+                            <strong>Hotline:</strong> <a href="tel:0123456789" class="text-decoration-none">0123 456 789</a>
+                        </p>
+                        <p class="text-muted mb-0">
+                            <strong>Văn phòng:</strong> <a href="tel:02838968641" class="text-decoration-none">(028) 3896 8641</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="contact-card animate-fade-in-up animate-delay-2">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3" style="color: var(--primary-color);">Email</h4>
+                        <p class="text-muted mb-2">
+                            <strong>Hỗ trợ:</strong><br>
+                            <a href="mailto:dacsanviethotro@gmail.com" class="text-decoration-none">dacsanviethotro@gmail.com</a>
+                        </p>
+                        <p class="text-muted mb-0">
+                            <strong>Kinh doanh:</strong><br>
+                            <a href="mailto:sales@dacsanviet.com" class="text-decoration-none">sales@dacsanviet.com</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Form Section -->
+    <section class="contact-form fade-in-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="form-card">
+                        <h2 class="text-center mb-5 section-title" style="color: var(--primary-color);">
+                            <i class="fas fa-paper-plane me-3"></i>
+                            Gửi Tin Nhắn Cho Chúng Tôi
+                        </h2>
+                        <form id="contactForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="fullName" class="form-label fw-semibold">
+                                        <i class="fas fa-user me-2"></i>Họ và Tên *
+                                    </label>
+                                    <input type="text" class="form-control" id="fullName" name="fullName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label fw-semibold">
+                                        <i class="fas fa-envelope me-2"></i>Email *
+                                    </label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label fw-semibold">
+                                        <i class="fas fa-phone me-2"></i>Số Điện Thoại
+                                    </label>
+                                    <input type="tel" class="form-control" id="phone" name="phone">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="subject" class="form-label fw-semibold">
+                                        <i class="fas fa-tag me-2"></i>Chủ Đề *
+                                    </label>
+                                    <select class="form-control" id="subject" name="subject" required>
+                                        <option value="">Chọn chủ đề...</option>
+                                        <option value="product">Thông tin sản phẩm</option>
+                                        <option value="order">Đặt hàng & Thanh toán</option>
+                                        <option value="shipping">Vận chuyển & Giao hàng</option>
+                                        <option value="complaint">Khiếu nại & Đổi trả</option>
+                                        <option value="partnership">Hợp tác kinh doanh</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="message" class="form-label fw-semibold">
+                                        <i class="fas fa-comment me-2"></i>Nội Dung Tin Nhắn *
+                                    </label>
+                                    <textarea class="form-control" id="message" name="message" rows="6" 
+                                              placeholder="Vui lòng mô tả chi tiết yêu cầu của bạn..." required></textarea>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-paper-plane me-2"></i>
+                                        Gửi Tin Nhắn
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Map Section -->
+    <section class="map-section fade-in-section">
+        <div class="container">
+            <h2 class="text-center mb-5 section-title" style="color: var(--primary-color);">
+                <i class="fas fa-map-marked-alt me-3"></i>
+                Vị Trí Của Chúng Tôi
+            </h2>
+            <div class="row">
+                <div class="col-12">
+                    <div class="map-container">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4199.105974381276!2d106.76933817529977!3d10.850637657819977!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752763f23816ab%3A0x282f711441b6916f!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBTxrAgcGjhuqFtIEvhu7kgdGh14bqtdCBUaMOgbmggcGjhu5EgSOG7kyBDaMOtIE1pbmg!5e1!3m2!1svi!2sus!4v1765991301515!5m2!1svi!2sus" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Working Hours Section -->
+    <section class="contact-info fade-in-section" style="background: var(--light-bg);">
+        <div class="container">
+            <h2 class="text-center mb-5 section-title" style="color: var(--primary-color);">
+                <i class="fas fa-clock me-3"></i>
+                Giờ Làm Việc
+            </h2>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="contact-card animate-fade-in-up">
+                        <div class="row text-center">
+                            <div class="col-md-6 mb-4">
+                                <h5 class="fw-bold mb-3" style="color: var(--accent-color);">
+                                    <i class="fas fa-business-time me-2"></i>Thứ 2 - Thứ 6
+                                </h5>
+                                <p class="fs-5 mb-0">8:00 - 18:00</p>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <h5 class="fw-bold mb-3" style="color: var(--accent-color);">
+                                    <i class="fas fa-calendar-weekend me-2"></i>Thứ 7 - Chủ Nhật
+                                </h5>
+                                <p class="fs-5 mb-0">9:00 - 17:00</p>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Hotline hỗ trợ 24/7 cho các trường hợp khẩn cấp
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="mb-4">
+                        <img src="https://files.catbox.moe/4ka4id.webp" alt="Đặc Sản Việt" style="height: 100px; width: auto;">
+                    </div>
+                    <div>
+                        <div class="mb-3 d-flex align-items-start">
+                            <i class="bi bi-geo-alt-fill me-2 mt-1 text-primary"></i>
+                            <span style="font-size: 0.9rem;">01 Võ Văn Ngân, Phường Thủ Đức, TP Hồ Chí Minh</span>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-telephone-fill me-2 text-primary"></i>
+                            <a href="tel:(028)38212430" style="font-size: 0.9rem;">(028) 3896 8641</a>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-envelope-fill me-2 text-primary"></i>
+                            <a href="mailto:dacsanviethotro@gmail.com" style="font-size: 0.9rem;">dacsanviethotro@gmail.com</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Về chúng tôi</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/">Trang chủ</a></li>
+                        <li class="mb-2"><a href="/about">Giới thiệu</a></li>
+                        <li class="mb-2"><a href="/products">Sản phẩm</a></li>
+                        <li class="mb-2"><a href="/contact">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Chính sách</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/privacy-policy">Chính sách bảo mật</a></li>
+                        <li class="mb-2"><a href="/shipping-policy">Chính sách vận chuyển</a></li>
+                        <li class="mb-2"><a href="/terms-of-service">Chính sách đổi trả</a></li>
+                        <li class="mb-2"><a href="/terms-of-service">Quy định sử dụng</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-5 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Theo dõi chúng tôi</h6>
+                    <div class="d-flex gap-3 mb-3">
+                        <a href="https://www.facebook.com/nhatthien.nguyen.566" class="text-light fs-4">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://www.youtube.com/@tee.2105" class="text-light fs-4">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                        <a href="https://www.tiktok.com/@nkqt.tee" class="text-light fs-4">
+                            <i class="bi bi-tiktok"></i>
+                        </a>
+                    </div>
+                    <p class="text-muted mb-0">
+                        Đăng ký nhận tin để cập nhật những sản phẩm đặc sản mới nhất từ khắp các vùng miền Việt Nam.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <p class="mb-0">Copyright © 2025 Đặc Sản Việt - Kết nối hương vị quê hương đến mọi miền</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SockJS and Stomp for WebSocket -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    
+    <!-- Chatbox -->
+    <script src="/js/chatbox.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simple intersection observer for animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe elements for animation
+            document.querySelectorAll('.fade-in-section').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Simple contact form handling
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Get form data
+                    const formData = new FormData(this);
+                    const data = Object.fromEntries(formData);
+                    
+                    // Simple validation
+                    if (!data.fullName || !data.email || !data.subject || !data.message) {
+                        alert('Vui lòng điền đầy đủ các trường bắt buộc (*)');
+                        return;
+                    }
+                    
+                    // Email validation
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(data.email)) {
+                        alert('Vui lòng nhập địa chỉ email hợp lệ');
+                        return;
+                    }
+                    
+                    // Show loading state
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang gửi...';
+                    submitBtn.disabled = true;
+                    
+                    // Simulate form submission
+                    setTimeout(() => {
+                        alert('Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong vòng 24 giờ.');
+                        
+                        // Reset form
+                        this.reset();
+                        
+                        // Reset button
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }, 2000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,18 +1,22 @@
 // Admin Analytics JavaScript
-let salesChart, trafficChart, demographicsChart;
+let salesChart, trafficChart, demographicsChart, newsViewsChart, categoriesChart;
 
 document.addEventListener('DOMContentLoaded', function() {
     loadAnalytics();
+    loadNewsAnalytics();
     initCharts();
     
-    document.getElementById('dateRange').addEventListener('change', loadAnalytics);
+    document.getElementById('dateRange').addEventListener('change', function() {
+        loadAnalytics();
+        loadNewsAnalytics();
+    });
 });
 
 async function loadAnalytics() {
     const period = document.getElementById('dateRange').value;
     
     try {
-        const response = await fetch(`/admin/api/dashboard/stats?period=${period}`);
+        const response = await fetch(`/admin/dashboard/stats?period=${period}`);
         const data = await response.json();
         
         document.getElementById('totalRevenue').textContent = formatCurrency(data.totalRevenue);
@@ -23,6 +27,30 @@ async function loadAnalytics() {
         updateCharts(period);
     } catch (error) {
         console.error('Error loading analytics:', error);
+    }
+}
+
+async function loadNewsAnalytics() {
+    const period = document.getElementById('dateRange').value;
+    
+    try {
+        const response = await fetch(`/admin/api/news/analytics?period=${period}`);
+        const data = await response.json();
+        
+        // Update news statistics
+        document.getElementById('totalArticles').textContent = formatNumber(data.totalPublishedArticles || 0);
+        document.getElementById('totalViews').textContent = formatNumber(data.totalViews || 0);
+        document.getElementById('featuredArticles').textContent = formatNumber(data.featuredArticlesCount || 0);
+        document.getElementById('recentArticles').textContent = formatNumber(data.recentArticlesCount || 0);
+        
+        // Update most viewed articles
+        updateMostViewedArticles(data.mostViewedArticles || []);
+        
+        // Update news charts
+        updateNewsCharts();
+        
+    } catch (error) {
+        console.error('Error loading news analytics:', error);
     }
 }
 
@@ -82,11 +110,78 @@ async function initCharts() {
             maintainAspectRatio: true
         }
     });
+    
+    // News Views Chart
+    const newsViewsCtx = document.getElementById('newsViewsChart').getContext('2d');
+    newsViewsChart = new Chart(newsViewsCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Lượt xem',
+                data: [],
+                borderColor: '#3f51b5',
+                backgroundColor: 'rgba(63, 81, 181, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Lượt xem: ' + formatNumber(context.parsed.y);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return formatNumber(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Categories Chart
+    const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
+    categoriesChart = new Chart(categoriesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: ['#3f51b5', '#4caf50', '#ff9800', '#e91e63', '#9c27b0', '#2196f3']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + formatNumber(context.parsed) + ' bài viết';
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 async function updateCharts(period) {
     try {
-        const response = await fetch(`/admin/api/dashboard/sales-chart?period=${period}`);
+        const response = await fetch(`/admin/dashboard/sales-chart?period=${period}`);
         const data = await response.json();
         
         salesChart.data.labels = data.labels;
@@ -97,6 +192,75 @@ async function updateCharts(period) {
     } catch (error) {
         console.error('Error updating charts:', error);
     }
+}
+
+async function updateNewsCharts() {
+    try {
+        // Update news views chart
+        const viewsResponse = await fetch('/admin/api/news/views-chart?months=12');
+        const viewsData = await viewsResponse.json();
+        
+        newsViewsChart.data.labels = viewsData.labels;
+        newsViewsChart.data.datasets[0].data = viewsData.data;
+        newsViewsChart.update();
+        
+        // Update categories chart
+        const categoriesResponse = await fetch('/admin/api/news/top-categories?limit=6');
+        const categoriesData = await categoriesResponse.json();
+        
+        categoriesChart.data.labels = categoriesData.map(cat => cat.name);
+        categoriesChart.data.datasets[0].data = categoriesData.map(cat => cat.articleCount);
+        categoriesChart.update();
+        
+    } catch (error) {
+        console.error('Error updating news charts:', error);
+    }
+}
+
+function updateMostViewedArticles(articles) {
+    const container = document.getElementById('mostViewedArticles');
+    
+    if (!articles || articles.length === 0) {
+        container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary);">Chưa có dữ liệu</div>';
+        return;
+    }
+    
+    container.innerHTML = articles.map((article, index) => `
+        <div style="padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 1rem;">
+            <div style="
+                width: 32px; 
+                height: 32px; 
+                border-radius: 50%; 
+                background: var(--primary-color); 
+                color: white; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                font-weight: 600;
+                font-size: 0.875rem;
+            ">
+                ${index + 1}
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: 600; margin-bottom: 0.25rem;">
+                    <a href="/news/${article.slug}" target="_blank" style="color: var(--text-primary); text-decoration: none;">
+                        ${article.title}
+                    </a>
+                </div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                    ${article.categoryName} • ${formatDate(article.publishedAt)}
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-weight: 600; color: var(--primary-color);">
+                    ${formatNumber(article.viewCount)}
+                </div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                    lượt xem
+                </div>
+            </div>
+        </div>
+    `).join('');
 }
 
 async function loadProductPerformance() {
@@ -130,6 +294,16 @@ function formatCurrency(amount) {
 
 function formatNumber(num) {
     return new Intl.NumberFormat('vi-VN').format(num);
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('vi-VN', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    }).format(date);
 }
 
 function exportReport() {
