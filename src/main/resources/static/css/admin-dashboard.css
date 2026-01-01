@@ -47,6 +47,7 @@ body {
     background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
     padding: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 1000;
     box-shadow: 2px 0 12px rgba(0,0,0,0.08);
 }
@@ -1965,4 +1966,30 @@ td .form-check-input:checked {
 
 .btn-add-new i {
     font-size: 1rem;
+}
+
+/* Custom Scrollbar for Admin Sidebar */
+.admin-sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 107, 53, 0.6);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 107, 53, 0.9);
+}
+
+/* Firefox scrollbar styling */
+.admin-sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 107, 53, 0.6) rgba(0, 0, 0, 0.1);
 }

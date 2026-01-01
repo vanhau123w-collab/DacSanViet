@@ -72,48 +72,41 @@ public class DatabaseOptimizationConfig {
 
         private void applyMySQLOptimizations(Statement statement) throws SQLException {
             // Create additional indexes for frequently queried columns if they don't exist
+            // MySQL doesn't support IF NOT EXISTS for CREATE INDEX, so we try-catch each one
+            
+            createIndexIfNotExists(statement, "idx_product_category_active", 
+                "CREATE INDEX idx_product_category_active ON products (category_id, is_active, name)");
+            
+            createIndexIfNotExists(statement, "idx_product_price_active",
+                "CREATE INDEX idx_product_price_active ON products (is_active, price, name)");
+            
+            createIndexIfNotExists(statement, "idx_product_featured_active",
+                "CREATE INDEX idx_product_featured_active ON products (is_featured, is_active, created_at)");
+            
+            createIndexIfNotExists(statement, "idx_order_user_date",
+                "CREATE INDEX idx_order_user_date ON orders (user_id, order_date DESC)");
+            
+            createIndexIfNotExists(statement, "idx_order_status_date",
+                "CREATE INDEX idx_order_status_date ON orders (status, order_date DESC)");
+            
+            createIndexIfNotExists(statement, "idx_cart_user_date",
+                "CREATE INDEX idx_cart_user_date ON cart_items (user_id, added_date DESC)");
+
+            System.out.println("✅ MySQL database optimizations applied successfully");
+        }
+        
+        private void createIndexIfNotExists(Statement statement, String indexName, String createIndexSql) {
             try {
-                // Composite index for product search with category and active status
-                statement.execute(
-                    "CREATE INDEX IF NOT EXISTS idx_product_category_active " +
-                    "ON products (category_id, is_active, name)"
-                );
-
-                // Composite index for product search with price range
-                statement.execute(
-                    "CREATE INDEX IF NOT EXISTS idx_product_price_active " +
-                    "ON products (is_active, price, name)"
-                );
-
-                // Index for featured products
-                statement.execute(
-                    "CREATE INDEX IF NOT EXISTS idx_product_featured_active " +
-                    "ON products (is_featured, is_active, created_at)"
-                );
-
-                // Composite index for order search by user and date
-                statement.execute(
-                    "CREATE INDEX IF NOT EXISTS idx_order_user_date " +
-                    "ON orders (user_id, order_date DESC)"
-                );
-
-                // Index for order search by status and date
-                statement.execute(
-                    "CREATE INDEX IF NOT EXISTS idx_order_status_date " +
-                    "ON orders (status, order_date DESC)"
-                );
-
-                // Composite index for cart items by user and date
-                statement.execute(
-                    "CREATE INDEX IF NOT EXISTS idx_cart_user_date " +
-                    "ON cart_items (user_id, added_date DESC)"
-                );
-
-                System.out.println("MySQL database optimizations applied successfully");
-
+                // Try to create the index
+                statement.execute(createIndexSql);
+                System.out.println("✅ Created index: " + indexName);
             } catch (SQLException e) {
-                // Indexes might already exist, which is fine
-                System.out.println("Some MySQL optimizations were skipped (likely already exist): " + e.getMessage());
+                // Index likely already exists (error code 1061 for MySQL)
+                if (e.getErrorCode() == 1061 || e.getMessage().contains("Duplicate key name")) {
+                    System.out.println("ℹ️  Index already exists: " + indexName);
+                } else {
+                    System.err.println("⚠️  Could not create index " + indexName + ": " + e.getMessage());
+                }
             }
         }
 

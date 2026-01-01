@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +7,17 @@
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/header.css(v=1)}">
+    <link rel="stylesheet" th:href="@{/css/modern-ecommerce.css(v=1)}">
     
     <style>
         :root {
@@ -19,39 +26,17 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             overflow-x: hidden;
         }
         
-        /* Header Styles */
-        .navbar {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 0.75rem 0;
-        }
-        
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: #fff;
-        }
-        
-        .navbar-nav .nav-link {
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            transition: color 0.3s ease;
-        }
-        
-        .navbar-nav .nav-link:hover,
-        .navbar-nav .nav-link.active {
-            color: #fff;
-        }
-        
-        /* Hero Section */
+        /* Hero Section with background image */
         .about-hero {
-            background: linear-gradient(135deg, #4ec2b6 0%, #2e857c 100%);
-            color: white;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/bg-about.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white !important;
             padding: 100px 0 80px;
             text-align: center;
             position: relative;
@@ -325,37 +310,6 @@
             color: #2e857c;
         }
         
-        /* Footer */
-        .footer {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 40px 0 20px;
-        }
-        
-        .footer h6 {
-            color: #fff;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-        
-        .footer a {
-            color: #bdc3c7;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        
-        .footer a:hover {
-            color: #e74c3c;
-        }
-        
-        .footer-bottom {
-            background-color: #77c4dd;
-            color: #fff;
-            font-size: 14px;
-            padding: 30px 0;
-            text-align: center;
-        }
-        
         /* Fade in animation */
         .fade-in-section {
             opacity: 0;
@@ -371,49 +325,17 @@
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <img src="https://files.catbox.moe/4ka4id.webp" alt="Đặc Sản Việt" style="height: 40px;">
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Trang chủ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Sản phẩm</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/about">Giới thiệu</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact">Liên hệ</a>
-                    </li>
-                </ul>
-                
-                <div class="d-flex align-items-center">
-                    <a href="/cart" class="text-white me-3">
-                        <i class="bi bi-bag fs-4"></i>
-                    </a>
-                    <a href="/login" class="btn btn-outline-light btn-sm me-2">Đăng nhập</a>
-                    <a href="/register" class="btn btn-light btn-sm">Đăng ký</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- Mobile Menu -->
+    <div th:replace="~{fragments/header :: mobile-menu}"></div>
 
     <!-- Hero Section -->
     <section class="about-hero">
         <div class="container">
-            <h1 class="display-3 fw-bold mb-4">Về Đặc Sản Việt</h1>
-            <p class="lead fs-4">
+            <h1 class="display-3 fw-bold mb-4" style="color: white;">Về Đặc Sản Việt</h1>
+            <p class="lead fs-4" style="color: white;"></p>
                 <i class="fas fa-leaf me-2"></i>
                 Gìn giữ hồn quê, lan toả giá trị Việt
                 <i class="fas fa-leaf ms-2"></i>
@@ -565,7 +487,7 @@
                         </div>
                         <h5 class="fw-bold mb-2">
                             <i class="fas fa-star me-2" style="color: #ffd700;"></i>
-                            Nguyễn Văn A
+                            Nguyễn Nhật Thiên (Tee)
                         </h5>
                         <p class="text-muted mb-0">
                             <i class="fas fa-crown me-1" style="color: #4ec2b6;"></i>
@@ -584,7 +506,7 @@
                         </div>
                         <h5 class="fw-bold mb-2">
                             <i class="fas fa-star me-2" style="color: #ffd700;"></i>
-                            Trần Thị B
+                            Nguyễn Minh Triết
                         </h5>
                         <p class="text-muted mb-0">
                             <i class="fas fa-award me-1" style="color: #4ec2b6;"></i>
@@ -603,7 +525,7 @@
                         </div>
                         <h5 class="fw-bold mb-2">
                             <i class="fas fa-star me-2" style="color: #ffd700;"></i>
-                            Lê Văn C
+                            Phạm Văn Hậu
                         </h5>
                         <p class="text-muted mb-0">
                             <i class="fas fa-code me-1" style="color: #4ec2b6;"></i>
@@ -635,79 +557,18 @@
                     <i class="fas fa-envelope me-2"></i>dacsanviethotro@gmail.com
                 </a>
                 <a href="tel:0123456789" class="btn">
-                    <i class="fas fa-phone me-2"></i>0123 456 789
+                    <i class="fas fa-phone me-2"></i>093 165 2105
                 </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="mb-4">
-                        <img src="https://files.catbox.moe/4ka4id.webp" alt="Đặc Sản Việt" style="height: 100px; width: auto;">
-                    </div>
-                    <div>
-                        <div class="mb-3 d-flex align-items-start">
-                            <i class="bi bi-geo-alt-fill me-2 mt-1 text-primary"></i>
-                            <span style="font-size: 0.9rem;">01 Võ Văn Ngân, Phường Thủ Đức, TP Hồ Chí Minh</span>
-                        </div>
-                        <div class="mb-3 d-flex align-items-center">
-                            <i class="bi bi-telephone-fill me-2 text-primary"></i>
-                            <a href="tel:(028)38212430" style="font-size: 0.9rem;">(028) 3896 8641</a>
-                        </div>
-                        <div class="mb-3 d-flex align-items-center">
-                            <i class="bi bi-envelope-fill me-2 text-primary"></i>
-                            <a href="mailto:dacsanviethotro@gmail.com" style="font-size: 0.9rem;">dacsanviethotro@gmail.com</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h6 class="fw-bold mb-3">Về chúng tôi</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/">Trang chủ</a></li>
-                        <li class="mb-2"><a href="/about">Giới thiệu</a></li>
-                        <li class="mb-2"><a href="/products">Sản phẩm</a></li>
-                        <li class="mb-2"><a href="/contact">Liên hệ</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h6 class="fw-bold mb-3">Chính sách</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/privacy-policy">Chính sách bảo mật</a></li>
-                        <li class="mb-2"><a href="/shipping-policy">Chính sách vận chuyển</a></li>
-                        <li class="mb-2"><a href="/terms-of-service">Chính sách đổi trả</a></li>
-                        <li class="mb-2"><a href="/terms-of-service">Quy định sử dụng</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-5 col-md-6 mb-4">
-                    <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-                        <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4199.105974381276!2d106.76933817529977!3d10.850637657819977!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752763f23816ab%3A0x282f711441b6916f!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBTxrAgcGjhuqFtIEvhu7kgdGh14bqtdCBUaMOgbmggcGjhu5EgSOG7kyBDaMOtIE1pbmg!5e1!3m2!1svi!2sus!4v1765991301515!5m2!1svi!2sus" 
-                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 12px;" 
-                            allowfullscreen="" 
-                            loading="lazy" 
-                            referrerpolicy="no-referrer-when-downgrade">
-                        </iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <div class="container">
-                <p class="mb-0">Copyright © 2025 Đặc Sản Việt - Kết nối hương vị quê hương đến mọi miền</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/header.js(v=1)}"></script>
     
     <!-- Vietnam Map Script -->
     <script>
@@ -729,7 +590,7 @@
                     return response.text();
                 })
                 .then(svgContent => {
-                    console.log('✅ Map loaded successfully');
+                    console.log('Map loaded successfully');
                     
                     // Display SVG
                     mapContainer.innerHTML = svgContent;
@@ -742,7 +603,7 @@
                         
                         // Get all provinces
                         const provinces = svg.querySelectorAll('path[id^="VN"]');
-                        console.log(`🗺️ Found ${provinces.length} provinces`);
+                        console.log(`Found ${provinces.length} provinces`);
                         
                         // Generate random colors for each province
                         const colors = [
@@ -847,23 +708,45 @@
                             province.setAttribute('data-province-name', data.name);
                             province.setAttribute('data-province-specialty', data.specialty);
                             
+                            // Determine if this is part of an archipelago
+                            let groupId = id;
+                            if (id.startsWith('VNHS_') || id.startsWith('VN-HS')) {
+                                groupId = 'VNHS'; // Hoàng Sa
+                            } else if (id.startsWith('VNTS_') || id.startsWith('VN-TS')) {
+                                groupId = 'VNTS'; // Trường Sa
+                            }
+                            province.setAttribute('data-group-id', groupId);
+                            
                             // Hover events
                             province.addEventListener('mouseenter', function(e) {
+                                const currentGroupId = this.getAttribute('data-group-id');
                                 const provinceName = this.getAttribute('data-province-name');
                                 const provinceSpecialty = this.getAttribute('data-province-specialty');
                                 
                                 // Dim all provinces
                                 provinces.forEach(p => {
                                     p.classList.add('dimmed');
+                                    p.classList.remove('highlighted');
                                 });
                                 
-                                // Highlight current province
-                                this.classList.remove('dimmed');
-                                this.classList.add('highlighted');
+                                // Highlight current province and its group
+                                provinces.forEach(p => {
+                                    const pGroupId = p.getAttribute('data-group-id');
+                                    if (pGroupId === currentGroupId) {
+                                        p.classList.remove('dimmed');
+                                        p.classList.add('highlighted');
+                                    }
+                                });
                                 
                                 // Show tooltip
                                 if (tooltip) {
-                                    tooltip.querySelector('.tooltip-title').textContent = provinceName;
+                                    let displayName = provinceName;
+                                    if (currentGroupId === 'VNHS') {
+                                        displayName = 'Quần đảo Hoàng Sa';
+                                    } else if (currentGroupId === 'VNTS') {
+                                        displayName = 'Quần đảo Trường Sa';
+                                    }
+                                    tooltip.querySelector('.tooltip-title').textContent = displayName;
                                     tooltip.querySelector('.tooltip-content').textContent = `Đặc sản: ${provinceSpecialty}`;
                                     tooltip.classList.add('show');
                                 }
@@ -889,15 +772,23 @@
                             
                             // Click event
                             province.addEventListener('click', function() {
+                                const currentGroupId = this.getAttribute('data-group-id');
                                 const provinceName = this.getAttribute('data-province-name');
                                 const provinceSpecialty = this.getAttribute('data-province-specialty');
-                                alert(`${provinceName}\nĐặc sản: ${provinceSpecialty}`);
+                                
+                                let displayName = provinceName;
+                                if (currentGroupId === 'VNHS') {
+                                    displayName = 'Quần đảo Hoàng Sa';
+                                } else if (currentGroupId === 'VNTS') {
+                                    displayName = 'Quần đảo Trường Sa';
+                                }
+                                alert(`${displayName}\nĐặc sản: ${provinceSpecialty}`);
                             });
                         });
                     }
                 })
                 .catch(error => {
-                    console.error('❌ Error loading map:', error);
+                    console.error('Error loading map:', error);
                     mapContainer.innerHTML = `
                         <div style="text-align: center; padding: 40px;">
                             <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 20px;"></i>

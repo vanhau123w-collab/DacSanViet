@@ -136,7 +136,7 @@ public class AdminDashboardController {
             model.addAttribute("error", "Không thể tải danh sách đơn hàng: " + e.getMessage());
         }
         
-        return "admin/orders/list-debug";
+        return "admin/orders/index";
     }
 
     /**
