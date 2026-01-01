@@ -173,6 +173,15 @@
                                     <textarea class="form-control" id="description" name="description" rows="4"
                                               th:text="${category.description}"></textarea>
                                 </div>
+                                
+                                <!-- Parent Category -->
+                                <div class="mb-3">
+                                    <label for="parentId" class="form-label">Danh mục cha</label>
+                                    <select class="form-select" id="parentId" name="parentId">
+                                        <option value="">-- Không có (Danh mục gốc) --</option>
+                                    </select>
+                                    <small class="text-muted">Chọn danh mục cha để tạo danh mục con</small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -230,7 +239,56 @@
         </div>
     </div>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Get current category data from Thymeleaf
+        const currentCategoryId = /*[[${category.id}]]*/ null;
+        const currentParentId = /*[[${category.parent != null ? category.parent.id : null}]]*/ null;
+        
+        console.log('Current category ID:', currentCategoryId);
+        console.log('Current parent ID:', currentParentId);
+        
+        // Load parent categories on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadParentCategories();
+        });
+        
+        async function loadParentCategories() {
+            try {
+                console.log('Loading parent categories...');
+                const response = await fetch('/admin/categories/all');
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const categories = await response.json();
+                    console.log('Categories loaded:', categories);
+                    const select = document.getElementById('parentId');
+                    
+                    categories.forEach(category => {
+                        // Don't allow category to be its own parent
+                        if (category.id !== currentCategoryId) {
+                            const option = document.createElement('option');
+                            option.value = category.id;
+                            option.textContent = category.name;
+                            
+                            // Select current parent
+                            if (currentParentId && category.id === currentParentId) {
+                                option.selected = true;
+                                console.log('Selected parent:', category.name);
+                            }
+                            
+                            select.appendChild(option);
+                        }
+                    });
+                    console.log('Dropdown populated with', categories.length - 1, 'categories (excluding self)');
+                } else {
+                    console.error('Failed to load categories:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error loading parent categories:', error);
+            }
+        }
+        
         function previewImage(input) {
             const preview = document.getElementById('imagePreview');
             preview.innerHTML = '';
@@ -246,6 +304,7 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+        /*]]>*/
     </script>
 </body>
 </html>

@@ -103,7 +103,7 @@ public class AdminCategoryController {
                 categoriesPage = categoryRepository.findAll(pageable);
             }
             
-            // Add product count for each category
+            // Add product count and parent info for each category
             java.util.List<Map<String, Object>> categoryList = categoriesPage.getContent().stream()
                 .map(category -> {
                     Map<String, Object> categoryData = new HashMap<>();
@@ -114,6 +114,14 @@ public class AdminCategoryController {
                     categoryData.put("isActive", category.getIsActive());
                     categoryData.put("createdAt", category.getCreatedAt());
                     categoryData.put("updatedAt", category.getUpdatedAt());
+                    
+                    // Add parent info
+                    if (category.getParent() != null) {
+                        Map<String, Object> parentData = new HashMap<>();
+                        parentData.put("id", category.getParent().getId());
+                        parentData.put("name", category.getParent().getName());
+                        categoryData.put("parent", parentData);
+                    }
                     
                     // Count products
                     Long productCount = categoryRepository.countActiveProductsInCategory(category.getId());
@@ -131,6 +139,33 @@ public class AdminCategoryController {
             response.put("size", categoriesPage.getSize());
             
             return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error loading categories: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Get all categories (for dropdown)
+     */
+    @GetMapping("/all")
+    @ResponseBody
+    public ResponseEntity<?> getAllCategories() {
+        try {
+            java.util.List<Map<String, Object>> categories = categoryRepository.findAll(Sort.by("name").ascending())
+                .stream()
+                .map(category -> {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("id", category.getId());
+                    data.put("name", category.getName());
+                    if (category.getParent() != null) {
+                        data.put("parentId", category.getParent().getId());
+                        data.put("parentName", category.getParent().getName());
+                    }
+                    return data;
+                })
+                .collect(java.util.stream.Collectors.toList());
+            
+            return ResponseEntity.ok(categories);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error loading categories: " + e.getMessage());
         }
@@ -164,6 +199,7 @@ public class AdminCategoryController {
     public String createCategory(
             @RequestParam("name") String name,
             @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "parentId", required = false) Long parentId,
             @RequestParam(value = "image", required = false) MultipartFile image,
             Model model) {
         
@@ -178,6 +214,11 @@ public class AdminCategoryController {
             category.setName(name);
             category.setDescription(description);
             category.setIsActive(true);
+            
+            // Set parent category if provided
+            if (parentId != null) {
+                categoryRepository.findById(parentId).ifPresent(category::setParent);
+            }
             
             // Handle image upload
             if (image != null && !image.isEmpty()) {
@@ -202,6 +243,7 @@ public class AdminCategoryController {
             @PathVariable Long id,
             @RequestParam("name") String name,
             @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "parentId", required = false) Long parentId,
             @RequestParam(value = "image", required = false) MultipartFile image,
             @RequestParam(value = "active", required = false) Boolean active,
             Model model) {
@@ -216,9 +258,23 @@ public class AdminCategoryController {
                         return "admin/categories/edit";
                     }
                     
+                    // Prevent circular reference (category cannot be its own parent)
+                    if (parentId != null && parentId.equals(id)) {
+                        model.addAttribute("error", "Danh mục không thể là cha của chính nó");
+                        model.addAttribute("category", category);
+                        return "admin/categories/edit";
+                    }
+                    
                     category.setName(name);
                     category.setDescription(description);
                     category.setIsActive(active != null && active);
+                    
+                    // Set parent category
+                    if (parentId != null) {
+                        categoryRepository.findById(parentId).ifPresent(category::setParent);
+                    } else {
+                        category.setParent(null);
+                    }
                     
                     // Handle image upload
                     if (image != null && !image.isEmpty()) {

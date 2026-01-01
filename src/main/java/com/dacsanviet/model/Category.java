@@ -38,6 +38,14 @@ public class Category {
     @Column(name = "is_active")
     private Boolean isActive = true;
     
+    // Parent-child relationship for hierarchical categories
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Category parent;
+    
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Category> children = new ArrayList<>();
+    
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
     
@@ -90,6 +98,12 @@ public class Category {
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
     
+    public Category getParent() { return parent; }
+    public void setParent(Category parent) { this.parent = parent; }
+    
+    public List<Category> getChildren() { return children; }
+    public void setChildren(List<Category> children) { this.children = children; }
+    
     public List<Product> getProducts() { return products; }
     public void setProducts(List<Product> products) { this.products = products; }
     
@@ -100,6 +114,16 @@ public class Category {
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     
     // Helper methods
+    public void addChild(Category child) {
+        children.add(child);
+        child.setParent(this);
+    }
+    
+    public void removeChild(Category child) {
+        children.remove(child);
+        child.setParent(null);
+    }
+    
     public void addProduct(Product product) {
         products.add(product);
         product.setCategory(this);
