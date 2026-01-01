@@ -83,4 +83,13 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("SELECT c FROM Category c WHERE c.id NOT IN " +
            "(SELECT DISTINCT p.category.id FROM Product p WHERE p.isActive = true)")
     List<Category> findEmptyCategories();
+    
+    /**
+     * Find root categories (no parent) with children eagerly loaded for header navigation
+     */
+    @Query("SELECT DISTINCT c FROM Category c " +
+           "LEFT JOIN FETCH c.children " +
+           "WHERE c.parent IS NULL AND c.isActive = true " +
+           "ORDER BY c.name")
+    List<Category> findRootCategoriesWithChildren();
 }

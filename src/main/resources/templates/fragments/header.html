@@ -38,89 +38,36 @@
                                     <i class="fas fa-chevron-down ms-1" style="font-size: 0.75rem;"></i>
                                 </a>
                                 <ul class="dropdown-menu mega-menu border-0 shadow-lg">
-                                    <!-- Đặc Sản Miền Bắc -->
-                                    <li class="dropdown-submenu">
-                                        <a class="dropdown-item py-2 d-flex align-items-center justify-content-between" href="#">
-                                            <span>
-                                                <i class="fas fa-mountain text-primary me-2"></i>
-                                                Đặc Sản Miền Bắc
-                                            </span>
-                                            <i class="fas fa-chevron-right ms-2"></i>
-                                        </a>
-                                        <ul class="dropdown-menu submenu-items">
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='bac',category='banh-chung')}">
-                                                <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Bánh Chưng Truyền Thống
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='bac',category='pho-bo')}">
-                                                <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Phở Bò Hà Nội
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='bac',category='cha-ca')}">
-                                                <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Chả Cá Lã Vọng
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='bac',category='com-lang')}">
-                                                <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Cốm Làng Vòng
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='bac',category='banh-cuon')}">
-                                                <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Bánh Cuốn Thanh Trì
-                                            </a></li>
-                                        </ul>
-                                    </li>
-                                    
-                                    <!-- Đặc Sản Miền Trung -->
-                                    <li class="dropdown-submenu">
-                                        <a class="dropdown-item py-2 d-flex align-items-center justify-content-between" href="#">
-                                            <span>
-                                                <i class="fas fa-sun text-warning me-2"></i>
-                                                Đặc Sản Miền Trung
-                                            </span>
-                                            <i class="fas fa-chevron-right ms-2"></i>
-                                        </a>
-                                        <ul class="dropdown-menu submenu-items">
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='bun-bo-hue')}">
-                                                <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Bún Bò Huế
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='banh-khoai')}">
-                                                <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Bánh Khoái Huế
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='mi-quang')}">
-                                                <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Mì Quảng Đà Nẵng
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='cao-lau')}">
-                                                <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Cao Lầu Hội An
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='trung',category='nem-lui')}">
-                                                <i class="fas fa-circle text-warning me-2" style="font-size: 0.5rem;"></i>Nem Lụi Huế
-                                            </a></li>
-                                        </ul>
-                                    </li>
-                                    
-                                    <!-- Đặc Sản Miền Nam -->
-                                    <li class="dropdown-submenu">
-                                        <a class="dropdown-item py-2 d-flex align-items-center justify-content-between" href="#">
-                                            <span>
-                                                <i class="fas fa-leaf text-info me-2"></i>
-                                                Đặc Sản Miền Nam
-                                            </span>
-                                            <i class="fas fa-chevron-right ms-2"></i>
-                                        </a>
-                                        <ul class="dropdown-menu submenu-items">
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='nam',category='banh-tet')}">
-                                                <i class="fas fa-circle text-info me-2" style="font-size: 0.5rem;"></i>Bánh Tét Trà Cuôn
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='nam',category='hu-tieu')}">
-                                                <i class="fas fa-circle text-info me-2" style="font-size: 0.5rem;"></i>Hủ Tiếu Nam Vang
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='nam',category='banh-xeo')}">
-                                                <i class="fas fa-circle text-info me-2" style="font-size: 0.5rem;"></i>Bánh Xèo Miền Tây
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='nam',category='mit-say')}">
-                                                <i class="fas fa-circle text-info me-2" style="font-size: 0.5rem;"></i>Mít Sấy Đồng Tháp
-                                            </a></li>
-                                            <li><a class="dropdown-item py-1" th:href="@{/products(region='nam',category='keo-dua')}">
-                                                <i class="fas fa-circle text-info me-2" style="font-size: 0.5rem;"></i>Kẹo Dừa Bến Tre
-                                            </a></li>
-                                        </ul>
-                                    </li>
+                                    <!-- Dynamic Categories from Database -->
+                                    <th:block th:each="category, iterStat : ${headerCategories}">
+                                        <li class="dropdown-submenu" th:if="${!category.children.isEmpty()}">
+                                            <a class="dropdown-item py-2 d-flex align-items-center justify-content-between" href="#">
+                                                <span>
+                                                    <i class="fas fa-folder text-primary me-2" 
+                                                       th:classappend="${iterStat.index == 0 ? 'fa-mountain' : (iterStat.index == 1 ? 'fa-sun' : 'fa-leaf')}"
+                                                       th:style="${iterStat.index == 0 ? 'color: #007bff !important;' : (iterStat.index == 1 ? 'color: #ffc107 !important;' : 'color: #17a2b8 !important;')}"></i>
+                                                    <span th:text="${category.name}">Category Name</span>
+                                                </span>
+                                                <i class="fas fa-chevron-right ms-2"></i>
+                                            </a>
+                                            <ul class="dropdown-menu submenu-items">
+                                                <li th:each="child : ${category.children}">
+                                                    <a class="dropdown-item py-1" th:href="@{/products(categoryId=${child.id})}">
+                                                        <i class="fas fa-circle me-2" style="font-size: 0.5rem;"
+                                                           th:style="${iterStat.index == 0 ? 'color: #28a745;' : (iterStat.index == 1 ? 'color: #ffc107;' : 'color: #17a2b8;')}"></i>
+                                                        <span th:text="${child.name}">Subcategory</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <!-- Category without children -->
+                                        <li th:if="${category.children.isEmpty()}">
+                                            <a class="dropdown-item py-2" th:href="@{/products(categoryId=${category.id})}">
+                                                <i class="fas fa-tag text-success me-2"></i>
+                                                <span th:text="${category.name}">Category Name</span>
+                                            </a>
+                                        </li>
+                                    </th:block>
                                     
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item py-2" th:href="@{/products}">
