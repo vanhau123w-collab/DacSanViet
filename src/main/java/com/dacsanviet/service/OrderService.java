@@ -770,6 +770,13 @@ public class OrderService {
 	 * Create order from cart with customer information - supports guest checkout
 	 */
 	public OrderDao createOrderFromCart(CreateOrderRequest request) {
+		// Debug logging
+		System.out.println("=== CREATE ORDER FROM CART DEBUG ===");
+		System.out.println("User ID: " + request.getUserId());
+		System.out.println("Customer Name: " + request.getCustomerName());
+		System.out.println("Payment Method: " + request.getPaymentMethod());
+		System.out.println("====================================");
+		
 		// Validate COD order requirements
 		validateCODOrder(request);
 
@@ -818,6 +825,13 @@ public class OrderService {
 		order.setShippingFee(shippingFee);
 		order.setPaymentMethod(request.getPaymentMethod());
 		order.setNotes(request.getNotes());
+
+		// Debug logging before save
+		System.out.println("=== BEFORE SAVING ORDER ===");
+		System.out.println("Order User: " + (order.getUser() != null ? order.getUser().getId() : "NULL"));
+		System.out.println("Order Customer Name: " + order.getCustomerName());
+		System.out.println("Order Total: " + order.getTotalAmount());
+		System.out.println("===========================");
 
 		// Set appropriate status based on payment method
 		if ("COD".equals(request.getPaymentMethod())) {

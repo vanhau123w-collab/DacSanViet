@@ -48,8 +48,126 @@ public class NewsAdminController {
     
     private final NewsService newsService;
     
-    @Value("${upload.path:uploads/news}")
+    @Value("${app.upload.news-images:uploads/news}")
     private String uploadPath;
+    
+    /**
+     * Test endpoint to check if API is working
+     */
+    @PostMapping("/test")
+    public ResponseEntity<?> testEndpoint(@RequestParam("test") String test) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Test successful");
+        response.put("received", test);
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Test endpoint for multipart form data
+     */
+    @PostMapping("/test-multipart")
+    public ResponseEntity<?> testMultipartEndpoint(
+            @RequestParam("title") String title,
+            @RequestParam(value = "file", required = false) MultipartFile file) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Multipart test successful");
+        response.put("title", title);
+        response.put("hasFile", file != null && !file.isEmpty());
+        if (file != null) {
+            response.put("filename", file.getOriginalFilename());
+            response.put("size", file.getSize());
+        }
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Debug endpoint to check if update endpoint is accessible
+     */
+    @PostMapping("/{id}/update-debug")
+    public ResponseEntity<?> debugUpdateEndpoint(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Update endpoint is accessible");
+        response.put("articleId", id);
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Simple update without file upload for testing
+     */
+    @PostMapping("/{id}/update-simple")
+    public ResponseEntity<?> updateArticleSimple(
+            @PathVariable Long id,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam("categoryId") Long categoryId) {
+        
+        try {
+            log.info("Simple update for article: {}", id);
+            
+            // Get existing article
+            Optional<NewsArticleDto> existingArticleOpt = newsService.findById(id);
+            if (existingArticleOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(createErrorResponse("Không tìm thấy bài viết với ID: " + id));
+            }
+            
+            NewsArticleDto existingArticle = existingArticleOpt.get();
+            
+            // Create updated article DTO
+            NewsArticleDto articleDto = new NewsArticleDto();
+            articleDto.setId(id);
+            articleDto.setTitle(title);
+            articleDto.setContent(content);
+            articleDto.setCategoryId(categoryId);
+            articleDto.setAuthorId(existingArticle.getAuthorId());
+            articleDto.setStatus(NewsStatus.DRAFT);
+            articleDto.setIsFeatured(false);
+            
+            // Preserve existing image
+            articleDto.setFeaturedImage(existingArticle.getFeaturedImage());
+            
+            // Update article
+            NewsArticleDto updatedArticle = newsService.updateArticle(id, articleDto);
+            
+            log.info("Simple update successful for article: {}", id);
+            return ResponseEntity.ok(updatedArticle);
+            
+        } catch (Exception e) {
+            log.error("Error in simple update: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(createErrorResponse("Lỗi khi cập nhật: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Catch all requests to debug routing issues
+     */
+    @RequestMapping(value = "/{id}/update", method = {RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH})
+    public ResponseEntity<?> catchAllUpdate(
+            @PathVariable Long id,
+            HttpServletRequest request) {
+        
+        log.info("=== CATCH-ALL UPDATE ENDPOINT ===");
+        log.info("Method: {}", request.getMethod());
+        log.info("Content-Type: {}", request.getContentType());
+        log.info("Article ID: {}", id);
+        log.info("Request URI: {}", request.getRequestURI());
+        log.info("Parameters: {}", request.getParameterMap().keySet());
+        log.info("================================");
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", false);
+        response.put("message", "Endpoint reached but not processed correctly");
+        response.put("method", request.getMethod());
+        response.put("contentType", request.getContentType());
+        response.put("articleId", id);
+        
+        return ResponseEntity.badRequest().body(response);
+    }
     
     /**
      * Get all articles with pagination, sorting, and filtering
@@ -328,7 +446,14 @@ public class NewsAdminController {
             @RequestParam(value = "featuredImage", required = false) MultipartFile featuredImage) {
         
         try {
-            log.info("Updating article with multipart data - id: {}, title: {}", id, title);
+            log.info("=== MULTIPART UPDATE REQUEST RECEIVED ===");
+            log.info("Article ID: {}", id);
+            log.info("Title: {}", title);
+            log.info("Category ID: {}", categoryId);
+            log.info("Status: {}", status);
+            log.info("Featured Image: {}", featuredImage != null ? featuredImage.getOriginalFilename() : "null");
+            log.info("Request received at endpoint: /api/admin/news/{}/update", id);
+            log.info("============================================");
             
             // Validate required fields
             if (title == null || title.trim().isEmpty()) {
@@ -343,7 +468,8 @@ public class NewsAdminController {
             // Get existing article to preserve author
             Optional<NewsArticleDto> existingArticleOpt = newsService.findById(id);
             if (existingArticleOpt.isEmpty()) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(createErrorResponse("Không tìm thấy bài viết với ID: " + id));
             }
             
             NewsArticleDto existingArticle = existingArticleOpt.get();
@@ -381,16 +507,21 @@ public class NewsAdminController {
             // Handle featured image upload
             if (featuredImage != null && !featuredImage.isEmpty()) {
                 try {
+                    log.info("Processing featured image upload...");
                     String imageUrl = saveImage(featuredImage);
                     articleDto.setFeaturedImage(imageUrl);
-                } catch (IOException e) {
-                    log.error("Error saving featured image: {}", e.getMessage());
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(createErrorResponse("Lỗi khi lưu hình ảnh: " + e.getMessage()));
+                    log.info("Featured image saved successfully: {}", imageUrl);
+                } catch (Exception e) {
+                    log.error("Error saving featured image: {}", e.getMessage(), e);
+                    // Don't fail the entire update if image upload fails
+                    // Just preserve the existing image
+                    articleDto.setFeaturedImage(existingArticle.getFeaturedImage());
+                    log.warn("Using existing featured image due to upload error");
                 }
             } else {
                 // Preserve existing featured image if no new image uploaded
                 articleDto.setFeaturedImage(existingArticle.getFeaturedImage());
+                log.info("No new image uploaded, preserving existing image");
             }
             
             // Update article
@@ -420,16 +551,20 @@ public class NewsAdminController {
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<?> deleteArticle(@PathVariable Long id) {
         try {
-            log.info("Deleting article with id: {}", id);
+            log.info("=== DELETE REQUEST RECEIVED ===");
+            log.info("Article ID: {}", id);
+            log.info("User roles: {}", SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+            log.info("===============================");
             
             newsService.deleteArticle(id);
             
-            log.info("Deleted article with id: {}", id);
+            log.info("Successfully deleted article with id: {}", id);
             return ResponseEntity.ok(createSuccessResponse("Bài viết đã được xóa thành công"));
             
         } catch (IllegalArgumentException e) {
             log.warn("Article not found for deletion: {}", e.getMessage());
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(createErrorResponse("Không tìm thấy bài viết với ID: " + id));
         } catch (Exception e) {
             log.error("Error deleting article {}: {}", id, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -624,25 +759,75 @@ public class NewsAdminController {
      * Save uploaded image to disk
      */
     private String saveImage(MultipartFile file) throws IOException {
-        // Create upload directory if not exists
-        Path uploadDir = Paths.get(uploadPath);
-        if (!Files.exists(uploadDir)) {
-            Files.createDirectories(uploadDir);
+        try {
+            log.info("Starting image save process...");
+            log.info("File info - Name: {}, Size: {} bytes, ContentType: {}", 
+                    file.getOriginalFilename(), file.getSize(), file.getContentType());
+            
+            // Validate file
+            if (file.isEmpty()) {
+                throw new IOException("File is empty");
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.getSize() > 5 * 1024 * 1024) {
+                throw new IOException("File size exceeds 5MB limit");
+            }
+            
+            // Validate file type
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new IOException("File is not an image");
+            }
+            
+            // Create upload directory if not exists
+            Path uploadDir = Paths.get(uploadPath);
+            log.info("Upload directory: {}", uploadDir.toAbsolutePath());
+            
+            if (!Files.exists(uploadDir)) {
+                log.info("Creating upload directory...");
+                Files.createDirectories(uploadDir);
+            }
+            
+            // Check if directory is writable
+            if (!Files.isWritable(uploadDir)) {
+                throw new IOException("Upload directory is not writable: " + uploadDir.toAbsolutePath());
+            }
+            
+            // Generate unique filename
+            String originalFilename = file.getOriginalFilename();
+            String extension = ".jpg"; // Default
+            
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+                // Validate extension
+                if (!extension.matches("\\.(jpg|jpeg|png|gif|webp)")) {
+                    extension = ".jpg";
+                }
+            }
+            
+            String filename = UUID.randomUUID().toString() + extension;
+            
+            // Save file
+            Path filePath = uploadDir.resolve(filename);
+            log.info("Saving file to: {}", filePath.toAbsolutePath());
+            
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            
+            // Verify file was saved
+            if (!Files.exists(filePath)) {
+                throw new IOException("File was not saved successfully");
+            }
+            
+            // Return relative URL
+            String imageUrl = "/uploads/news/" + filename;
+            log.info("Image saved successfully: {}", imageUrl);
+            return imageUrl;
+            
+        } catch (Exception e) {
+            log.error("Error in saveImage method: {}", e.getMessage(), e);
+            throw new IOException("Không thể lưu hình ảnh: " + e.getMessage(), e);
         }
-        
-        // Generate unique filename
-        String originalFilename = file.getOriginalFilename();
-        String extension = originalFilename != null && originalFilename.contains(".") 
-                ? originalFilename.substring(originalFilename.lastIndexOf(".")) 
-                : "";
-        String filename = UUID.randomUUID().toString() + extension;
-        
-        // Save file
-        Path filePath = uploadDir.resolve(filename);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        
-        // Return relative URL
-        return "/uploads/news/" + filename;
     }
     
     // Helper methods for response creation

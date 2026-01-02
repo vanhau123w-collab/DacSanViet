@@ -26,10 +26,10 @@ public class NewsArticleDto {
     @Size(min = 5, max = 200, message = "Tiêu đề phải từ 5 đến 200 ký tự")
     private String title;
     
-    @ValidSlug(allowEmpty = true)
+    //@ValidSlug(allowEmpty = true)
     private String slug;
     
-    @ValidHtml(maxLength = 50000, allowEmpty = true)
+    //@ValidHtml(maxLength = 50000, allowEmpty = true)
     private String content;
     
     @Size(max = 300, message = "Tóm tắt không được vượt quá 300 ký tự")

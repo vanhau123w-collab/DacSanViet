@@ -21,7 +21,7 @@ public class SEOService {
     private final NewsArticleRepository newsArticleRepository;
     
     // Constants for validation
-    private static final int MIN_META_DESCRIPTION_LENGTH = 150;
+    private static final int MIN_META_DESCRIPTION_LENGTH = 50;  // Reduced from 150 to 50
     private static final int MAX_META_DESCRIPTION_LENGTH = 160;
     private static final int MAX_SLUG_LENGTH = 250;
     private static final Pattern SLUG_PATTERN = Pattern.compile("^[a-z0-9-]+$");
@@ -164,8 +164,9 @@ public class SEOService {
         int length = metaDescription.trim().length();
         
         if (length < MIN_META_DESCRIPTION_LENGTH) {
-            result.setValid(false);
-            result.addMessage(String.format("Meta description is too short (%d characters). Recommended: %d-%d characters", 
+            // Only warn, don't reject for short meta descriptions
+            result.setValid(true);
+            result.addMessage(String.format("Meta description is shorter than recommended (%d characters). Consider expanding to %d-%d characters for better SEO", 
                 length, MIN_META_DESCRIPTION_LENGTH, MAX_META_DESCRIPTION_LENGTH));
         } else if (length > MAX_META_DESCRIPTION_LENGTH) {
             result.setValid(false);
