@@ -222,11 +222,17 @@ public class CategoryService {
      * Convert Category entity to CategoryDao
      */
     private CategoryDao convertToDto(Category category) {
+        // Fix image URL - remove leading slash if present
+        String imageUrl = category.getImageUrl();
+        if (imageUrl != null && imageUrl.startsWith("/")) {
+            imageUrl = imageUrl.substring(1);
+        }
+        
         return new CategoryDao(
             category.getId(),
             category.getName(),
             category.getDescription(),
-            category.getImageUrl(),
+            imageUrl,
             category.getIsActive(),
             null, // productCount will be set separately when needed
             category.getCreatedAt(),

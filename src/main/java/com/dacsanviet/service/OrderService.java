@@ -775,6 +775,7 @@ public class OrderService {
 		System.out.println("User ID: " + request.getUserId());
 		System.out.println("Customer Name: " + request.getCustomerName());
 		System.out.println("Payment Method: " + request.getPaymentMethod());
+		System.out.println("Items from request: " + (request.getItems() != null ? request.getItems().size() : 0));
 		System.out.println("====================================");
 		
 		// Validate COD order requirements
@@ -786,16 +787,31 @@ public class OrderService {
 
 		User user = null;
 		List<CartItem> cartItems = new ArrayList<>();
+		boolean useRequestItems = false;
 
-		// Check if this is a guest order or authenticated user order
-		if (request.getUserId() != null) {
-			// Authenticated user - get user and cart from database
+		// Priority 1: Use items from request (localStorage - works for both guest and logged-in users)
+		if (request.getItems() != null && !request.getItems().isEmpty()) {
+			System.out.println("Using items from request (localStorage)");
+			useRequestItems = true;
+			
+			// Get user if authenticated
+			if (request.getUserId() != null) {
+				user = getUserById(request.getUserId());
+			}
+		}
+		// Priority 2: Fallback to database cart (only for authenticated users without request items)
+		else if (request.getUserId() != null) {
+			System.out.println("Using items from database cart");
 			user = getUserById(request.getUserId());
 			cartItems = cartItemRepository.findByUserIdOrderByAddedDateDesc(request.getUserId());
 
 			if (cartItems.isEmpty()) {
 				throw new RuntimeException("Cart is empty");
 			}
+		}
+		// No items at all
+		else {
+			throw new RuntimeException("Cart is empty");
 		}
 
 		// Calculate totals (for guest orders, use values from request)
@@ -805,7 +821,7 @@ public class OrderService {
 		BigDecimal totalAmount = subtotal.add(shippingFee).add(taxAmount);
 
 		// If we have cart items from database, calculate from them
-		if (!cartItems.isEmpty()) {
+		if (!useRequestItems && !cartItems.isEmpty()) {
 			// Validate cart items and check inventory
 			validateCartForOrder(cartItems);
 			subtotal = calculateCartSubtotal(cartItems);
@@ -850,26 +866,10 @@ public class OrderService {
 		// Save order
 		order = orderRepository.save(order);
 
-		// Create order items from cart items and update inventory
-		if (!cartItems.isEmpty()) {
-			// Authenticated user - use cart items from database
-			for (CartItem cartItem : cartItems) {
-				OrderItem orderItem = new OrderItem(order, cartItem);
-				orderItemRepository.save(orderItem);
-				order.addOrderItem(orderItem);
-
-				// Update product stock
-				Product product = cartItem.getProduct();
-				product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
-				productRepository.save(product);
-			}
-
-			// Clear cart for authenticated users
-			if (request.getUserId() != null) {
-				cartItemRepository.deleteByUserId(request.getUserId());
-			}
-		} else if (request.getItems() != null && !request.getItems().isEmpty()) {
-			// Guest order - use cart items from request
+		// Create order items - Priority: request items (localStorage) > database cart
+		if (useRequestItems && request.getItems() != null && !request.getItems().isEmpty()) {
+			// Use items from request (localStorage - works for both guest and logged-in users)
+			System.out.println("Creating order items from request (localStorage)");
 			for (CreateOrderRequest.CartItemRequest itemRequest : request.getItems()) {
 				// Get product from database
 				Product product = productRepository.findById(itemRequest.getProductId())
@@ -894,6 +894,41 @@ public class OrderService {
 				// Update product stock
 				product.setStockQuantity(product.getStockQuantity() - itemRequest.getQuantity());
 				productRepository.save(product);
+			}
+			
+			// ONLY clear database cart if user is authenticated AND we used localStorage items
+			// This prevents clearing cart unnecessarily
+			if (request.getUserId() != null) {
+				try {
+					cartItemRepository.deleteByUserId(request.getUserId());
+					System.out.println("Cleared database cart for authenticated user after localStorage checkout");
+				} catch (Exception e) {
+					System.err.println("Error clearing database cart: " + e.getMessage());
+					// Don't fail the order if cart clearing fails
+				}
+			}
+		} else if (!cartItems.isEmpty()) {
+			// Fallback: Use cart items from database (authenticated user)
+			System.out.println("Creating order items from database cart");
+			for (CartItem cartItem : cartItems) {
+				OrderItem orderItem = new OrderItem(order, cartItem);
+				orderItemRepository.save(orderItem);
+				order.addOrderItem(orderItem);
+
+				// Update product stock
+				Product product = cartItem.getProduct();
+				product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
+				productRepository.save(product);
+			}
+
+			// Clear database cart for authenticated users
+			if (request.getUserId() != null) {
+				try {
+					cartItemRepository.deleteByUserId(request.getUserId());
+					System.out.println("Cleared database cart after database cart checkout");
+				} catch (Exception e) {
+					System.err.println("Error clearing database cart: " + e.getMessage());
+				}
 			}
 		}
 

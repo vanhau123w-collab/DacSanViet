@@ -354,6 +354,12 @@ function showEditOrderModal(order) {
                         </span>
                     </div>
                     <div class="info-row">
+                        <span class="info-label">Đơn vị vận chuyển:</span>
+                        <span class="info-value">
+                            ${order.shippingCarrier ? getCarrierText(order.shippingCarrier) : 'Chưa chọn'}
+                        </span>
+                    </div>
+                    <div class="info-row">
                         <span class="info-label">Phương thức thanh toán:</span>
                         <span class="info-value">
                             ${order.paymentMethod === 'COD' ? '💵 Thanh toán khi nhận hàng' :
@@ -534,11 +540,16 @@ async function saveOrderChanges(orderId) {
         return;
     }
     
+    // Get CSRF token from meta tag
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+    
     try {
         const response = await fetch(`/api/admin/orders/${orderId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
             },
             body: JSON.stringify({
                 status: status,

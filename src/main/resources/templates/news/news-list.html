@@ -1,431 +1,593 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${pageTitle}">Tin Tức - Đặc Sản Việt</title>
     <meta name="description" th:content="${pageDescription}">
-    <meta name="keywords" th:content="${pageKeywords}">
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{/css/header.css(v=1)}">
-    <link rel="stylesheet" th:href="@{/css/modern-ecommerce.css(v=1)}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
     
     <style>
-        :root {
-            --primary-color: #D2691E;
-            --primary-dark: #8B4513;
-            --secondary-color: #34495e;
-            --accent-color: #6B8E23;
-            --light-bg: #f8f9fa;
-            --dark-bg: #2c3e50;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
-        /* Hero Section with background image */
+        /* Hero Section */
         .news-hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/bg-news.jpg') !important;
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                        url('/images/bg-news.jpg') center/cover;
+            padding: 80px 0;
             color: white;
-            padding: 100px 0 80px;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
         
-        .news-hero::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 30px 30px;
-            animation: backgroundScroll 30s linear infinite;
-        }
-        
-        @keyframes backgroundScroll {
-            from { transform: translate(0, 0); }
-            to { transform: translate(30px, 30px); }
+        .news-hero .container {
+            position: relative;
+            z-index: 2;
         }
         
         .news-hero h1 {
-            animation: fadeInUp 1s ease;
-            position: relative;
-            z-index: 1;
-            font-weight: 800;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
         .news-hero p {
-            animation: fadeInUp 1.2s ease;
-            position: relative;
-            z-index: 1;
+            font-size: 1.2rem;
+            opacity: 0.95;
         }
         
-        /* Search Section */
-        .search-section {
-            background: white;
-            padding: 40px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .search-form {
+        /* Search Bar */
+        .news-search {
+            margin-top: 2rem;
             max-width: 600px;
-            margin: 0 auto;
+            margin-left: auto;
+            margin-right: auto;
         }
         
-        .search-input {
-            border: 2px solid #e9ecef;
-            border-radius: 50px;
-            padding: 15px 25px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
+        .news-search .input-group {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         
-        .search-input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(210, 105, 30, 0.25);
-        }
-        
-        .search-btn {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        .news-search input {
             border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
+            padding: 15px 20px;
+            font-size: 1rem;
+        }
+        
+        .news-search button {
+            background: #FF6B35;
+            border: none;
+            padding: 0 30px;
             color: white;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
         
-        .search-btn:hover {
+        .news-search button:hover {
+            background: #e55a2b;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(210, 105, 30, 0.4);
         }
         
         /* Category Filter */
         .category-filter {
-            background: var(--light-bg);
-            padding: 30px 0;
-        }
-        
-        .category-btn {
             background: white;
-            border: 2px solid #e9ecef;
-            color: var(--secondary-color);
-            padding: 10px 20px;
-            border-radius: 25px;
-            margin: 5px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 80px;
+            z-index: 99;
+            transition: top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         
-        .category-btn:hover,
-        .category-btn.active {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
+        /* When header is hidden, filter moves to top */
+        .header-hidden ~ * .category-filter,
+        body.header-hidden .category-filter {
+            top: 0;
+        }
+        
+        .category-pills {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .category-pill {
+            padding: 10px 24px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .category-pill:hover {
+            background: #FF6B35;
             color: white;
             transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
         }
         
-        /* News Section */
-        .news-section {
-            padding: 80px 0;
-            background: white;
+        .category-pill.active {
+            background: #FF6B35;
+            color: white;
+            border-color: #FF6B35;
         }
         
+        /* Featured Section */
+        .featured-section {
+            padding: 60px 0;
+            background: linear-gradient(135deg, #fff5f0 0%, #f0fffe 100%);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #FF6B35, #4EC2B6);
+            border-radius: 2px;
+        }
+        
+        .section-title .icon {
+            color: #FF6B35;
+            margin-right: 10px;
+        }
+        
+        /* News Card */
         .news-card {
             background: white;
-            border-radius: 20px;
-            padding: 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            height: 100%;
-            border: none;
+            border-radius: 15px;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         
         .news-card:hover {
-            transform: translateY(-15px) scale(1.02);
-            box-shadow: 0 25px 50px rgba(210, 105, 30, 0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
         
-        .news-card img {
+        .news-card-img {
+            position: relative;
+            overflow: hidden;
+            height: 220px;
+        }
+        
+        .news-card-img img {
             width: 100%;
-            height: 250px;
+            height: 100%;
             object-fit: cover;
-            transition: transform 0.4s ease;
+            transition: transform 0.5s;
         }
         
-        .news-card:hover img {
+        .news-card:hover .news-card-img img {
             transform: scale(1.1);
         }
         
-        .news-card-body {
-            padding: 30px;
-        }
-        
-        .news-date {
-            color: var(--primary-color);
+        .news-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #FF6B35;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
             font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-        }
-        
-        .news-title {
-            font-weight: 700;
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: var(--secondary-color);
-            line-height: 1.4;
-        }
-        
-        .news-excerpt {
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-        
-        .news-tag {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin-right: 8px;
-            margin-bottom: 8px;
-        }
-        
-        .read-more-btn {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            border: none;
-            padding: 10px 25px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 25px;
-            transition: all 0.4s ease;
-            color: white;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .read-more-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(210, 105, 30, 0.4);
-            color: white;
-        }
-        
-        /* Featured News */
-        .featured-news {
-            padding: 80px 0;
-            background: var(--light-bg);
-        }
-        
-        .featured-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: all 0.4s ease;
-        }
-        
-        .featured-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        }
-        
-        .featured-card img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
+            z-index: 2;
         }
         
         .featured-badge {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
+            top: 15px;
+            left: 15px;
+            background: #FFD700;
+            color: #333;
+            padding: 6px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
             font-weight: 600;
-            font-size: 0.9rem;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .news-card-body {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .news-card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .news-card-title a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .news-card-title a:hover {
+            color: #FF6B35;
+        }
+        
+        .news-card-excerpt {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .news-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 0.85rem;
+            color: #999;
+        }
+        
+        .news-card-meta i {
+            margin-right: 5px;
+        }
+        
+        .read-more-btn {
+            background: #FF6B35;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s;
+            margin-top: 15px;
+            border: 2px solid #FF6B35;
+        }
+        
+        .read-more-btn:hover {
+            background: white;
+            color: #FF6B35;
+            border-color: #FF6B35;
+        }
+        
+        /* Latest News Section */
+        .latest-section {
+            padding: 60px 0;
+            background: white;
         }
         
         /* Pagination */
-        .pagination .page-link {
-            border: none;
-            color: var(--primary-color);
-            padding: 12px 18px;
-            margin: 0 5px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
+        .pagination-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
         }
         
-        .pagination .page-item.active .page-link {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        .pagination {
+            gap: 8px;
+        }
+        
+        .page-link {
+            border: 2px solid #eee;
+            color: #333;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .page-link:hover {
+            background: #FF6B35;
             color: white;
+            border-color: #FF6B35;
         }
         
-        .pagination .page-link:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
+        .page-item.active .page-link {
+            background: #FF6B35;
+            border-color: #FF6B35;
         }
         
-        /* Section Titles */
-        .section-title {
-            font-weight: 800;
-            margin-bottom: 1rem;
-            position: relative;
+        .page-item.disabled .page-link {
+            background: #f8f9fa;
+            border-color: #eee;
         }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-            border-radius: 2px;
-        }
-        
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .animate-fade-in-up {
-            animation: fadeInUp 0.6s ease-out;
-        }
-        
-        .animate-delay-1 { animation-delay: 0.1s; }
-        .animate-delay-2 { animation-delay: 0.2s; }
-        .animate-delay-3 { animation-delay: 0.3s; }
-        .animate-delay-4 { animation-delay: 0.4s; }
         
         /* Empty State */
         .empty-state {
             text-align: center;
             padding: 80px 20px;
-            color: #666;
         }
         
         .empty-state i {
-            font-size: 4rem;
+            font-size: 5rem;
             color: #ddd;
             margin-bottom: 20px;
         }
+        
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #999;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                        url('/images/bg-newsCTA.jpeg') center/cover;
+            padding: 80px 0;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 50%;
+        }
+        
+        .cta-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 400px;
+            height: 400px;
+            background: rgba(78, 194, 182, 0.1);
+            border-radius: 50%;
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-btn {
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cta-btn-primary {
+            background: white;
+            color: #FF6B35;
+            border: 2px solid white;
+        }
+        
+        .cta-btn-primary:hover {
+            background: transparent;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cta-btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .cta-btn-secondary:hover {
+            background: white;
+            color: #FF6B35;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .news-hero h1 {
+                font-size: 2rem;
+            }
+            
+            .news-hero p {
+                font-size: 1rem;
+            }
+            
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+            
+            .category-pills {
+                justify-content: flex-start;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 10px;
+            }
+            
+            .category-pill {
+                white-space: nowrap;
+            }
+            
+            .cta-section h2 {
+                font-size: 1.8rem;
+            }
+            
+            .cta-section p {
+                font-size: 1rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
-
 <body>
     <!-- Header -->
     <div th:replace="~{fragments/header :: navbar}"></div>
     
-    <!-- Mobile Menu -->
-    <div th:replace="~{fragments/header :: mobile-menu}"></div>
-
     <!-- Hero Section -->
     <section class="news-hero">
         <div class="container">
-            <h1 class="display-3 fw-bold mb-4" style="color: white;">Tin Tức & Sự Kiện</h1>
-            <p class="lead fs-4" style="color: white;">
-                <i class="fas fa-newspaper me-2"></i>
-                Cập nhật những tin tức mới nhất về đặc sản Việt Nam
-                <i class="fas fa-star ms-2"></i>
-            </p>
-        </div>
-    </section>
-    
-    <!-- Search Section -->
-    <section class="search-section">
-        <div class="container">
-            <form class="search-form" th:action="@{/news/search}" method="get">
-                <div class="input-group">
-                    <input type="text" class="form-control search-input" name="q" 
-                           th:value="${searchKeyword}" placeholder="Tìm kiếm tin tức...">
-                    <button class="btn search-btn" type="submit">
-                        <i class="fas fa-search me-2"></i>Tìm kiếm
-                    </button>
-                </div>
-            </form>
+            <h1>Tin Tức & Sự Kiện</h1>
+            <p>Những câu chuyện ý nghĩa đằng sau các loại đặc sản, mẹo sử dụng và tin tức khuyến mãi hàng tuần.</p>
+            
+            <!-- Search Bar -->
+            <div class="news-search">
+                <form th:action="@{/news/search}" method="get">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="q" 
+                               placeholder="Tìm kiếm tin tức..." 
+                               th:value="${searchKeyword}">
+                        <button class="btn" type="submit">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </section>
     
     <!-- Category Filter -->
-    <section class="category-filter" th:if="${categories != null and !categories.empty}">
+    <section class="category-filter">
         <div class="container">
-            <div class="text-center">
-                <a href="/news" class="category-btn" 
-                   th:classappend="${currentCategory == null} ? 'active' : ''">
-                    <i class="fas fa-list me-2"></i>Tất cả
+            <div class="category-pills">
+                <a th:href="@{/news}" class="category-pill" 
+                   th:classappend="${currentCategory == null ? 'active' : ''}">
+                    <i class="fas fa-th"></i> Tất cả
                 </a>
-                <a th:each="category : ${categories}" 
-                   th:href="@{/news/category/{slug}(slug=${category.slug})}"
-                   th:text="${category.name}"
-                   class="category-btn"
-                   th:classappend="${currentCategory != null and currentCategory.id == category.id} ? 'active' : ''">
+                <a th:each="cat : ${categories}" 
+                   th:href="@{/news/category/{slug}(slug=${cat.slug})}" 
+                   class="category-pill"
+                   th:classappend="${currentCategory != null && currentCategory.id == cat.id ? 'active' : ''}">
+                    <i class="fas fa-tag"></i> <span th:text="${cat.name}">Category</span>
                 </a>
             </div>
         </div>
     </section>
     
-    <!-- Featured News Section -->
-    <section class="featured-news" th:if="${featuredArticles != null and !featuredArticles.empty}">
+    <!-- Featured Articles Section -->
+    <section class="featured-section" th:if="${featuredArticles != null && !featuredArticles.isEmpty()}">
         <div class="container">
-            <h2 class="text-center mb-5 section-title" style="color: var(--primary-color);">
-                <i class="fas fa-fire me-3"></i>
-                Tin Nổi Bật
-            </h2>
-            <div class="row">
-                <div class="col-lg-8 mx-auto" th:if="${featuredArticles.size() > 0}">
-                    <div class="featured-card position-relative" th:with="featured=${featuredArticles[0]}">
-                        <div class="featured-badge">
-                            <i class="fas fa-star me-1"></i>Nổi bật
+            <div class="section-title">
+                <h2>
+                    <i class="fas fa-star icon"></i>
+                    Tin Nổi Bật
+                </h2>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6" th:each="article : ${featuredArticles}">
+                    <div class="news-card">
+                        <div class="news-card-img">
+                            <img th:src="${article.featuredImage != null ? article.featuredImage : '/images/default-news.jpg'}" 
+                                 th:alt="${article.title}">
+                            <span class="featured-badge">
+                                <i class="fas fa-star"></i> Nổi bật
+                            </span>
+                            <span class="news-badge" th:if="${article.categoryName != null}" 
+                                  th:text="${article.categoryName}">Category</span>
                         </div>
-                        <img th:src="${featured.featuredImage != null ? featured.featuredImage : '/images/news-placeholder.jpg'}" 
-                             th:alt="${featured.title}" class="img-fluid">
-                        <div class="p-4">
-                            <div class="news-date">
-                                <i class="fas fa-calendar me-2"></i>
-                                <span th:text="${#temporals.format(featured.publishedAt, 'dd/MM/yyyy')}"></span>
+                        <div class="news-card-body">
+                            <h3 class="news-card-title">
+                                <a th:href="@{/news/{slug}(slug=${article.slug})}" th:text="${article.title}">Article Title</a>
+                            </h3>
+                            <p class="news-card-excerpt" th:text="${article.excerpt}">Article excerpt...</p>
+                            <div class="news-card-meta">
+                                <span>
+                                    <i class="far fa-calendar"></i>
+                                    <span th:text="${#temporals.format(article.publishedAt, 'dd/MM/yyyy')}">Date</span>
+                                </span>
+                                <span>
+                                    <i class="far fa-eye"></i>
+                                    <span th:text="${article.viewCount}">0</span> lượt xem
+                                </span>
                             </div>
-                            <h3 class="news-title" th:text="${featured.title}"></h3>
-                            <p class="news-excerpt" th:text="${featured.excerpt}"></p>
-                            <div class="mb-3" th:if="${featured.categoryName != null}">
-                                <span class="news-tag" th:text="${featured.categoryName}"></span>
-                            </div>
-                            <a th:href="@{/news/{slug}(slug=${featured.slug})}" class="read-more-btn">
-                                <i class="fas fa-arrow-right me-2"></i>Đọc tiếp
+                            <a th:href="@{/news/{slug}(slug=${article.slug})}" class="read-more-btn">
+                                Đọc thêm <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
                     </div>
@@ -435,33 +597,42 @@
     </section>
     
     <!-- Latest News Section -->
-    <section class="news-section">
+    <section class="latest-section">
         <div class="container">
-            <h2 class="text-center mb-5 section-title" style="color: var(--primary-color);">
-                <i class="fas fa-clock me-3"></i>
-                <span th:if="${currentCategory != null}" th:text="'Tin tức ' + ${currentCategory.name}"></span>
-                <span th:unless="${currentCategory != null}">Tin Tức Mới Nhất</span>
-            </h2>
+            <div class="section-title">
+                <h2>
+                    <i class="fas fa-clock icon"></i>
+                    Tin Tức Mới Nhất
+                </h2>
+            </div>
             
             <!-- Articles Grid -->
-            <div th:if="${articles != null and articles.hasContent()}" class="row g-4">
-                <div class="col-lg-4 col-md-6" th:each="article, iterStat : ${articles.content}">
-                    <div class="news-card animate-fade-in-up" 
-                         th:classappend="'animate-delay-' + ${(iterStat.index % 3) + 1}">
-                        <img th:src="${article.thumbnailImage != null ? article.thumbnailImage : '/images/news-placeholder.jpg'}" 
-                             th:alt="${article.title}">
+            <div class="row g-4" th:if="${articles != null && !articles.isEmpty()}">
+                <div class="col-lg-4 col-md-6" th:each="article : ${articles}">
+                    <div class="news-card">
+                        <div class="news-card-img">
+                            <img th:src="${article.featuredImage != null ? article.featuredImage : '/images/default-news.jpg'}" 
+                                 th:alt="${article.title}">
+                            <span class="news-badge" th:if="${article.categoryName != null}" 
+                                  th:text="${article.categoryName}">Category</span>
+                        </div>
                         <div class="news-card-body">
-                            <div class="news-date">
-                                <i class="fas fa-calendar me-2"></i>
-                                <span th:text="${#temporals.format(article.publishedAt, 'dd/MM/yyyy')}"></span>
-                            </div>
-                            <h4 class="news-title" th:text="${article.title}"></h4>
-                            <p class="news-excerpt" th:text="${article.excerpt}"></p>
-                            <div class="mb-3" th:if="${article.categoryName != null}">
-                                <span class="news-tag" th:text="${article.categoryName}"></span>
+                            <h3 class="news-card-title">
+                                <a th:href="@{/news/{slug}(slug=${article.slug})}" th:text="${article.title}">Article Title</a>
+                            </h3>
+                            <p class="news-card-excerpt" th:text="${article.excerpt}">Article excerpt...</p>
+                            <div class="news-card-meta">
+                                <span>
+                                    <i class="far fa-calendar"></i>
+                                    <span th:text="${#temporals.format(article.publishedAt, 'dd/MM/yyyy')}">Date</span>
+                                </span>
+                                <span>
+                                    <i class="far fa-eye"></i>
+                                    <span th:text="${article.viewCount}">0</span> lượt xem
+                                </span>
                             </div>
                             <a th:href="@{/news/{slug}(slug=${article.slug})}" class="read-more-btn">
-                                <i class="fas fa-arrow-right me-2"></i>Đọc tiếp
+                                Đọc thêm <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
                     </div>
@@ -469,58 +640,66 @@
             </div>
             
             <!-- Empty State -->
-            <div th:unless="${articles != null and articles.hasContent()}" class="empty-state">
+            <div class="empty-state" th:if="${articles == null || articles.isEmpty()}">
                 <i class="fas fa-newspaper"></i>
-                <h3>Không có tin tức nào</h3>
-                <p th:if="${searchKeyword != null}">
-                    Không tìm thấy kết quả cho từ khóa "<span th:text="${searchKeyword}"></span>"
-                </p>
-                <p th:unless="${searchKeyword != null}">
-                    Hiện tại chưa có tin tức nào được đăng tải.
-                </p>
-                <a href="/news" class="btn btn-primary mt-3" th:if="${searchKeyword != null}">
-                    <i class="fas fa-arrow-left me-2"></i>Quay lại trang tin tức
-                </a>
+                <h3>Chưa có tin tức nào</h3>
+                <p>Hiện tại chưa có bài viết nào được xuất bản.</p>
             </div>
             
             <!-- Pagination -->
-            <div th:if="${articles != null and articles.totalPages > 1}" class="text-center mt-5">
-                <nav aria-label="News pagination">
-                    <ul class="pagination justify-content-center">
-                        <!-- Previous Page -->
-                        <li class="page-item" th:classappend="${articles.first} ? 'disabled'">
-                            <a class="page-link" 
-                               th:href="${articles.first} ? '#' : @{/news(page=${articles.number - 1}, size=${articles.size})}"
-                               tabindex="-1">
+            <div class="pagination-wrapper" th:if="${articles != null && totalPages > 1}">
+                <nav>
+                    <ul class="pagination">
+                        <!-- Previous -->
+                        <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/news(page=${currentPage - 1})}" 
+                               th:if="${currentPage > 0}">
                                 <i class="fas fa-chevron-left"></i>
                             </a>
+                            <span class="page-link" th:if="${currentPage == 0}">
+                                <i class="fas fa-chevron-left"></i>
+                            </span>
                         </li>
                         
                         <!-- Page Numbers -->
-                        <li th:each="pageNum : ${#numbers.sequence(0, articles.totalPages - 1)}"
-                            th:if="${pageNum >= articles.number - 2 and pageNum <= articles.number + 2}"
-                            class="page-item"
-                            th:classappend="${pageNum == articles.number} ? 'active'">
-                            <a class="page-link" 
-                               th:href="@{/news(page=${pageNum}, size=${articles.size})}"
-                               th:text="${pageNum + 1}"></a>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:if="${i >= currentPage - 2 && i <= currentPage + 2}"
+                            th:classappend="${i == currentPage ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/news(page=${i})}" th:text="${i + 1}">1</a>
                         </li>
                         
-                        <!-- Next Page -->
-                        <li class="page-item" th:classappend="${articles.last} ? 'disabled'">
-                            <a class="page-link" 
-                               th:href="${articles.last} ? '#' : @{/news(page=${articles.number + 1}, size=${articles.size})}">
+                        <!-- Next -->
+                        <li class="page-item" th:classappend="${currentPage >= totalPages - 1 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/news(page=${currentPage + 1})}" 
+                               th:if="${currentPage < totalPages - 1}">
                                 <i class="fas fa-chevron-right"></i>
                             </a>
+                            <span class="page-link" th:if="${currentPage >= totalPages - 1}">
+                                <i class="fas fa-chevron-right"></i>
+                            </span>
                         </li>
                     </ul>
                 </nav>
-                
-                <!-- Page Info -->
-                <p class="text-muted mt-3">
-                    Hiển thị <span th:text="${articles.numberOfElements}"></span> 
-                    trong tổng số <span th:text="${articles.totalElements}"></span> tin tức
-                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2><i class="fas fa-shopping-basket"></i> Khám Phá Đặc Sản Việt</h2>
+                <p>Hàng ngàn sản phẩm đặc sản chất lượng từ khắp 63 tỉnh thành Việt Nam</p>
+                <div class="cta-buttons">
+                    <a th:href="@{/products}" class="cta-btn cta-btn-primary">
+                        <i class="fas fa-store"></i>
+                        Mua Sắm Ngay
+                    </a>
+                    <a th:href="@{/about}" class="cta-btn cta-btn-secondary">
+                        <i class="fas fa-info-circle"></i>
+                        Tìm Hiểu Thêm
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -528,36 +707,44 @@
     <!-- Footer -->
     <div th:replace="~{fragments/footer :: footer}"></div>
     
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:src="@{/js/header.js(v=1)}"></script>
+    <!-- Mobile Menu -->
+    <div th:replace="~{fragments/header :: mobile-menu}"></div>
     
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Header Scroll Hide/Show Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animate cards on scroll
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
+        (function() {
+            let lastScrollTop = 0;
+            const header = document.querySelector('.modern-header');
+            const scrollThreshold = 100;
             
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                        observer.unobserve(entry.target);
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop > scrollThreshold) {
+                    if (scrollTop > lastScrollTop) {
+                        // Scrolling down - hide header
+                        header.classList.add('header-hidden');
+                        header.classList.remove('header-visible');
+                        document.body.classList.add('header-hidden');
+                    } else {
+                        // Scrolling up - show header
+                        header.classList.remove('header-hidden');
+                        header.classList.add('header-visible');
+                        document.body.classList.remove('header-hidden');
                     }
-                });
-            }, observerOptions);
-            
-            // Observe cards for animation
-            document.querySelectorAll('.animate-fade-in-up').forEach(el => {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(30px)';
-                el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-                observer.observe(el);
+                } else {
+                    // At top of page - show header
+                    header.classList.remove('header-hidden');
+                    header.classList.remove('header-visible');
+                    document.body.classList.remove('header-hidden');
+                }
+                
+                lastScrollTop = scrollTop;
             });
-        });
+        })();
     </script>
 </body>
 </html>

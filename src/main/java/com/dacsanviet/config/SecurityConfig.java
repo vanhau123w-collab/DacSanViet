@@ -73,7 +73,7 @@ public class SecurityConfig {
                 // Enable CSRF for form-based endpoints, but ignore specific API endpoints
                 .ignoringRequestMatchers("/api/auth/**", "/api/csrf/**", "/api/payment/**", "/h2-console/**", "/ws/**", 
                                        "/api/admin/news/*/update-debug", "/api/admin/news/*/update-simple", "/api/admin/news/*/update",
-                                       "/api/admin/news/*") // Allow DELETE without CSRF
+                                       "/api/admin/news/*", "/api/checkout/**", "/api/cart/**", "/checkout/process") // Allow checkout process without CSRF
                 .csrfTokenRepository(org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse())
             )
             .headers(headers -> headers
@@ -116,6 +116,7 @@ public class SecurityConfig {
                 
                 // Checkout endpoints (allow guests for guest checkout)
                 .requestMatchers("/checkout", "/checkout/**").permitAll()
+                .requestMatchers("/api/checkout/**").permitAll()
                 
                 // Payment endpoints (allow all for payment processing)
                 .requestMatchers("/payment/**").permitAll()
