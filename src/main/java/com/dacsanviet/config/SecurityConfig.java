@@ -72,6 +72,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(
                                 "/api/auth/**", "/api/csrf/**", "/api/payment/**", "/h2-console/**", "/ws/**",
+                                "/logout",
                                 "/api/admin/news/*/update-debug", "/api/admin/news/*/update-simple", "/api/admin/news/*/update",
                                 "/api/admin/news/*", "/api/checkout/**", "/api/cart/**", "/checkout/process",
                                 "/api/admin/orders/**", "/api/test/**",
@@ -187,7 +188,7 @@ public class SecurityConfig {
             .logoutSuccessUrl("/")
             .invalidateHttpSession(true)
             .clearAuthentication(true)
-            .deleteCookies("JSESSIONID", "JWT-TOKEN")
+            .deleteCookies("JSESSIONID", "accessToken", "JWT-TOKEN")
             .permitAll()
         );
         

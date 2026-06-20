@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Thêm meta tag cho CSRF -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Thông Tin Cá Nhân - Đặc Sản Việt</title>
+    
+    <!-- Favicon -->
+    <th:block th:replace="~{fragments/favicon :: favicon}"></th:block>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -460,20 +466,168 @@
         </div>
     </div>
 
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Đổi mật khẩu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="changePasswordForm">
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu hiện tại *</label>
+                            <input type="password" class="form-control" id="oldPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu mới *</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                            <div class="form-text">Mật khẩu phải có ít nhất 6 ký tự.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Xác nhận mật khẩu mới *</label>
+                            <input type="password" class="form-control" id="confirmNewPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="submitChangePassword()">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Thêm SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // Hàm lấy CSRF token
+        function getCsrfToken() {
+            const tokenMeta = document.querySelector('meta[name="_csrf"]');
+            if (tokenMeta) return tokenMeta.getAttribute('content');
+            
+            // Fallback lấy từ cookie nếu không có meta
+            const name = 'XSRF-TOKEN=';
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const ca = decodedCookie.split(';');
+            for(let i = 0; i <ca.length; i++) {
+                let c = ca[i].trim();
+                if (c.indexOf(name) === 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return '';
+        }
+
+        function getCsrfHeader() {
+            const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+            return headerMeta ? headerMeta.getAttribute('content') : 'X-XSRF-TOKEN';
+        }
+
+        function getHeaders() {
+            const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+            const token = getCsrfToken();
+            if (token) {
+                headers[getCsrfHeader()] = token;
+            }
+            return headers;
+        }
+
         function editProfile() {
-            alert('Chức năng chỉnh sửa thông tin đang được phát triển!');
+            Swal.fire({
+                icon: 'info',
+                title: 'Đang phát triển',
+                text: 'Chức năng chỉnh sửa thông tin đang được phát triển!',
+                confirmButtonColor: '#4ec2b6'
+            });
         }
         
         function changePassword() {
-            alert('Chức năng đổi mật khẩu đang được phát triển!');
+            // Reset form
+            document.getElementById('changePasswordForm').reset();
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+            modal.show();
+        }
+        
+        async function submitChangePassword() {
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+            
+            if (!oldPassword || !newPassword || !confirmNewPassword) {
+                Swal.fire({ icon: 'warning', title: 'Thiếu thông tin', text: 'Vui lòng điền đầy đủ các trường bắt buộc!', confirmButtonColor: '#4ec2b6' });
+                return;
+            }
+            if (newPassword.length < 6) {
+                Swal.fire({ icon: 'warning', title: 'Lỗi mật khẩu', text: 'Mật khẩu mới phải có ít nhất 6 ký tự!', confirmButtonColor: '#4ec2b6' });
+                return;
+            }
+            if (newPassword !== confirmNewPassword) {
+                Swal.fire({ icon: 'warning', title: 'Lỗi mật khẩu', text: 'Mật khẩu mới và xác nhận không khớp!', confirmButtonColor: '#4ec2b6' });
+                return;
+            }
+            
+            try {
+                Swal.fire({ title: 'Đang xử lý...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                
+                const response = await fetch('/api/user/change-password', {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ oldPassword, newPassword })
+                });
+                
+                // Tránh lỗi SyntaxError khi server trả về HTML (VD: trang lỗi 403, 500)
+                const contentType = response.headers.get("content-type");
+                let data = {};
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    data = await response.json();
+                } else {
+                    throw new Error("Máy chủ trả về dữ liệu không hợp lệ (Không phải JSON). HTTP Status: " + response.status);
+                }
+                
+                if (response.ok && data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+                    Swal.fire({
+                        icon: 'success', title: 'Thành công!', text: data.message || 'Đổi mật khẩu thành công.', confirmButtonColor: '#4ec2b6'
+                    });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Lỗi', text: data.message || 'Có lỗi xảy ra, vui lòng thử lại', confirmButtonColor: '#4ec2b6' });
+                }
+            } catch (error) {
+                console.error("Change Password Error: ", error);
+                Swal.fire({ icon: 'error', title: 'Lỗi hệ thống', text: 'Chi tiết: ' + error.message, confirmButtonColor: '#4ec2b6' });
+            }
         }
         
         function logout() {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                window.location.href = '/logout';
-            }
+            Swal.fire({
+                title: 'Đăng xuất?',
+                text: 'Bạn có chắc chắn muốn đăng xuất?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4ec2b6',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Đồng ý',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/logout';
+                    
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_csrf';
+                    csrfInput.value = getCsrfToken();
+                    
+                    form.appendChild(csrfInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
         }
         
         function addNewAddress() {
@@ -504,7 +658,7 @@
             });
             
             if (!isValid) {
-                alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+                Swal.fire({ icon: 'warning', title: 'Thiếu thông tin', text: 'Vui lòng điền đầy đủ thông tin bắt buộc!', confirmButtonColor: '#4ec2b6' });
                 return;
             }
             
@@ -524,9 +678,7 @@
             // Send to API
             fetch('/api/addresses', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: getHeaders(),
                 body: JSON.stringify(addressData)
             })
             .then(response => {
@@ -541,14 +693,15 @@
                 bootstrap.Modal.getInstance(document.getElementById('addressModal')).hide();
                 
                 // Show success message
-                alert('Địa chỉ đã được lưu thành công!');
-                
-                // Refresh page to show new address
-                window.location.reload();
+                Swal.fire({ icon: 'success', title: 'Thành công!', text: 'Địa chỉ đã được lưu thành công!', confirmButtonColor: '#4ec2b6' })
+                .then(() => {
+                    // Refresh page to show new address
+                    window.location.reload();
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Có lỗi xảy ra khi lưu địa chỉ: ' + error.message);
+                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Có lỗi xảy ra khi lưu địa chỉ: ' + error.message, confirmButtonColor: '#4ec2b6' });
             });
         }
         
@@ -577,28 +730,40 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Không thể tải thông tin địa chỉ');
+                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể tải thông tin địa chỉ', confirmButtonColor: '#4ec2b6' });
             });
         }
         
         function deleteAddress(addressId) {
-            if (confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
-                fetch(`/api/addresses/${addressId}`, {
-                    method: 'DELETE'
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Địa chỉ đã được xóa thành công!');
-                        window.location.reload();
-                    } else {
-                        throw new Error('Không thể xóa địa chỉ');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi xóa địa chỉ: ' + error.message);
-                });
-            }
+            Swal.fire({
+                title: 'Xóa địa chỉ?',
+                text: 'Bạn có chắc chắn muốn xóa địa chỉ này?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/api/addresses/${addressId}`, {
+                        method: 'DELETE',
+                        headers: getHeaders()
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire({ icon: 'success', title: 'Đã xóa!', text: 'Địa chỉ đã được xóa thành công.', confirmButtonColor: '#4ec2b6' })
+                            .then(() => window.location.reload());
+                        } else {
+                            throw new Error('Không thể xóa địa chỉ');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Có lỗi xảy ra khi xóa địa chỉ: ' + error.message, confirmButtonColor: '#4ec2b6' });
+                    });
+                }
+            });
         }
     </script>
 </body>

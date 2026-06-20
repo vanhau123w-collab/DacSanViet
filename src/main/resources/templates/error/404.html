@@ -213,9 +213,9 @@
     </div>
     
     <div class="error-container">
-        <div class="error-code">404</div>
-        <h1 class="error-title">Oops! Trang Không Tìm Thấy</h1>
-        <p class="error-message">
+        <div class="error-code" th:text="${status != null ? status : '404'}">404</div>
+        <h1 class="error-title" th:text="${errorTitle != null ? errorTitle : 'Oops! Trang Không Tìm Thấy'}">Oops! Trang Không Tìm Thấy</h1>
+        <p class="error-message" th:utext="${errorMessage != null ? errorMessage : 'Trang bạn đang tìm kiếm có thể đã được di chuyển, xóa hoặc không tồn tại.<br>Đừng lo lắng, chúng tôi sẽ giúp bạn tìm thấy những gì bạn cần!'}">
             Trang bạn đang tìm kiếm có thể đã được di chuyển, xóa hoặc không tồn tại.<br>
             Đừng lo lắng, chúng tôi sẽ giúp bạn tìm thấy những gì bạn cần!
         </p>

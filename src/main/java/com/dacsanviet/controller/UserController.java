@@ -15,6 +15,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
+import com.dacsanviet.dto.ChangePasswordRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * User controller for user profile and account management
  */
@@ -29,6 +39,9 @@ public class UserController {
     
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     @GetMapping({"/profile", "/user/profile"})
     public String profile(Model model, Authentication authentication) {
@@ -62,6 +75,44 @@ public class UserController {
         } catch (Exception e) {
             model.addAttribute("error", "Không thể tải thông tin cá nhân: " + e.getMessage());
             return "user/simple-profile";
+        }
+    }
+
+    @PostMapping("/api/user/change-password")
+    @ResponseBody
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request, Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            response.put("success", false);
+            response.put("message", "Bạn cần đăng nhập để thực hiện chức năng này.");
+            return ResponseEntity.status(401).body(response);
+        }
+
+        try {
+            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+            User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Check if old password matches
+            if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+                response.put("success", false);
+                response.put("message", "Mật khẩu hiện tại không chính xác.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Update new password
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+
+            response.put("success", true);
+            response.put("message", "Đổi mật khẩu thành công!");
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Đã xảy ra lỗi: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
     }
 }
