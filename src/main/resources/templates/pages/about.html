@@ -1,38 +1,40 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giới Thiệu - Đặc Sản Việt</title>
-    
+
     <!-- Favicon -->
     <th:block th:replace="~{fragments/favicon :: favicon}"></th:block>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Custom CSS -->
     <link rel="stylesheet" th:href="@{/css/header.css(v=1)}">
     <link rel="stylesheet" th:href="@{/css/modern-ecommerce.css(v=1)}">
-    
+
     <style>
         :root {
             --primary-color: #4ec2b6;
             --secondary-color: #34495e;
         }
-        
+
         body {
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
         }
-        
+
         /* Hero Section with background image */
         .about-hero {
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/bg-about.jpg');
@@ -45,65 +47,71 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .about-hero::before {
             content: '';
             position: absolute;
             width: 100%;
             height: 100%;
-            background-image: 
-                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px),
-                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-image:
+                radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
             background-size: 50px 50px;
             background-position: 0 0, 25px 25px;
             animation: particleFloat 20s linear infinite;
         }
-        
+
         @keyframes particleFloat {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-50px); }
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-50px);
+            }
         }
-        
+
         .about-hero h1 {
             animation: fadeInUp 1s ease;
             position: relative;
             z-index: 1;
         }
-        
+
         .about-hero p {
             animation: fadeInUp 1.2s ease;
             position: relative;
             z-index: 1;
         }
-        
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         /* Story Section */
         .story-section {
             padding: 80px 0;
             background: white;
         }
-        
+
         .story-card {
             background: white;
             border: 2px solid #e9ecef;
             border-radius: 20px;
             padding: 50px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
             transition: all 0.5s ease;
             position: relative;
             overflow: hidden;
         }
-        
+
         .story-card::before {
             content: '🌾';
             position: absolute;
@@ -113,39 +121,44 @@
             top: -50px;
             animation: rotate 20s linear infinite;
         }
-        
+
         @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
-        
+
         .story-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
-        
+
         /* Values Section */
         .values-section {
             background: #f8f9fa;
             color: #2c3e50;
             padding: 80px 0;
         }
-        
+
         .value-item {
             text-align: center;
             padding: 40px 30px;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.4s ease;
             height: 100%;
         }
-        
+
         .value-item:hover {
             transform: translateY(-15px);
             box-shadow: 0 15px 40px rgba(78, 194, 182, 0.2);
         }
-        
+
         .value-icon {
             font-size: 4rem;
             margin-bottom: 20px;
@@ -153,27 +166,39 @@
             color: #4ec2b6;
             animation: bounce 2s ease infinite;
         }
-        
+
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
-        
+
         .value-item:hover .value-icon {
             animation: spin 0.6s ease;
         }
-        
+
         @keyframes spin {
-            from { transform: rotate(0deg) scale(1); }
-            to { transform: rotate(360deg) scale(1.2); }
+            from {
+                transform: rotate(0deg) scale(1);
+            }
+
+            to {
+                transform: rotate(360deg) scale(1.2);
+            }
         }
-        
+
         /* Map Styles */
         .vietnam-map-section {
             padding: 80px 0;
             background: white;
         }
-        
+
         .map-container {
             position: relative;
             background: #f8f9fa;
@@ -182,7 +207,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             min-height: 400px;
         }
-        
+
         .province {
             stroke: #fff;
             stroke-width: 0.5;
@@ -195,18 +220,18 @@
             stroke-width: 1.5;
             filter: brightness(1.2);
         }
-        
+
         .province.dimmed {
             opacity: 0.3;
             filter: grayscale(80%);
         }
-        
+
         .province.highlighted {
             stroke: #333;
             stroke-width: 2;
-            filter: brightness(1.3) drop-shadow(0 0 10px rgba(0,0,0,0.5));
+            filter: brightness(1.3) drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
         }
-        
+
         .map-tooltip {
             position: fixed;
             background: rgba(0, 0, 0, 0.9);
@@ -222,12 +247,12 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             transition: opacity 0.3s ease;
         }
-        
+
         .map-tooltip.show {
             display: block !important;
             opacity: 1 !important;
         }
-        
+
         .tooltip-title {
             font-weight: bold;
             font-size: 16px;
@@ -236,34 +261,34 @@
             border-bottom: 1px solid #555;
             padding-bottom: 5px;
         }
-        
+
         .tooltip-content {
             line-height: 1.4;
         }
-        
+
         /* Team Section */
         .team-section {
             padding: 80px 0;
             background: #f8f9fa;
         }
-        
+
         .team-member {
             text-align: center;
             padding: 40px 30px;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
             height: 100%;
         }
-        
+
         .team-member:hover {
             transform: translateY(-15px) rotate(2deg);
             box-shadow: 0 15px 40px rgba(78, 194, 182, 0.3);
         }
-        
+
         .member-avatar {
             width: 120px;
             height: 120px;
@@ -277,12 +302,12 @@
             color: white;
             transition: all 0.4s ease;
         }
-        
+
         .team-member:hover .member-avatar {
             transform: scale(1.1) rotate(360deg);
             box-shadow: 0 10px 30px rgba(78, 194, 182, 0.4);
         }
-        
+
         /* Contact Section */
         .contact-section {
             background: linear-gradient(135deg, #2e857c 0%, #4ec2b6 100%);
@@ -292,7 +317,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .contact-section .btn {
             background: white;
             color: #2e857c;
@@ -306,35 +331,35 @@
             display: inline-block;
             margin: 0 10px;
         }
-        
+
         .contact-section .btn:hover {
             transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
             color: #2e857c;
         }
-        
+
         /* Fade in animation */
         .fade-in-section {
             opacity: 0;
             transform: translateY(50px);
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
-        
+
         .fade-in-section.is-visible {
             opacity: 1;
             transform: translateY(0);
         }
-        
+
         /* Regional Stories Section */
         .story-card-region:hover {
             transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
-        
+
         .story-card-region .region-badge {
             transition: all 0.3s ease;
         }
-        
+
         .story-card-region:hover .region-badge {
             transform: scale(1.1);
             background: rgba(78, 194, 182, 1) !important;
@@ -345,7 +370,7 @@
 <body>
     <!-- Header -->
     <div th:replace="~{fragments/header :: navbar}"></div>
-    
+
     <!-- Mobile Menu -->
     <div th:replace="~{fragments/header :: mobile-menu}"></div>
 
@@ -354,13 +379,13 @@
         <div class="container">
             <h1 class="display-3 fw-bold mb-4" style="color: white;">Về Đặc Sản Việt</h1>
             <p class="lead fs-4" style="color: white;"></p>
-                <i class="fas fa-leaf me-2"></i>
-                Gìn giữ hồn quê, lan toả giá trị Việt
-                <i class="fas fa-leaf ms-2"></i>
+            <i class="fas fa-leaf me-2"></i>
+            Gìn giữ hồn quê, lan toả giá trị Việt
+            <i class="fas fa-leaf ms-2"></i>
             </p>
         </div>
     </section>
-    
+
     <!-- Story Section -->
     <section class="story-section fade-in-section">
         <div class="container">
@@ -377,8 +402,10 @@
                             <i class="fas fa-quote-right ms-2" style="color: #4ec2b6;"></i>
                         </p>
                         <p class="fs-5 text-muted text-center" style="line-height: 1.8;">
-                            Chúng tôi hiểu rằng mỗi vùng miền đều có những đặc sản riêng biệt, mang đậm dấu ấn văn hóa và tâm huyết của người làm ra chúng. 
-                            Sứ mệnh của chúng tôi là kết nối những người yêu ẩm thực với các nghệ nhân, làng nghề truyền thống 
+                            Chúng tôi hiểu rằng mỗi vùng miền đều có những đặc sản riêng biệt, mang đậm dấu ấn văn hóa
+                            và tâm huyết của người làm ra chúng.
+                            Sứ mệnh của chúng tôi là kết nối những người yêu ẩm thực với các nghệ nhân, làng nghề truyền
+                            thống
                             trên khắp cả nước, mang đến cho bạn những sản phẩm chất lượng nhất với giá cả hợp lý nhất.
                         </p>
                     </div>
@@ -386,7 +413,7 @@
             </div>
         </div>
     </section>
-    
+
     <!-- Values Section -->
     <section class="values-section fade-in-section">
         <div class="container">
@@ -404,7 +431,8 @@
                             <i class="fas fa-check-circle me-2"></i>
                             Chất Lượng Tự Nhiên
                         </h4>
-                        <p class="fs-5">Sản phẩm từ nguyên liệu tự nhiên, không chất bảo quản, đảm bảo an toàn cho sức khỏe.</p>
+                        <p class="fs-5">Sản phẩm từ nguyên liệu tự nhiên, không chất bảo quản, đảm bảo an toàn cho sức
+                            khỏe.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -416,7 +444,8 @@
                             <i class="fas fa-check-circle me-2"></i>
                             Hỗ Trợ Cộng Đồng
                         </h4>
-                        <p class="fs-5">Đồng hành cùng nghệ nhân và làng nghề truyền thống, giữ gìn bản sắc văn hóa Việt.</p>
+                        <p class="fs-5">Đồng hành cùng nghệ nhân và làng nghề truyền thống, giữ gìn bản sắc văn hóa
+                            Việt.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -428,13 +457,14 @@
                             <i class="fas fa-check-circle me-2"></i>
                             Giao Hàng Tận Tâm
                         </h4>
-                        <p class="fs-5">Đóng gói cẩn thận, bảo quản tốt nhất để sản phẩm đến tay bạn trong tình trạng hoàn hảo.</p>
+                        <p class="fs-5">Đóng gói cẩn thận, bảo quản tốt nhất để sản phẩm đến tay bạn trong tình trạng
+                            hoàn hảo.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    
+
     <!-- Vietnam Map Section -->
     <section class="vietnam-map-section fade-in-section">
         <div class="container">
@@ -444,7 +474,8 @@
                     <div class="map-container">
                         <!-- Bản đồ SVG sẽ được tải động -->
                         <div id="map-loading" style="text-align: center; padding: 50px; color: #6c757d;">
-                            <i class="fas fa-map-marked-alt" style="font-size: 4rem; color: #4ec2b6; margin-bottom: 20px;"></i>
+                            <i class="fas fa-map-marked-alt"
+                                style="font-size: 4rem; color: #4ec2b6; margin-bottom: 20px;"></i>
                             <p class="fs-5">🗺️ Đang khởi tạo bản đồ Việt Nam...</p>
                         </div>
                     </div>
@@ -457,24 +488,29 @@
                             <h5 class="fw-bold mb-3" style="color: #007bff;">
                                 <i class="fas fa-map-marker-alt me-2"></i>Miền Bắc (26 tỉnh thành)
                             </h5>
-                            <p class="mb-0">Hương vị tinh tế, thanh đạm. Nổi bật với các món như Phở, Bún chả, Cơm cháy, Bánh cuốn...</p>
+                            <p class="mb-0">Hương vị tinh tế, thanh đạm. Nổi bật với các món như Phở, Bún chả, Cơm cháy,
+                                Bánh cuốn...</p>
                         </div>
                         <div class="mb-4 p-4 bg-light rounded-3">
                             <h5 class="fw-bold mb-3" style="color: #ffc107;">
                                 <i class="fas fa-map-marker-alt me-2"></i>Miền Trung (18 tỉnh thành)
                             </h5>
-                            <p class="mb-0">Đậm đà, cay nồng. Nổi tiếng với Mì Quảng, Bún bò Huế, Bánh khoái, Nem lụi...</p>
+                            <p class="mb-0">Đậm đà, cay nồng. Nổi tiếng với Mì Quảng, Bún bò Huế, Bánh khoái, Nem lụi...
+                            </p>
                         </div>
                         <div class="mb-4 p-4 bg-light rounded-3">
                             <h5 class="fw-bold mb-3" style="color: #28a745;">
                                 <i class="fas fa-map-marker-alt me-2"></i>Miền Nam (19 tỉnh thành)
                             </h5>
-                            <p class="mb-0">Ngọt ngào, dân dã. Phong phú với Cơm tấm, Hủ tiếu, Bánh xèo, Bánh khọt...</p>
+                            <p class="mb-0">Ngọt ngào, dân dã. Phong phú với Cơm tấm, Hủ tiếu, Bánh xèo, Bánh khọt...
+                            </p>
                         </div>
-                        <div class="mt-4 p-3 rounded-3" style="background: linear-gradient(135deg, #4ec2b6 0%, #2e857c 100%); color: white;">
+                        <div class="mt-4 p-3 rounded-3"
+                            style="background: linear-gradient(135deg, #4ec2b6 0%, #2e857c 100%); color: white;">
                             <p class="mb-0">
                                 <i class="fas fa-info-circle me-2"></i>
-                                <strong>Hướng dẫn:</strong> Di chuột qua bản đồ bên trái để xem đặc sản chi tiết từng tỉnh. 
+                                <strong>Hướng dẫn:</strong> Di chuột qua bản đồ bên trái để xem đặc sản chi tiết từng
+                                tỉnh.
                                 Hiện tại đã cập nhật <strong>63 tỉnh thành</strong> trên toàn quốc.
                             </p>
                         </div>
@@ -483,13 +519,13 @@
             </div>
         </div>
     </section>
-    
+
     <!-- Map Tooltip -->
     <div class="map-tooltip" id="mapTooltip">
         <div class="tooltip-title"></div>
         <div class="tooltip-content"></div>
     </div>
-    
+
     <!-- Team Section -->
     <section class="team-section fade-in-section">
         <div class="container">
@@ -524,7 +560,7 @@
                         </div>
                         <h5 class="fw-bold mb-2">
                             <i class="fas fa-star me-2" style="color: #ffd700;"></i>
-                            Nguyễn Minh Triết
+                            Trương Công Anh
                         </h5>
                         <p class="text-muted mb-0">
                             <i class="fas fa-award me-1" style="color: #4ec2b6;"></i>
@@ -558,10 +594,10 @@
             </div>
         </div>
     </section>
-     <!-- Contact Section -->
+    <!-- Contact Section -->
     <section class="contact-section fade-in-section mb-5">
         <div class="container">
-            <h2 class="fw-bold mb-4 fs-1" style = "color: white">
+            <h2 class="fw-bold mb-4 fs-1" style="color: white">
                 <i class="fas fa-phone-alt me-3"></i>
                 Liên Hệ Với Chúng Tôi
             </h2>
@@ -589,46 +625,58 @@
             <div class="row g-4">
                 <!-- Hà Giang Story -->
                 <div class="col-lg-4">
-                    <div class="story-card-region" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/images/nuiHG.webp'); background-size: cover; background-position: center; color: white; border-radius: 20px; padding: 40px; height: 400px; position: relative; overflow: hidden; transition: all 0.4s ease;">
-                        <div class="region-badge" style="position: absolute; top: 20px; left: 20px; background: rgba(78, 194, 182, 0.9); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                    <div class="story-card-region"
+                        style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/images/nuiHG.webp'); background-size: cover; background-position: center; color: white; border-radius: 20px; padding: 40px; height: 400px; position: relative; overflow: hidden; transition: all 0.4s ease;">
+                        <div class="region-badge"
+                            style="position: absolute; top: 20px; left: 20px; background: rgba(78, 194, 182, 0.9); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
                             Hà Giang
                         </div>
                         <div style="position: absolute; bottom: 40px; left: 40px; right: 40px;">
                             <h4 class="fw-bold mb-3" style="color: white;">Vị Ngọt Của Đá</h4>
-                            <p class="mb-3" style="line-height: 1.6; color: white;">Câu chuyện về những báo ngọt kiên cường mọc trên các ngọn núi đá vôi chẻn rạn ngỏ âm nóng thiên nhiên H'Mông.</p>
-                            <a href="https://www.youtube.com/watch?v=ORlO0RyhSug" target="_blank" class="btn btn-outline-light btn-sm" style="border-radius: 20px;">
+                            <p class="mb-3" style="line-height: 1.6; color: white;">Câu chuyện về những báo ngọt kiên
+                                cường mọc trên các ngọn núi đá vôi chẻn rạn ngỏ âm nóng thiên nhiên H'Mông.</p>
+                            <a href="https://www.youtube.com/watch?v=ORlO0RyhSug" target="_blank"
+                                class="btn btn-outline-light btn-sm" style="border-radius: 20px;">
                                 Xem Video <i class="fab fa-youtube ms-2"></i>
                             </a>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Thái Nguyên Story -->
                 <div class="col-lg-4">
-                    <div class="story-card-region" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/images/comTN.webp'); background-size: cover; background-position: center; color: white; border-radius: 20px; padding: 40px; height: 400px; position: relative; overflow: hidden; transition: all 0.4s ease;">
-                        <div class="region-badge" style="position: absolute; top: 20px; left: 20px; background: rgba(78, 194, 182, 0.9); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                    <div class="story-card-region"
+                        style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/images/comTN.webp'); background-size: cover; background-position: center; color: white; border-radius: 20px; padding: 40px; height: 400px; position: relative; overflow: hidden; transition: all 0.4s ease;">
+                        <div class="region-badge"
+                            style="position: absolute; top: 20px; left: 20px; background: rgba(78, 194, 182, 0.9); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
                             Thái Nguyên
                         </div>
                         <div style="position: absolute; bottom: 40px; left: 40px; right: 40px;">
                             <h4 class="fw-bold mb-3" style="color: white;">Hương Cốm Mùa Thu</h4>
-                            <p class="mb-3" style="line-height: 1.6; color: white;">Làng nghề nhịp chày gia sốm đậm trắng và nghệ thuật tép trà sen tinh tế của người nghệ nhân gia.</p>
-                            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="btn btn-outline-light btn-sm" style="border-radius: 20px;">
+                            <p class="mb-3" style="line-height: 1.6; color: white;">Làng nghề nhịp chày gia sốm đậm
+                                trắng và nghệ thuật tép trà sen tinh tế của người nghệ nhân gia.</p>
+                            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"
+                                class="btn btn-outline-light btn-sm" style="border-radius: 20px;">
                                 Xem Video <i class="fab fa-youtube ms-2"></i>
                             </a>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Miền Tây Story -->
                 <div class="col-lg-4">
-                    <div class="story-card-region" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/images/chonoi.webp'); background-size: cover; background-position: center; color: white; border-radius: 20px; padding: 40px; height: 400px; position: relative; overflow: hidden; transition: all 0.4s ease;">
-                        <div class="region-badge" style="position: absolute; top: 20px; left: 20px; background: rgba(78, 194, 182, 0.9); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                    <div class="story-card-region"
+                        style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/images/chonoi.webp'); background-size: cover; background-position: center; color: white; border-radius: 20px; padding: 40px; height: 400px; position: relative; overflow: hidden; transition: all 0.4s ease;">
+                        <div class="region-badge"
+                            style="position: absolute; top: 20px; left: 20px; background: rgba(78, 194, 182, 0.9); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
                             Miền Tây
                         </div>
                         <div style="position: absolute; bottom: 40px; left: 40px; right: 40px;">
                             <h4 class="fw-bold mb-3" style="color: white;">Chợ Nổi Cái Răng</h4>
-                            <p class="mb-3" style="line-height: 1.6; color: white;">Văn hóa ghe xuồng đặc đáo và những thức quả bình dị được truy tay giữa sông nước mênh mông.</p>
-                            <a href="https://www.youtube.com/watch?v=ORlO0RyhSug" target="_blank" class="btn btn-outline-light btn-sm" style="border-radius: 20px;">
+                            <p class="mb-3" style="line-height: 1.6; color: white;">Văn hóa ghe xuồng đặc đáo và những
+                                thức quả bình dị được truy tay giữa sông nước mênh mông.</p>
+                            <a href="https://www.youtube.com/watch?v=ORlO0RyhSug" target="_blank"
+                                class="btn btn-outline-light btn-sm" style="border-radius: 20px;">
                                 Xem Video <i class="fab fa-youtube ms-2"></i>
                             </a>
                         </div>
@@ -637,28 +685,28 @@
             </div>
         </div>
     </section>
-    
+
 
     <!-- Footer -->
     <div th:replace="~{fragments/footer :: footer}"></div>
-    
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/js/header.js(v=1)}"></script>
-    
+
     <!-- Vietnam Map Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             console.log('🗺️ Loading Vietnam Map...');
-            
+
             const mapContainer = document.querySelector('.map-container');
             const tooltip = document.getElementById('mapTooltip');
-            
+
             if (!mapContainer) {
                 console.error('Map container not found');
                 return;
             }
-            
+
             // Load SVG map
             fetch('/vn.svg')
                 .then(response => {
@@ -667,20 +715,20 @@
                 })
                 .then(svgContent => {
                     console.log('Map loaded successfully');
-                    
+
                     // Display SVG
                     mapContainer.innerHTML = svgContent;
-                    
+
                     const svg = mapContainer.querySelector('svg');
                     if (svg) {
                         svg.style.width = '100%';
                         svg.style.height = 'auto';
                         svg.style.maxHeight = '600px';
-                        
+
                         // Get all provinces
                         const provinces = svg.querySelectorAll('path[id^="VN"]');
                         console.log(`Found ${provinces.length} provinces`);
-                        
+
                         // Generate random colors for each province
                         const colors = [
                             '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
@@ -696,7 +744,7 @@
                             '#7209B7', '#560BAD', '#480CA8', '#3A0CA3', '#3F37C9',
                             '#4361EE', '#4895EF', '#4CC9F0', '#06FFA5', '#FFFB46'
                         ];
-                        
+
                         // Province data (all 63 provinces)
                         const provinceData = {
                             'VNHN': { name: 'Hà Nội', specialty: 'Phở, Bún chả, Cơm cháy' },
@@ -763,19 +811,19 @@
                             'VN72': { name: 'Đắk Nông', specialty: 'Cà phê, Cơm lam' },
                             'VN73': { name: 'Hậu Giang', specialty: 'Bánh xèo, Lẩu mắm' }
                         };
-                        
+
                         provinces.forEach((province, index) => {
                             const id = province.getAttribute('id');
-                            
+
                             // Try to find province data
                             let data = provinceData[id];
                             if (!data) {
-                                data = { 
-                                    name: id.replace('VN-', 'Tỉnh ').replace('VN', 'Tỉnh '), 
-                                    specialty: 'Đang cập nhật...' 
+                                data = {
+                                    name: id.replace('VN-', 'Tỉnh ').replace('VN', 'Tỉnh '),
+                                    specialty: 'Đang cập nhật...'
                                 };
                             }
-                            
+
                             // Assign unique color to each province
                             const color = colors[index % colors.length];
                             province.style.fill = color;
@@ -783,7 +831,7 @@
                             province.setAttribute('data-province-id', id);
                             province.setAttribute('data-province-name', data.name);
                             province.setAttribute('data-province-specialty', data.specialty);
-                            
+
                             // Determine if this is part of an archipelago
                             let groupId = id;
                             if (id.startsWith('VNHS_') || id.startsWith('VN-HS')) {
@@ -792,19 +840,19 @@
                                 groupId = 'VNTS'; // Trường Sa
                             }
                             province.setAttribute('data-group-id', groupId);
-                            
+
                             // Hover events
-                            province.addEventListener('mouseenter', function(e) {
+                            province.addEventListener('mouseenter', function (e) {
                                 const currentGroupId = this.getAttribute('data-group-id');
                                 const provinceName = this.getAttribute('data-province-name');
                                 const provinceSpecialty = this.getAttribute('data-province-specialty');
-                                
+
                                 // Dim all provinces
                                 provinces.forEach(p => {
                                     p.classList.add('dimmed');
                                     p.classList.remove('highlighted');
                                 });
-                                
+
                                 // Highlight current province and its group
                                 provinces.forEach(p => {
                                     const pGroupId = p.getAttribute('data-group-id');
@@ -813,7 +861,7 @@
                                         p.classList.add('highlighted');
                                     }
                                 });
-                                
+
                                 // Show tooltip
                                 if (tooltip) {
                                     let displayName = provinceName;
@@ -827,31 +875,31 @@
                                     tooltip.classList.add('show');
                                 }
                             });
-                            
-                            province.addEventListener('mousemove', function(e) {
+
+                            province.addEventListener('mousemove', function (e) {
                                 if (tooltip) {
                                     tooltip.style.left = (e.clientX + 15) + 'px';
                                     tooltip.style.top = (e.clientY + 15) + 'px';
                                 }
                             });
-                            
-                            province.addEventListener('mouseleave', function() {
+
+                            province.addEventListener('mouseleave', function () {
                                 // Remove all effects when mouse leaves
                                 provinces.forEach(p => {
                                     p.classList.remove('dimmed', 'highlighted');
                                 });
-                                
+
                                 if (tooltip) {
                                     tooltip.classList.remove('show');
                                 }
                             });
-                            
+
                             // Click event
-                            province.addEventListener('click', function() {
+                            province.addEventListener('click', function () {
                                 const currentGroupId = this.getAttribute('data-group-id');
                                 const provinceName = this.getAttribute('data-province-name');
                                 const provinceSpecialty = this.getAttribute('data-province-specialty');
-                                
+
                                 let displayName = provinceName;
                                 if (currentGroupId === 'VNHS') {
                                     displayName = 'Quần đảo Hoàng Sa';
@@ -877,17 +925,17 @@
                     `;
                 });
         });
-        
+
         // Fade in animation on scroll
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const faders = document.querySelectorAll('.fade-in-section');
-            
+
             const appearOptions = {
                 threshold: 0.15,
                 rootMargin: "0px 0px -100px 0px"
             };
-            
-            const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll) {
+
+            const appearOnScroll = new IntersectionObserver(function (entries, appearOnScroll) {
                 entries.forEach(entry => {
                     if (!entry.isIntersecting) {
                         return;
@@ -897,11 +945,12 @@
                     }
                 });
             }, appearOptions);
-            
+
             faders.forEach(fader => {
                 appearOnScroll.observe(fader);
             });
         });
     </script>
 </body>
+
 </html>

@@ -81,22 +81,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
         }
 
-        /* 3D Effect for Featured Products Section */
-        section.featured-products-section .product-card {
-            perspective: 1000px !important;
-            transform-style: preserve-3d !important;
-            transition: transform 0.1s ease-out !important;
-        }
 
-        section.featured-products-section .product-card .card-body {
-            transform-style: preserve-3d !important;
-        }
-
-        section.featured-products-section .card.product-card {
-            perspective: 1000px !important;
-            transform-style: preserve-3d !important;
-            transition: transform 0.1s ease-out !important;
-        }
 
         /* Product Image Hover Effect - Show Second Image */
         .product-img-container {
@@ -105,7 +90,7 @@
         }
 
         .product-img {
-            transition: opacity 0.4s ease-in-out !important;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
         }
 
         .product-img-hover {
@@ -646,10 +631,12 @@
                 <div class="col-lg-3 col-md-6 product-item" th:each="product, iterStat : ${newProducts}" th:attr="data-index=${iterStat.index}">
                     <div class="card modern-card product-card h-100 animate-fade-in-up" th:attr="style='animation-delay: ' + ${(iterStat.index % 8) * 0.1} + 's'">
                         <div class="position-relative">
-                            <img th:src="${product.imageUrl}"
-                                 th:alt="${product.name}"
-                                 class="card-img-top product-img"
-                                 onerror="this.src='https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&q=80'">
+                            <a th:href="@{/products/{id}(id=${product.id})}">
+                                <img th:src="${product.imageUrl}"
+                                     th:alt="${product.name}"
+                                     class="card-img-top product-img"
+                                     onerror="this.src='https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&q=80'">
+                            </a>
                             <div class="product-badge">
                                 <span class="badge bg-danger mb-1">
                                     <i class="bi bi-lightning-fill me-1"></i>Mới
@@ -660,7 +647,9 @@
                             </div>
                         </div>
                         <div class="card-body p-4">
-                            <h5 class="card-title fw-bold mb-2" th:text="${product.name}">Tên sản phẩm</h5>
+                            <a th:href="@{/products/{id}(id=${product.id})}" class="text-decoration-none text-dark">
+                                <h5 class="card-title fw-bold mb-2" th:text="${product.name}">Tên sản phẩm</h5>
+                            </a>
                             <p class="card-text text-muted mb-3" th:utext="${product.description}">Mô tả sản phẩm</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="price-tag" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>

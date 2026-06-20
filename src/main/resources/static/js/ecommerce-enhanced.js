@@ -102,42 +102,8 @@ function initializeProductInteractions() {
         }
     });
     
-    // Product quick view
-    document.querySelectorAll('.product-card').forEach(card => {
-        const quickViewBtn = document.createElement('button');
-        quickViewBtn.className = 'btn btn-outline-primary btn-sm position-absolute';
-        quickViewBtn.style.cssText = 'top: 10px; left: 10px; opacity: 0; transition: opacity 0.3s ease;';
-        quickViewBtn.innerHTML = '<i class="bi bi-eye"></i>';
-        quickViewBtn.title = 'Xem nhanh';
-        
-        card.style.position = 'relative';
-        card.appendChild(quickViewBtn);
-        
-        card.addEventListener('mouseenter', () => {
-            quickViewBtn.style.opacity = '1';
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            quickViewBtn.style.opacity = '0';
-        });
-        
-        quickViewBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            // Implement quick view modal
-            showQuickViewModal(card);
-        });
-    });
-    
-    // Product image zoom effect
-    document.querySelectorAll('.product-img').forEach(img => {
-        img.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.1)';
-        });
-        
-        img.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1)';
-        });
-    });
+
+
 }
 
 // Enhanced Add to Cart (uses localStorage for guests, server for logged-in users)

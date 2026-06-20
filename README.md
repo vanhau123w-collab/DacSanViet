@@ -1,29 +1,40 @@
-# 🛒 Đặc Sản Việt - E-commerce Platform
+<div align="center">
 
-> **Nền tảng thương mại điện tử hiện đại cho đặc sản Việt Nam**
+# 🛒 Đặc Sản Việt - E-Commerce Platform
 
-[![Demo](https://img.shields.io/badge/Demo-Live-brightgreen)](http://localhost:8082) [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-brightgreen.svg)](https://spring.io/projects/spring-boot) [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue.svg)](https://www.mysql.com/) [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Spring Boot](https://img.shields.io/badge/SPRING_BOOT-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Java 17](https://img.shields.io/badge/JAVA_17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![MySQL](https://img.shields.io/badge/MYSQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Thymeleaf](https://img.shields.io/badge/THYMELEAF-005F0F?style=for-the-badge&logo=thymeleaf&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/BOOTSTRAP-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JAVASCRIPT-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![E-Commerce](https://img.shields.io/badge/E--COMMERCE-FF6A00?style=for-the-badge)
+![License MIT](https://img.shields.io/badge/LICENSE-MIT-green?style=for-the-badge)
 
-## 📋 Mục lục
-- [Giới thiệu](#-giới-thiệu)
-- [Tính năng](#-tính-năng)
-- [Công nghệ sử dụng](#️-công-nghệ-sử-dụng)
-- [Cài đặt](#-cài-đặt)
-- [Cấu hình](#️-cấu-hình)
-- [API Documentation](#-api-documentation)
-- [Screenshots](#-screenshots)
-- [Đóng góp](#-đóng-góp)
-- [License](#-license)
+> 🎁 Nền tảng thương mại điện tử hiện đại chuyên phân phối các sản phẩm đặc sản vùng miền Việt Nam, mang hương vị quê hương đến mọi miền tổ quốc.
 
-## 🌟 Giới thiệu
+</div>
 
-**Đặc Sản Việt** là một nền tảng thương mại điện tử hiện đại được xây dựng bằng Spring Boot, chuyên về việc bán các sản phẩm đặc sản từ khắp các vùng miền Việt Nam. Dự án tập trung vào trải nghiệm người dùng tuyệt vời với giao diện đẹp mắt, hiệu suất cao và tính năng phong phú.
+---
 
-### 🎯 Mục tiêu dự án
-- ✅ Tạo ra một nền tảng bán hàng trực tuyến chuyên nghiệp
-- ✅ Quảng bá các sản phẩm đặc sản Việt Nam
-- ✅ Cung cấp trải nghiệm mua sắm tuyệt vời cho khách hàng
-- ✅ Hỗ trợ các nhà bán hàng địa phương
+## 📌 Giới thiệu dự án
+
+**Đặc Sản Việt** là hệ thống ứng dụng công nghệ web hiện đại kết hợp **Spring Boot** và **Thymeleaf** nhằm tạo ra một kênh phân phối đặc sản Việt Nam uy tín và tiện lợi.
+
+Hệ thống được định hướng trở thành một nền tảng bán hàng trực tuyến toàn diện, có khả năng quản lý kho hàng, xử lý đơn hàng, tích hợp thanh toán đa phương thức và cung cấp trải nghiệm mua sắm tuyệt vời cho người dùng.
+
+Các chức năng chính:
+
+- 🔍 Tìm kiếm và lọc sản phẩm thông minh theo danh mục, mức giá
+- 🛒 Giỏ hàng tối ưu hóa bằng localStorage, đồng bộ dữ liệu người dùng
+- ⚡ Checkout 1 trang (1-page checkout) nhanh chóng và tích hợp mã QR thanh toán
+- 🧩 Dashboard quản trị trực quan với các biểu đồ thống kê doanh thu, đơn hàng
+- 💬 Hỗ trợ hệ thống bình luận, đánh giá sản phẩm realtime bằng WebSocket
+- 🔔 Gửi email thông báo tự động cho từng trạng thái của đơn hàng
+- 🧠 Quản lý phân quyền chặt chẽ (Admin, Customer, Staff) bằng Spring Security
+- 📊 Hỗ trợ hệ thống tin tức, blog chuẩn SEO để quảng bá sản phẩm
+
+---
 
 ## ✨ Tính năng
 

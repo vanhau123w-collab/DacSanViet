@@ -21,13 +21,17 @@
     </span>
     
     <!-- Product image -->
-    <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/placeholder-product.jpg'}" 
-         class="card-img-top" th:alt="'Hình ảnh sản phẩm ' + ${product.name}"
-         loading="lazy" decoding="async">
+    <a th:href="@{/products/{id}(id=${product.id})}">
+        <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/placeholder-product.jpg'}" 
+             class="card-img-top" th:alt="'Hình ảnh sản phẩm ' + ${product.name}"
+             loading="lazy" decoding="async">
+    </a>
     
     <div class="card-body d-flex flex-column">
         <!-- Product name -->
-        <h5 class="card-title" th:text="${product.name}" th:id="'product-title-' + ${product.id}">Product Name</h5>
+        <a th:href="@{/products/{id}(id=${product.id})}" class="text-decoration-none text-dark">
+            <h5 class="card-title" th:text="${product.name}" th:id="'product-title-' + ${product.id}">Product Name</h5>
+        </a>
         
         <!-- Product description -->
         <p class="card-text text-muted small flex-grow-1" 

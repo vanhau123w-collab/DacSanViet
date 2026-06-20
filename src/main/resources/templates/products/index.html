@@ -133,11 +133,11 @@
         .product-img {
             height: 250px;
             object-fit: cover;
-            transition: transform 0.3s ease;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         
         .product-card:hover .product-img {
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
         
         .product-badge {
@@ -631,10 +631,12 @@
                          th:data-index="${iterStat.index}">
                         <div class="product-card">
                             <div class="position-relative">
-                                <img th:src="${product.imageUrl}" 
-                                     th:alt="${product.name}"
-                                     class="product-img w-100" 
-                                     onerror="this.src='https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80'">
+                                <a th:href="@{/products/{id}(id=${product.id})}">
+                                    <img th:src="${product.imageUrl}" 
+                                         th:alt="${product.name}"
+                                         class="product-img w-100" 
+                                         onerror="this.src='https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80'">
+                                </a>
                                 <div class="product-badge">
                                     <span class="badge bg-success mb-1" th:if="${product.isFeatured}">
                                         <i class="bi bi-star-fill me-1"></i>Nổi bật
@@ -648,7 +650,9 @@
                                 </div>
                             </div>
                             <div class="product-info">
-                                <h5 class="product-title" th:text="${product.name}">Tên sản phẩm</h5>
+                                <a th:href="@{/products/{id}(id=${product.id})}" class="text-decoration-none text-dark">
+                                    <h5 class="product-title" th:text="${product.name}">Tên sản phẩm</h5>
+                                </a>
                                 <p class="product-description" th:utext="${product.description}">Mô tả sản phẩm</p>
                                 <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
                                 
