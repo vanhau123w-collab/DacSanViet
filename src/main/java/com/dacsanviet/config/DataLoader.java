@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * DataLoader to initialize default users and sample data
@@ -37,6 +39,9 @@ public class DataLoader implements CommandLineRunner {
     
     @Autowired
     private NewsArticleRepository newsArticleRepository;
+
+    @Autowired
+    private SupplierRepository supplierRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -70,6 +75,9 @@ public class DataLoader implements CommandLineRunner {
         
         // Create sample categories and products
         createSampleData();
+
+        // Backfill the richer catalog exported from the DacSanVietRail database.
+        createRailwayCatalogData();
         
         // Create sample news data
         createSampleNewsData();
@@ -109,6 +117,233 @@ public class DataLoader implements CommandLineRunner {
                 new BigDecimal("25000"), 120, dacSanMienNam, "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=300&q=80", "Phan Thiết", 80);
         
         System.out.println("✅ Sample categories and products created successfully!");
+    }
+
+    private void createRailwayCatalogData() {
+        Map<String, Category> categories = new LinkedHashMap<>();
+
+        categories.put("Đặc Sản Miền Bắc", createOrUpdateCategory("Đặc Sản Miền Bắc",
+                "Các sản phẩm đặc sản từ miền Bắc Việt Nam",
+                "/uploads/categories/8ec9f056-1d64-450b-9eef-e3587f79b868.jpg", null));
+        categories.put("Đặc Sản Miền Trung", createOrUpdateCategory("Đặc Sản Miền Trung",
+                "Các sản phẩm đặc sản từ miền Trung Việt Nam",
+                "/uploads/categories/9de89f4a-e524-4659-b682-f443777226df.webp", null));
+        categories.put("Đặc Sản Miền Nam", createOrUpdateCategory("Đặc Sản Miền Nam",
+                "Các sản phẩm đặc sản từ miền Nam Việt Nam",
+                "/uploads/categories/b37e33bc-a9bf-4ef4-817b-1fddf2cdfaa1.jpg", null));
+
+        categories.put("Bánh Kẹo", createOrUpdateCategory("Bánh Kẹo", "Các loại bánh kẹo truyền thống",
+                "/uploads/categories/bfb54091-31cb-493f-b0d6-e2fb0efdb803.jpg", categories.get("Đặc Sản Miền Bắc")));
+        categories.put("Nem Chua", createOrUpdateCategory("Nem Chua", "Các loại nem chua đặc sản",
+                "/uploads/categories/27853534-c2e1-43e3-b781-6b06cc42af19.jpg", categories.get("Đặc Sản Miền Trung")));
+        categories.put("Các Loại Mắm", createOrUpdateCategory("Các Loại Mắm",
+                "Các loại mắm đặc sản miền Tây vô cùng thơm ngon",
+                "/uploads/categories/47f547fd-a3a3-4dee-b507-0070cc00efe2.jpg", categories.get("Đặc Sản Miền Nam")));
+        categories.put("Bến Tre", createOrUpdateCategory("Bến Tre", "Tỉnh Miền Tây",
+                "/uploads/categories/34b3f4c0-25be-4be7-840d-a893924aee8d.jpg", categories.get("Đặc Sản Miền Nam")));
+        categories.put("Kẹo dừa", createOrUpdateCategory("Kẹo dừa", "",
+                "/uploads/categories/06743131-dbb4-40bf-a970-652f7b2ed941.jpg", categories.get("Bến Tre")));
+
+        addProvinceCategories(categories, "Đặc Sản Miền Bắc", new String[][] {
+                {"Hà Nội", "Đặc sản từ thủ đô Hà Nội - Bánh chưng, bánh giầy, chả cá Lã Vọng"},
+                {"Hải Phòng", "Đặc sản từ thành phố cảng Hải Phòng - Bánh đa cua, nem cua bể"},
+                {"Quảng Ninh", "Đặc sản từ Quảng Ninh - Ngọc trai, hải sản tươi sống"},
+                {"Lạng Sơn", "Đặc sản từ Lạng Sơn - Bánh cuốn Lạng Sơn, măng khô"},
+                {"Cao Bằng", "Đặc sản từ Cao Bằng - Bánh khảo, thịt trâu gác bếp"},
+                {"Bắc Kạn", "Đặc sản từ Bắc Kạn - Cá suối, măng rừng"},
+                {"Thái Nguyên", "Đặc sản từ Thái Nguyên - Chè Thái Nguyên, cốm xanh"},
+                {"Lào Cai", "Đặc sản từ Lào Cai - Thịt trâu gác bếp, rượu cần"},
+                {"Yên Bái", "Đặc sản từ Yên Bái - Hồng không hạt, bánh chưng gù"},
+                {"Sơn La", "Đặc sản từ Sơn La - Mận Sơn La, cá suối nướng"},
+                {"Điện Biên", "Đặc sản từ Điện Biên - Thịt trâu gác bếp, rượu cần"},
+                {"Lai Châu", "Đặc sản từ Lai Châu - Chè Shan Tuyết, mật ong rừng"},
+                {"Hà Giang", "Đặc sản từ Hà Giang - Thịt trâu gác bếp, mật ong đá"},
+                {"Tuyên Quang", "Đặc sản từ Tuyên Quang - Bánh coóng phù, chè Tân Cương"},
+                {"Phú Thọ", "Đặc sản từ Phú Thọ - Bánh chưng Phú Thọ, chè Phú Thọ"},
+                {"Vĩnh Phúc", "Đặc sản từ Vĩnh Phúc - Bánh cuốn Thanh Trì, chả cá"},
+                {"Bắc Giang", "Đặc sản từ Bắc Giang - Vải thiều Lục Ngạn, bánh đậu xanh"},
+                {"Bắc Ninh", "Đặc sản từ Bắc Ninh - Bánh phu thê, chả cá Bắc Ninh"},
+                {"Hải Dương", "Đặc sản từ Hải Dương - Bánh đậu xanh, nem Thanh Hà"},
+                {"Hưng Yên", "Đặc sản từ Hưng Yên - Longan Hưng Yên, bánh đậu xanh"},
+                {"Thái Bình", "Đặc sản từ Thái Bình - Bánh ít lá gai, nem chua"},
+                {"Hà Nam", "Đặc sản từ Hà Nam - Bánh cuốn Phủ Lý, chả cá"},
+                {"Nam Định", "Đặc sản từ Nam Định - Bánh gai, nem Yên Mạc"},
+                {"Ninh Bình", "Đặc sản từ Ninh Bình - Cơm cháy, thịt dê núi"}
+        });
+
+        addProvinceCategories(categories, "Đặc Sản Miền Trung", new String[][] {
+                {"Thanh Hóa", "Đặc sản từ Thanh Hóa - Nem chua Thanh Hóa, bánh trôi tàu"},
+                {"Nghệ An", "Đặc sản từ Nghệ An - Bánh mướt, nem chua Yên Thành"},
+                {"Hà Tĩnh", "Đặc sản từ Hà Tĩnh - Bánh khoái, nem nướng"},
+                {"Quảng Bình", "Đặc sản từ Quảng Bình - Bánh ướt thịt nướng, tôm he"},
+                {"Quảng Trị", "Đặc sản từ Quảng Trị - Bánh bèo, bánh nậm"},
+                {"Thừa Thiên Huế", "Đặc sản từ Huế - Bún bò Huế, bánh khoái, chè Huế"},
+                {"Đà Nẵng", "Đặc sản từ Đà Nẵng - Mì Quảng, bánh tráng cuốn thịt heo"},
+                {"Quảng Nam", "Đặc sản từ Quảng Nam - Mì Quảng, bánh xèo, cao lầu"},
+                {"Quảng Ngãi", "Đặc sản từ Quảng Ngãi - Bánh xèo, bánh căn"},
+                {"Bình Định", "Đặc sản từ Bình Định - Bánh hỏi, bánh ít lá gai"},
+                {"Phú Yên", "Đặc sản từ Phú Yên - Bánh căn, ốc hến"},
+                {"Khánh Hòa", "Đặc sản từ Khánh Hòa - Bánh căn, nem nướng Nha Trang"},
+                {"Ninh Thuận", "Đặc sản từ Ninh Thuận - Bánh căn, nho Ninh Thuận"},
+                {"Bình Thuận", "Đặc sản từ Bình Thuận - Bánh căn, nước mắm Phan Thiết"},
+                {"Kon Tum", "Đặc sản từ Kon Tum - Rượu cần, thịt nướng lá chuối"},
+                {"Gia Lai", "Đặc sản từ Gia Lai - Rượu cần, bánh tráng nướng"},
+                {"Đắk Lắk", "Đặc sản từ Đắk Lắk - Cà phê Buôn Ma Thuột, bánh tráng nướng"},
+                {"Đắk Nông", "Đặc sản từ Đắk Nông - Cà phê, hạt điều"},
+                {"Lâm Đồng", "Đặc sản từ Lâm Đồng - Rau củ Đà Lạt, bánh tráng nướng"}
+        });
+
+        addProvinceCategories(categories, "Đặc Sản Miền Nam", new String[][] {
+                {"TP. Hồ Chí Minh", "Đặc sản từ TP.HCM - Bánh mì, hủ tiếu, bánh xèo"},
+                {"Bà Rịa - Vũng Tàu", "Đặc sản từ Vũng Tàu - Bánh khọt, hải sản tươi sống"},
+                {"Bình Dương", "Đặc sản từ Bình Dương - Bánh tráng nướng, chả cá"},
+                {"Bình Phước", "Đặc sản từ Bình Phước - Hạt điều, bánh tráng"},
+                {"Tây Ninh", "Đặc sản từ Tây Ninh - Bánh tráng nướng, bánh căn"},
+                {"Đồng Nai", "Đặc sản từ Đồng Nai - Bánh tráng, nem nướng"},
+                {"Long An", "Đặc sản từ Long An - Bánh tráng, dưa hấu"},
+                {"Tiền Giang", "Đặc sản từ Tiền Giang - Bánh tráng, kẹo dừa"},
+                {"Trà Vinh", "Đặc sản từ Trà Vinh - Bánh tét, bánh ít lá gai"},
+                {"Vĩnh Long", "Đặc sản từ Vĩnh Long - Bánh khọt, hủ tiếu"},
+                {"Đồng Tháp", "Đặc sản từ Đồng Tháp - Bánh xèo, cá linh"},
+                {"An Giang", "Đặc sản từ An Giang - Bánh pía, bánh tét"},
+                {"Kiên Giang", "Đặc sản từ Kiên Giang - Bánh tét, hải sản Phú Quốc"},
+                {"Cần Thơ", "Đặc sản từ Cần Thơ - Bánh cống, bánh xèo"},
+                {"Hậu Giang", "Đặc sản từ Hậu Giang - Bánh tét, bánh ít"},
+                {"Sóc Trăng", "Đặc sản từ Sóc Trăng - Bánh pía, bánh tét"},
+                {"Bạc Liêu", "Đặc sản từ Bạc Liêu - Bánh tét, tôm khô"},
+                {"Cà Mau", "Đặc sản từ Cà Mau - U tôm, bánh tét"}
+        });
+
+        Supplier supplier = createOrUpdateSupplier();
+        createOrUpdateRailwayProduct("Bánh Chưng Truyền Thống",
+                "<p>Bánh chưng làm từ gạo nếp, đậu xanh và thịt heo, gói lá dong</p>",
+                "Bánh chưng xanh truyền thống",
+                "Bánh chưng gói lá dong, nhân đậu xanh thịt heo, phù hợp làm quà biếu ngày lễ Tết.",
+                new BigDecimal("150000.00"), 50, categories.get("Đặc Sản Miền Bắc"), supplier,
+                "/uploads/products/5185ab6c-5761-4e43-a172-805c43eb0658.jpg", "Hà Nội", 500, true);
+        createOrUpdateRailwayProduct("Bánh Chưng Truyền Thống Đốc",
+                "<p>Bánh chưng làm từ gạo nếp, đậu xanh và thịt heo, gói lá dong</p>",
+                null, "", new BigDecimal("150000.00"), 48, categories.get("Đặc Sản Miền Bắc"), supplier,
+                "/uploads/products/5185ab6c-5761-4e43-a172-805c43eb0658.jpg", "Hà Nội", 500, false);
+        createOrUpdateRailwayProduct("Nem Chua Thanh Hóa",
+                "<p>Nem chua truyền thống Thanh Hóa với hương vị đặc trưng</p>",
+                null, "", new BigDecimal("80000.00"), 98, categories.get("Nem Chua"), supplier,
+                "https://vifoodshop.com/wp-content/uploads/2019/07/nem-chua-chuan-thanh-hoa-247x296.jpg", "Thanh Hóa", 200, false);
+        createOrUpdateRailwayProduct("Bánh Tráng Nướng Đà Lạt",
+                "<p>Bánh tráng nướng giòn rụm với các loại topping đa dạng</p>",
+                null, "", new BigDecimal("45000.00"), 200, categories.get("Đặc Sản Miền Trung"), supplier,
+                "/uploads/products/73b72354-b7f0-40cb-b6ec-a94ccc466625.jpg", "Đà Lạt", 100, false);
+        createOrUpdateRailwayProduct("Kẹo Dừa Bến Tre",
+                "<p>Kẹo dừa thơm ngon làm từ dừa tươi Bến Tre</p>",
+                null, "", new BigDecimal("60000.00"), 149, categories.get("Bánh Kẹo"), supplier,
+                "/uploads/products/e8648088-122d-47f7-bd42-a1f1aeee3989.jpg", "Bến Tre", 250, false);
+        createOrUpdateRailwayProduct("Chả Cá Lã Vọng",
+                "<p>Chả cá truyền thống Hà Nội với hương vị đặc biệt</p>",
+                null, "", new BigDecimal("200000.00"), 29, categories.get("Đặc Sản Miền Bắc"), supplier,
+                "/uploads/products/3fbd6d5d-27a6-4ed9-9fb2-ba01e311bd28.jpg", "Hà Nội", 300, false);
+        createOrUpdateRailwayProduct("Bánh Ít Lá Gai",
+                "<p>Bánh ít lá gai truyền thống miền Trung với nhân tôm thịt</p>",
+                null, "", new BigDecimal("35000.00"), 72, categories.get("Đặc Sản Miền Trung"), supplier,
+                "/uploads/products/15e1ac5e-17db-43f8-9c7d-0227a82791a9.jpg", "Huế", 150, true);
+        createOrUpdateRailwayProduct("Mắm Ruốc Huế",
+                "<p>Mắm ruốc đặc sản Huế với hương vị đậm đà</p>",
+                null, "", new BigDecimal("120000.00"), 59, categories.get("Đặc Sản Miền Trung"), supplier,
+                "/uploads/products/4057446a-de2b-488e-86d7-3b70c75d0863.jpg", "Huế", 200, false);
+        createOrUpdateRailwayProduct("Bánh Căn Phan Thiết",
+                "<p>Bánh căn nướng giòn với nước chấm đặc biệt</p>",
+                null, "", new BigDecimal("25000.00"), 117, categories.get("Đặc Sản Miền Nam"), supplier,
+                "/uploads/products/142f1909-4bfa-4275-b0d1-cbddbf297da5.jpeg", "Phan Thiết", 80, false);
+        createOrUpdateRailwayProduct("Nước Mắm Phan Thiết",
+                "Nước mắm Phan Thiết ủ chượp truyền thống, độ đạm cao",
+                "Nước mắm truyền thống Phan Thiết",
+                "Nước mắm được ủ từ cá cơm tươi theo phương pháp truyền thống tại Phan Thiết.",
+                new BigDecimal("85000.00"), 120, categories.get("Bình Thuận"), supplier,
+                "/uploads/products/6cd8b125-7eab-4a8a-b3f7-33df51bc05d8.jpg", "Bình Thuận", 500, true);
+        createOrUpdateRailwayProduct("Bánh Khọt Vũng Tàu",
+                "<p>Bánh khọt Vũng Tàu giòn rụm, ăn kèm rau sống</p>",
+                "Bánh khọt đặc sản Vũng Tàu",
+                "<p>Bánh khọt là món ăn nổi tiếng của Vũng Tàu với lớp vỏ giòn và nhân tôm.</p>",
+                new BigDecimal("60000.00"), 80, categories.get("Bà Rịa - Vũng Tàu"), supplier,
+                "/uploads/products/46440fd4-274e-4243-9a0a-5e9bfda125d3.jpg", "Bà Rịa - Vũng Tàu", 400, false);
+        createOrUpdateRailwayProduct("Cơm Cháy Ninh Bình",
+                "Cơm cháy Ninh Bình giòn rụm, sốt đậm đà",
+                "Cơm cháy đặc sản Ninh Bình",
+                "Cơm cháy được chiên giòn và ăn kèm nước sốt đặc trưng của vùng Ninh Bình.",
+                new BigDecimal("70000.00"), 100, categories.get("Ninh Bình"), supplier,
+                "/uploads/products/01c5797f-e43f-4f33-b713-33e68528250a.webp", "Ninh Bình", 300, true);
+        createOrUpdateRailwayProduct("Mắm Cá Linh An Giang",
+                "Mắm cá linh An Giang - đặc sản mùa nước nổi",
+                "Mắm cá linh miền Tây",
+                "Mắm cá linh được làm từ cá linh tươi trong mùa nước nổi An Giang.",
+                new BigDecimal("95000.00"), 60, categories.get("An Giang"), supplier,
+                "/uploads/products/ece8f68a-14be-4306-a3fa-47d4d320a6cc.jpg", "An Giang", 500, false);
+        createOrUpdateRailwayProduct("Hải Sản Khô Cà Mau",
+                "Hải sản khô Cà Mau - tôm khô, cá khô tự nhiên",
+                "Hải sản khô đặc sản Cà Mau",
+                "Hải sản được phơi khô tự nhiên tại vùng biển Cà Mau.",
+                new BigDecimal("150000.00"), 49, categories.get("Cà Mau"), supplier,
+                "/uploads/products/46440fd4-274e-4243-9a0a-5e9bfda125d3.jpg", "Cà Mau", 600, true);
+
+        System.out.println("✅ DacSanVietRail catalog data synchronized successfully!");
+    }
+
+    private void addProvinceCategories(Map<String, Category> categories, String parentName, String[][] data) {
+        Category parent = categories.get(parentName);
+        for (String[] item : data) {
+            categories.put(item[0], createOrUpdateCategory(item[0], item[1], null, parent));
+        }
+    }
+
+    private Category createOrUpdateCategory(String name, String description, String imageUrl, Category parent) {
+        Category category = categoryRepository.findByName(name).orElseGet(Category::new);
+        category.setName(name);
+        category.setDescription(description);
+        if (imageUrl != null) {
+            category.setImageUrl(imageUrl);
+        }
+        category.setParent(parent);
+        category.setIsActive(true);
+        return categoryRepository.save(category);
+    }
+
+    private Supplier createOrUpdateSupplier() {
+        Supplier supplier = supplierRepository.findAll().stream()
+                .filter(s -> "Công ty TNHH Khoga Detem".equals(s.getName()))
+                .findFirst()
+                .orElseGet(Supplier::new);
+        supplier.setName("Công ty TNHH Khoga Detem");
+        supplier.setContactPerson("Phùng Đô Thạnh");
+        supplier.setPhone("0328494207");
+        supplier.setEmail("phungdothanh@khogadetem.com");
+        supplier.setAddress("120 Yên Lãng, Phường Kim Liên, Quận Đống Đa, Thành phố Hà Nội");
+        supplier.setTaxCode("75837583758378");
+        supplier.setIsActive(true);
+        return supplierRepository.save(supplier);
+    }
+
+    private Product createOrUpdateRailwayProduct(String name, String description, String shortDescription, String story,
+                                                BigDecimal price, Integer stock, Category category, Supplier supplier,
+                                                String imageUrl, String origin, Integer weight, boolean featured) {
+        if (category == null) {
+            logger.warn("Category not found for product {}, skipping catalog sync", name);
+            return null;
+        }
+
+        Product product = productRepository.findByName(name).orElseGet(Product::new);
+        product.setName(name);
+        product.setDescription(description);
+        product.setShortDescription(shortDescription);
+        product.setStory(story);
+        product.setPrice(price);
+        product.setStockQuantity(stock);
+        product.setCategory(category);
+        product.setSupplier(supplier);
+        product.setImageUrl(imageUrl);
+        product.setOrigin(origin);
+        product.setWeightGrams(weight);
+        product.setIsActive(true);
+        product.setIsFeatured(featured);
+        return productRepository.save(product);
     }
     
     private void createSampleNewsData() {
